@@ -6,4 +6,6 @@
 function void pidUpdate()
 {
 
+    do {
+    } while (perf(100))
 }
