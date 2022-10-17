@@ -5,7 +5,80 @@
 
 function void pidUpdate()
 {
+    # PID Controller can have several operating modes.
+    # These modes can include, but aren't limited to:
+    #   > Manual Mode.
+    #       In this mode, all PID tunings are set extremely low, so that the control loop is only correcting for residual disturbances.
+    #       Feedforward is heavily manipulated in order to provide you with a traditional locomotive engineering experience.
+    #       If you're experienced with Garry's Mod Train Build & train simulators in general, use this mode.
+    #   > Throttle Mode.
+    #       This is similar to Manual Mode. But, with a twist.
+    #       Instead of controlling torque, you're controlling how quickly/slowly the locomotive will accelerate or decelerate to your
+    #       desired speed.
+    #       The higher you set your throttle, the faster the locomotive will accelerate.
+    #       Deceleration is controlled by operating the brake lever. Again, this is similar to traditional braking.
+    #       Speed is only held when both the throttle & brake levers are in their neutral positions.
+    #       I-Term Decay is heavily leveraged in this mode to prevent the locomotive from rolling backwards & winding up the control
+    #       loop.
+    #   > Speed Hold Mode.
+    #       This mode can be thought of as Cruise Control, as it is the most simplest & most beginner/user-friendly mode.
+    #       Use this mode if you're new to Garry's Mod Train Build or you just want to quickly get on the tracks & run without any
+    #       hassles.
+    #       Your throttle lever is controlling what speed your locomotive will travel at, instead of controlling torque or acceleration.
+    #       To increase speed, simply move the throttle lever up one notch & leave it there.
+    #       To decrease speed, simply move the throttle lever down one notch & leave it there.
+    #       To stop completely, simply move the throttle lever to its neutral position.
+    #       The Control Loop will do all of the heavy lifting for you & it will keep the locomotive locked to your desired speed,
+    #       regardless of the railroad conditions.
+    #       Climbing or descending hills? Not a problem!
+    #       Going around corners? Not a problem!
+    #       Doing a coupler approach at a slow speed? Not a problem!
+    # 
+    # Keep in mind that the speed settings in Speed Hold Mode are dependent on what map you're driving on.
+    # In any mode, you will not be allowed to drive faster than the posted line speed limit.
+    # There are legit safety checks in RailDriver that prevent you from doing this.
+    # The control loop is also supervised by an observer that monitors the performance of the PID controller itself.
+    # The observer will enact safety protocols on a case-by-case basis, if something goes awry.
 
+    # PID needs a lot of processing power for its real-time requirements.
     do {
+        # TODO: Measure Process Variable.
+        #       The process being measured is the locomotive's speed.
+        #       Speed data comes from the speed counter that's mounted to one of the trucks' bearings.
+        # TODO: Calculate Error from Set Point & Process Variable delta.
+        # TODO: Calculate I-Term.
+        # TODO: Calculate P-Term either from Error or Measurement.
+        # TODO: Calculate & apply I-Term Limit.
+        #         This limits the buildup of Integral, to help stave off windup.
+        # TODO: Calculate & apply I-Term Relax.
+        #         I-Term Relax will benefit the locomotive when it's on flat & level sections of track, or other situations where
+        #         the Control Loop does not need to be as reactive.
+        # TODO: Calculate & apply I-Term Decay.
+        #         This will bleed off the I-Term when the locomotive is decelerating to a full stop.
+        #         My theory with this is, it will help with preventing the locomotive from rolling backwards.
+        #         When this happens, the I-Term has already wound back in the opposite direction from slowing the locomotive down.
+        #         But, the Control Loop hasn't had time to react to the fact that the locomotive has actually stopped.
+        #         The I-Term continues to wind back until it hits its lowermost limit (this is even worse, when it already has hit
+        #         its lowermost limit from decelerating the train from a high speed), because the control loop still thinks that the
+        #         locomotive is still moving. I mean... it's not wrong, it's just that the locomotive is now moving in the opposite
+        #         direction to what the Control Loop thinks it's moving in. So, the locomotive continues to accelerate...
+        #         in the opposite direction... while the Control Loop has completely wound up & hit its lowermost limits.
+        #         If the locomotive is allowed to continue accelerating like this, it will do it to the point of derailing & causing
+        #         total destruction. I have been piloting a 1200 ton train when this has happened & it is not fun. ='^/,..,^=
+        #         I-Term Decay stops this from happening, by bleeding off the accumulated I-Term when the Set Point has been set to 0
+        #         & the Process Variable crosses a threshold that's close to the locomotive's actual stopping speed.
+        # TODO: Calculate D-Term.
+        # TODO: Calculate Feedforward - This may come from several sources. This can include, but isn't limited to:
+        #       > Acceleration Data (taken from an accelerometer).
+        #           This is useful for aiding the control loop with accelerating the locomotive to the desired Set Point.
+        #           This will only be available when a change in Set Point has been detected.
+        #       > Rotation Rate Data (taken from a gyroscope).
+        #           This will aid in cornering stability.
+        #       > Orientation Data (taken from an inclinometer).
+        #           This will aid the locomotive in climbing & descending hills.
+        #           As the hill gets steeper, more feedforward will be applied.
+        #       > Trailing weight?
+        #           This is something that I want to explore, at some point.
+        #           Factoring the locomotive's trailing weight into the feedforward.
     } while (perf(100))
 }
