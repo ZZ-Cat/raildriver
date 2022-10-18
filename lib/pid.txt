@@ -14,16 +14,16 @@ function number pidSetControlVariableLimits(S:table, Floor, Ceiling)
 
     else
     {
-        S["PID CV Floor", number] = Floor
-        S["PID CV Ceiling", number] = Ceiling
+        S["CV Floor", number] = Floor
+        S["CV Ceiling", number] = Ceiling
 
-        if (S["PID Mode", string] != "Automatic")
+        if (S["Mode", string] != "automatic")
         {
             return 0
         }
 
-        S["PID Control Variable", number] = clamp(S["PID Control Variable", number], Floor, Ceiling)
-        # S["PID CV Sum", number] = clamp(S["PID CV Sum", number], Floor, Ceiling)
+        S["Control Variable", number] = clamp(S["Control Variable", number], Floor, Ceiling)
+        # S["CV Sum", number] = clamp(S["CV Sum", number], Floor, Ceiling)
         return 1
     }
 }
