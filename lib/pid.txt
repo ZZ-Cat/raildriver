@@ -3,6 +3,7 @@
     Copyright © 2022, Cassandra "ZZ Cat" Robinson. All rights reserved.
 ]#
 
+@name RailDriver/lib/pid
 #include "e2shared/RailDriver/lib/timers"
 
 function number pidSetControlVariableLimits(S:table, Floor, Ceiling)
