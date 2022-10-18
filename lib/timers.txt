@@ -15,5 +15,5 @@ function number millis()
 
 function number ticksToSeconds(Ticks)
 {
-    return Ticks / 1000
+    return Ticks * tickInterval()
 }
