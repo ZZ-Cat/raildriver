@@ -7,3 +7,8 @@ function number millis()
 {
     return curtime() * 1000
 }
+
+function number ticksToSeconds(Ticks)
+{
+    return Ticks / 1000
+}
