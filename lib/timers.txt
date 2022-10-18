@@ -17,3 +17,8 @@ function number ticksToSeconds(Ticks)
 {
     return Ticks * tickInterval()
 }
+
+function number ticksToMicros(Ticks)
+{
+    return ticksToSeconds(Ticks) * 1000000
+}
