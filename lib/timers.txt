@@ -5,12 +5,12 @@
 
 function number micros()
 {
-    return realtime()
+    return curtime() * 1000000
 }
 
 function number millis()
 {
-    return micros() * 1000
+    return micros() / 1000
 }
 
 function number ticksToSeconds(Ticks)
