@@ -3,6 +3,8 @@
     Copyright © 2022, Cassandra "ZZ Cat" Robinson. All rights reserved.
 ]#
 
+@name RailDriver/lib/timers
+
 function number micros()
 {
     return curtime() * 1000000
