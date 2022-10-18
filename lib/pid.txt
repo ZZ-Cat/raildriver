@@ -3,7 +3,37 @@
     Copyright © 2022, Cassandra "ZZ Cat" Robinson. All rights reserved.
 ]#
 
-function void pidUpdate()
+function number pidSetGains(S:table, PtermGain, ItermGain, DtermGain, FFgain, PoN:string)
+{
+    return 0
+}
+
+function number pidSetGains(S:table, PtermGain, ItermGain, DtermGain, FFgain)
+{
+    return 0
+}
+
+function number pidSetSampleTime(S:table, T)
+{
+    return 0
+}
+
+function void pidCreateInstance(S:table)
+{
+    return
+}
+
+function number pidInitialize(S:table)
+{
+    return 0
+}
+
+function number pidSetMode(S:table, M:string)
+{
+    return 0
+}
+
+function void pidUpdate(S:table, T)
 {
     # PID Controller can have several operating modes.
     # These modes can include, but aren't limited to:
