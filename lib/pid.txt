@@ -96,44 +96,42 @@ function void pidUpdate(S:table)
     # The observer will enact safety protocols on a case-by-case basis, if something goes awry.
 
     # PID needs a lot of processing power for its real-time requirements.
-
-        # TODO: Measure Process Variable.
-        #       The process being measured is the locomotive's speed.
-        #       Speed data comes from the speed counter that's mounted to one of the trucks' bearings.
-        # TODO: Calculate Error from Set Point & Process Variable delta.
-        # TODO: Calculate I-Term.
-        # TODO: Calculate P-Term either from Error or Measurement.
-        # TODO: Calculate & apply I-Term Limit.
-        #         This limits the buildup of Integral, to help stave off windup.
-        # TODO: Calculate & apply I-Term Relax.
-        #         I-Term Relax will benefit the locomotive when it's on flat & level sections of track, or other situations where
-        #         the Control Loop does not need to be as reactive.
-        # TODO: Calculate & apply I-Term Decay.
-        #         This will bleed off the I-Term when the locomotive is decelerating to a full stop.
-        #         My theory with this is, it will help with preventing the locomotive from rolling backwards.
-        #         When this happens, the I-Term has already wound back in the opposite direction from slowing the locomotive down.
-        #         But, the Control Loop hasn't had time to react to the fact that the locomotive has actually stopped.
-        #         The I-Term continues to wind back until it hits its lowermost limit (this is even worse, when it already has hit
-        #         its lowermost limit from decelerating the train from a high speed), because the control loop still thinks that the
-        #         locomotive is still moving. I mean... it's not wrong, it's just that the locomotive is now moving in the opposite
-        #         direction to what the Control Loop thinks it's moving in. So, the locomotive continues to accelerate...
-        #         in the opposite direction... while the Control Loop has completely wound up & hit its lowermost limits.
-        #         If the locomotive is allowed to continue accelerating like this, it will do it to the point of derailing & causing
-        #         total destruction. I have been piloting a 1200 ton train when this has happened & it is not fun. ='^/,..,^=
-        #         I-Term Decay stops this from happening, by bleeding off the accumulated I-Term when the Set Point has been set to 0
-        #         & the Process Variable crosses a threshold that's close to the locomotive's actual stopping speed.
-        # TODO: Calculate D-Term.
-        # TODO: Calculate Feedforward - This may come from several sources. This can include, but isn't limited to:
-        #       > Acceleration Data (taken from an accelerometer).
-        #           This is useful for aiding the control loop with accelerating the locomotive to the desired Set Point.
-        #           This will only be available when a change in Set Point has been detected.
-        #       > Rotation Rate Data (taken from a gyroscope).
-        #           This will aid in cornering stability.
-        #       > Orientation Data (taken from an inclinometer).
-        #           This will aid the locomotive in climbing & descending hills.
-        #           As the hill gets steeper, more feedforward will be applied.
-        #       > Trailing weight?
-        #           This is something that I want to explore, at some point.
-        #           Factoring the locomotive's trailing weight into the feedforward.
-
+    # TODO: Measure Process Variable.
+    #       The process being measured is the locomotive's speed.
+    #       Speed data comes from the speed counter that's mounted to one of the trucks' bearings.
+    # TODO: Calculate Error from Set Point & Process Variable delta.
+    # TODO: Calculate I-Term.
+    # TODO: Calculate P-Term either from Error or Measurement.
+    # TODO: Calculate & apply I-Term Limit.
+    #         This limits the buildup of Integral, to help stave off windup.
+    # TODO: Calculate & apply I-Term Relax.
+    #         I-Term Relax will benefit the locomotive when it's on flat & level sections of track, or other situations where
+    #         the Control Loop does not need to be as reactive.
+    # TODO: Calculate & apply I-Term Decay.
+    #         This will bleed off the I-Term when the locomotive is decelerating to a full stop.
+    #         My theory with this is, it will help with preventing the locomotive from rolling backwards.
+    #         When this happens, the I-Term has already wound back in the opposite direction from slowing the locomotive down.
+    #         But, the Control Loop hasn't had time to react to the fact that the locomotive has actually stopped.
+    #         The I-Term continues to wind back until it hits its lowermost limit (this is even worse, when it already has hit
+    #         its lowermost limit from decelerating the train from a high speed), because the control loop still thinks that the
+    #         locomotive is still moving. I mean... it's not wrong, it's just that the locomotive is now moving in the opposite
+    #         direction to what the Control Loop thinks it's moving in. So, the locomotive continues to accelerate...
+    #         in the opposite direction... while the Control Loop has completely wound up & hit its lowermost limits.
+    #         If the locomotive is allowed to continue accelerating like this, it will do it to the point of derailing & causing
+    #         total destruction. I have been piloting a 1200 ton train when this has happened & it is not fun. ='^/,..,^=
+    #         I-Term Decay stops this from happening, by bleeding off the accumulated I-Term when the Set Point has been set to 0
+    #         & the Process Variable crosses a threshold that's close to the locomotive's actual stopping speed.
+    # TODO: Calculate D-Term.
+    # TODO: Calculate Feedforward - This may come from several sources. This can include, but isn't limited to:
+    #       > Acceleration Data (taken from an accelerometer).
+    #           This is useful for aiding the control loop with accelerating the locomotive to the desired Set Point.
+    #           This will only be available when a change in Set Point has been detected.
+    #       > Rotation Rate Data (taken from a gyroscope).
+    #           This will aid in cornering stability.
+    #       > Orientation Data (taken from an inclinometer).
+    #           This will aid the locomotive in climbing & descending hills.
+    #           As the hill gets steeper, more feedforward will be applied.
+    #       > Trailing weight?
+    #           This is something that I want to explore, at some point.
+    #           Factoring the locomotive's trailing weight into the feedforward.
 }
