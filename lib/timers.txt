@@ -22,3 +22,8 @@ function number ticksToMicros(Ticks)
 {
     return ticksToSeconds(Ticks) * 1000000
 }
+
+function number ticksToMillis(Ticks)
+{
+    return ticksToMicros(Ticks) / 1000
+}
