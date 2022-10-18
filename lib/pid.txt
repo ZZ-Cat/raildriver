@@ -43,9 +43,74 @@ function number pidSetSampleTime(S:table, T)
     return 0
 }
 
-function void pidCreateInstance(S:table)
+function table pidCreateInstance()
 {
-    return
+    local S = table()
+    S:clear()
+
+    # Default properties:
+    S["Sample Time", number] = ticksToMillis(1)
+    S["Range", number] = 75000
+    S["Scale", number] = 100
+    S["Proportional", number] = 1012
+    S["Integral", number] = 850
+    S["Derivative", number] = 10
+    S["Feed Forward", number] = 14
+    S["Proportional Mode", string] = "proportional on error"
+    S["Direction", string] = "forward"
+    S["Mode", string] = "automatic"
+
+    # Default CV properties:
+    S["CV Floor", number] = -75000
+    S["CV Ceiling", number] = 75000
+
+    # Default I-Term limit properties:
+    S["Use I-Term Limit", number] = 1
+    S["I-Term Limit Max", number] = 75000
+    S["I-Term Limit Min", number] = -75000
+
+    # Default I-Term decay properties:
+    S["Use I-Term Decay", number] = 1
+    S["I-Term Decay Time Millis", number] = 2000
+    S["I-Term Decay SP Threshold", number] = 0
+    S["I-Term Decay PV Threshold", number] = 8.0
+    S["I-Term Decay PV Hysteresis", number] = (2/100)*S["I-Term Decay PV Threshold", number]
+
+    # Primary variables:
+    S["Set Point", number] = 0
+    S["Process Variable", number] = 0
+    S["Control Variable", number] = 0
+
+    # Feedforward Gains:
+    S["Acceleration Feedforward", number] = 0
+    S["Yaw Rate Feedforward", number] = 0
+    S["Pitch Angle Feedforward", number] = 0
+    S["Throttle Feedforward", number] = 0
+    S["Brake Feedforward", number] = 0
+
+    # Internal Gains:
+    S["Internal P Gain", number] = 0
+    S["Internal I Gain", number] = 0
+    S["Internal D Gain", number] = 0
+
+    # Last known variables:
+    S["Last Time", number] = 0
+    S["Last Process Variable", number] = 0
+
+    # Control Variable summing bus:
+    S["P-Term", number] = 0
+    S["I-Term", number] = 0
+    S["D-Term", number] = 0
+    S["FF Accel", number] = 0
+    S["FF Yaw Rate", number] = 0
+    S["FF Pit Ang", number] = 0
+    S["FF Thr", number] = 0
+    S["FF Brk", number] = 0
+    S["FF Sum", number] = 0
+    S["CV Sum", number] = 0
+
+    # Return the PID table that was created.
+    return S
 }
 
 function number pidInitialize(S:table)
