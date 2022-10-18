@@ -10,7 +10,7 @@ function number micros()
 
 function number millis()
 {
-    return curtime() * 1000
+    return micros() * 1000
 }
 
 function number ticksToSeconds(Ticks)
