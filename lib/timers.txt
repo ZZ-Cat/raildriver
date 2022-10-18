@@ -3,6 +3,11 @@
     Copyright © 2022, Cassandra "ZZ Cat" Robinson. All rights reserved.
 ]#
 
+function number micros()
+{
+    return realtime()
+}
+
 function number millis()
 {
     return curtime() * 1000
