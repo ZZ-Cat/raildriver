@@ -3,6 +3,8 @@
     Copyright © 2022, Cassandra "ZZ Cat" Robinson. All rights reserved.
 ]#
 
+#include "timers.txt"
+
 function number pidSetControlVariableLimits(S:table, Floor, Ceiling)
 {
     if (Floor > Ceiling)
