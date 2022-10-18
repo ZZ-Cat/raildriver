@@ -96,7 +96,7 @@ function void pidUpdate(S:table)
     # The observer will enact safety protocols on a case-by-case basis, if something goes awry.
 
     # PID needs a lot of processing power for its real-time requirements.
-    do {
+
         # TODO: Measure Process Variable.
         #       The process being measured is the locomotive's speed.
         #       Speed data comes from the speed counter that's mounted to one of the trucks' bearings.
@@ -135,5 +135,5 @@ function void pidUpdate(S:table)
         #       > Trailing weight?
         #           This is something that I want to explore, at some point.
         #           Factoring the locomotive's trailing weight into the feedforward.
-    } while (perf(100))
+
 }
