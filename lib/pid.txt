@@ -6,44 +6,6 @@
 @name RailDriver/lib/pid
 #include "e2shared/RailDriver/lib/timers"
 
-function number pidSetControlVariableLimits(S:table, Floor, Ceiling)
-{
-    if (Floor > Ceiling)
-    {
-        return 0
-    }
-
-    else
-    {
-        S["CV Floor", number] = Floor
-        S["CV Ceiling", number] = Ceiling
-
-        if (S["Mode", string] != "automatic")
-        {
-            return 0
-        }
-
-        S["Control Variable", number] = clamp(S["Control Variable", number], Floor, Ceiling)
-        # S["CV Sum", number] = clamp(S["CV Sum", number], Floor, Ceiling)
-        return 1
-    }
-}
-
-function number pidSetGains(S:table, PtermGain, ItermGain, DtermGain, FFgain, PoN:string)
-{
-    return 0
-}
-
-function number pidSetGains(S:table, PtermGain, ItermGain, DtermGain, FFgain)
-{
-    return 0
-}
-
-function number pidSetSampleTime(S:table, T)
-{
-    return 0
-}
-
 function table pidCreateInstance()
 {
     local S = table()
@@ -112,6 +74,44 @@ function table pidCreateInstance()
 
     # Return the PID table that was created.
     return S
+}
+
+function number pidSetControlVariableLimits(S:table, Floor, Ceiling)
+{
+    if (Floor > Ceiling)
+    {
+        return 0
+    }
+
+    else
+    {
+        S["CV Floor", number] = Floor
+        S["CV Ceiling", number] = Ceiling
+
+        if (S["Mode", string] != "automatic")
+        {
+            return 0
+        }
+
+        S["Control Variable", number] = clamp(S["Control Variable", number], Floor, Ceiling)
+        # S["CV Sum", number] = clamp(S["CV Sum", number], Floor, Ceiling)
+        return 1
+    }
+}
+
+function number pidSetGains(S:table, PtermGain, ItermGain, DtermGain, FFgain, PoN:string)
+{
+    return 0
+}
+
+function number pidSetGains(S:table, PtermGain, ItermGain, DtermGain, FFgain)
+{
+    return 0
+}
+
+function number pidSetSampleTime(S:table, T)
+{
+    return 0
 }
 
 function number pidInitialize(S:table)
