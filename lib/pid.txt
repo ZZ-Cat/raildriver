@@ -58,7 +58,7 @@ function number pidSetMode(S:table, M:string)
     return 0
 }
 
-function void pidUpdate(S:table, T)
+function void pidUpdate(S:table)
 {
     # PID Controller can have several operating modes.
     # These modes can include, but aren't limited to:
