@@ -7,4 +7,9 @@
 
 if (first() | duped())
 {
+    runOnTick(1)
+}
+
+if (tickClk())
+{
 }
