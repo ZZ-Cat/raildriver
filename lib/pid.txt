@@ -3,6 +3,29 @@
     Copyright © 2022, Cassandra "ZZ Cat" Robinson. All rights reserved.
 ]#
 
+function number pidSetControlVariableLimits(S:table, Floor, Ceiling)
+{
+    if (Floor > Ceiling)
+    {
+        return 0
+    }
+
+    else
+    {
+        S["PID CV Floor", number] = Floor
+        S["PID CV Ceiling", number] = Ceiling
+
+        if (S["PID Mode", string] != "Automatic")
+        {
+            return 0
+        }
+
+        S["PID Control Variable", number] = clamp(S["PID Control Variable", number], Floor, Ceiling)
+        # S["PID CV Sum", number] = clamp(S["PID CV Sum", number], Floor, Ceiling)
+        return 1
+    }
+}
+
 function number pidSetGains(S:table, PtermGain, ItermGain, DtermGain, FFgain, PoN:string)
 {
     return 0
