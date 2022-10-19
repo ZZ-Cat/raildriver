@@ -1,0 +1,1137 @@
+@name PID Controller
+@model models/beer/wiremod/gate_e2_nano.mdl
+@inputs 
+@outputs SampleRate PoN Scale Kp Ki Kd Kf SetPoint Error Speed ControlVariable
+@persist PID:table Direction Range
+@persist ABthreshold ABhysteresis ABapplied
+@persist Emergency
+@persist [ Controls Speeds ]:table SpeedsIndex PreviousIndex PreviousSetPoint PreviousDirection Keys:array
+@persist [ E O ]:entity [ CV ControlEntities ]:array
+
+@persist ObserverState ObserverStateQ 
+@persist Observer:table ObserverBufferIndex ObserverBufferSize ObserverSampleRate ObserverSampleRateMillis
+
+@trigger all
+
+if( first() | duped() ) {
+    
+    #------------------------------ PID Properties ------------------------------#
+    #                      (Now with Feed Forward, at long last)
+    SampleRate = 1 * ( tickInterval() * 1000 )      # Sample Rate in milliseconds.
+    Range = 75000                                   # The maximum range for the Control Variable. Prev: 75000
+    Scale = 100                                     # Determines the overall size of the Proportional, Integral, Derivative & Feed Forward gains.
+    Kp = 1012                                       # Proportional Gain - How much correction the PID Controller will apply to an error.
+    Ki = 850                                        # Integral Gain - How fast the PID Controller will respond to an error.
+    Kd = 10                                         # Derivative Gain - How much the PID Controller will react to an error's rate of change.
+    Kf = 14                                         # Feed Forward Gain - How much of the Set Point is coupled directly to the output of the PID Controller.
+    PoN = 1                                         # Determines where the Proportional term is applied: 
+                                                    #    > 0 - Proportional on Error (Faster, but less accurate),
+                                                    #    > 1 - Proportional on Measurement (Slower, but more accurate).
+    
+    #----------------------------- Control Bindings -----------------------------#
+    Controls[ "Increase Speed", string ] = "pad_8"  # 
+    Controls[ "Decrease Speed", string ] = "pad_2"  # 
+    Controls[ "Stop",           string ] = "pad_5"  # 
+    Controls[ "Forwards",       string ] = "pad_7"  # 
+    Controls[ "Neutral",        string ] = "pad_4"  # 
+    Controls[ "Reverse",        string ] = "pad_1"  # 
+    Controls[ "Emergency Stop", string ] = "pad_0"  # 
+    
+    #------------------------------- Speed Grades -------------------------------#
+    Speeds[ "Maximum",              number ] = 60   # The absolute maximum speed (in MPH) that the PID Controller will allow a locomotive to continuously travel at.
+    Speeds[ "Speed 3",              number ] = 40   # 
+    Speeds[ "Speed 2",              number ] = 30   # 
+    Speeds[ "Speed 1",              number ] = 20   # 
+    Speeds[ "Yard Speed",           number ] = 15   # 
+    Speeds[ "Coupler Approach",     number ] = 5    # 
+    
+    #----------------------------- Leave this shit alone! -----------------------#
+    ObserverSampleRateMillis = 7 * (tickInterval() * 1000)  # This equates to approximately 105 milliseconds. Smaller sample rates increases accuracy & overall processing time.
+    ObserverSampleRate = 1000 / ObserverSampleRateMillis
+    ObserverBufferSize = select(1,  # Larger buffer sizes means the Observer have more data to work with, but it will have a longer sampling time.
+                            round(ObserverSampleRate, 0),
+                            round((1 * (ObserverSampleRate * 2)), 0),
+                            round((1 * (ObserverSampleRate * 5)), 0),
+                            round((1 * (ObserverSampleRate * 10)), 0),
+                            round((1 * (ObserverSampleRate * 20)), 0),
+                            round((1 * (ObserverSampleRate * 30)), 0),
+                            round((1 * (ObserverSampleRate * 60)), 0)
+                        )
+    ObserverBufferIndex = 0
+    Observer["This Set Point", number] = 0
+    Observer["This Process Variable", number] = 0
+    Observer["This Error", number] = 0
+    Observer["This Control Variable", number] = 0
+    
+    Observer["Set Point buffer", array] = array()
+    Observer["Process Variable buffer", array] = array()
+    Observer["Error buffer", array] = array()
+    Observer["Control Variable buffer", array] = array()
+    
+    for (I = 1, ObserverBufferSize)
+    {
+        Observer["Set Point buffer", array][I, number] = 0
+        Observer["Process Variable buffer", array][I, number] = 0
+        Observer["Error buffer", array][I, number] = 0
+        Observer["Control Variable buffer", array][I, number] = 0
+    }
+    
+    # These function definitions are an Expression 2 adaptation of Brett Beauregard's PID Library for Arduino.
+    function number millis() { return curtime() * 1000 }
+    
+    function void pidSetOutputLimits( S:table, Floor, Ceiling ) {
+        
+        if( Floor > Ceiling ) { return }
+        
+        else {
+            
+            S[ "Output Floor", number ] = Floor
+            S[ "Output Ceiling", number ] = Ceiling
+            
+            if( S[ "Mode", number] == 0 ) { return }
+            
+            S[ "Control Variable", number ] = clamp( S[ "Control Variable", number ], Floor, Ceiling )
+            S[ "Output Sum", number ] = clamp( S[ "Output Sum", number ], Floor, Ceiling )
+            
+        }
+    }
+    
+    function void pidSetTunings( S:table, Kp, Ki, Kd, Kf, PoN ) {
+        
+        S[ "Proportional", number ] = Kp * Scale
+        S[ "Integral", number ] = Ki * Scale
+        S[ "Derivative", number ] = Kd * Scale
+        S[ "Feed Forward", number ] = Kf * Scale
+        S[ "Proportional on Error/Measurement", number ] = PoN == 0 ? 0 : 1
+        
+        local TicksToSeconds = S[ "Sample Rate", number ] / 1000
+        
+        S[ "Kp Internal", number ] = S[ "Proportional", number ]
+        S[ "Ki Internal", number ] = S[ "Integral", number ] * TicksToSeconds
+        S[ "Kd Internal", number ] = S[ "Derivative", number ] / TicksToSeconds
+        S[ "Kf Internal", number ] = S[ "Feed Forward", number ]
+        
+    }
+    
+    function void pidSetTunings( S:table, Kp, Ki, Kd, Kf ) {
+        
+        pidSetTunings( S, Kp, Ki, Kd, Kf, S[ "Proportional on Error/Measurement", number ] )
+        
+    }
+    
+    function void pidSetSampleTime( S:table, T ) {
+        
+        if( T <= 0 ) { return }
+        
+        local Ratio = T / S[ "Sample Rate", number ]
+        
+        local Ki = S[ "Ki Internal", number ]
+        local Kd = S[ "Kd Internal", number ]
+        
+        Ki *= Ratio
+        Kd /= Ratio
+        
+        S[ "Ki Internal", number ] = Ki
+        S[ "Kd Internal", number ] = Kd
+        
+        S[ "Sample Rate", number ] = T
+        
+    }
+    
+    function void pidCreateInstance( S:table, T ) {
+        
+        S[ "Process Variable", number ] = 0
+        S[ "Control Variable", number ] = 0
+        S[ "Set Point", number ] = 0
+        S[ "Proportional", number ] = 0
+        S[ "Integral", number ] = 0
+        S[ "Derivative", number ] = 0
+        S[ "Feed Forward", number ] = 0
+        S[ "Proportional on Error/Measurement", number ] = 0
+        S[ "Direction", number ] = 0
+        S[ "Mode", number ] = 0
+        
+        pidSetSampleTime( S, 100 )
+        
+        S[ "Previous Tick", number ] = T - S[ "Sample Rate", number ]
+        
+    }
+    
+    function void pidInitialize( S:table ) {
+        
+        S[ "Previous Input", number ] = S[ "Process Variable", number ]
+        S[ "Output Sum", number ] = S[ "Control Variable", number ]
+        
+        S[ "Output Sum", number ] = clamp( S[ "Output Sum", number ], S[ "Output Floor", number ], S[ "Output Ceiling", number ] )
+        
+    }
+    
+    function void pidSetMode( S:table, Mode ) {
+        
+        local NewMode = ( Mode == 1 ? 1 : 0 )
+        
+        if( ( NewMode == 1 ) && ( S[ "Mode", number ] == 0 ) ) {
+            
+            pidInitialize( S )
+            
+        }
+        
+        S[ "Mode", number ] = NewMode
+        
+    }
+    
+    function void pidCompute( S:table, T ) {
+        
+        if( S[ "Mode", number ] == 0 ) { return }
+        
+        local Now = T
+        local TimeChange = Now - S[ "Previous Tick", number ]
+        
+        if( TimeChange >= S[ "Sample Rate", number ] ) {
+            
+            # Calculate Error.
+            local Input = S[ "Process Variable", number ]
+                  Error = S[ "Set Point", number ] - Input
+            
+            # Calculate I Term.
+            local DInput = Input - S[ "Previous Input", number ]
+            local OutputSum = S[ "Output Sum", number ]
+            OutputSum += ( S[ "Ki Internal", number ] * Error )
+            
+            # If specified, P Term is calculated on measurement (Slower, but more precise; & it has a stronger hold on the Set Point).
+            if( S[ "Proportional on Error/Measurement", number ] == 1 ) { OutputSum -= S[ "Kp Internal", number ] * DInput }
+            
+            # Apply a limit to the I Term.
+            OutputSum = clamp( OutputSum, S[ "Output Floor", number ], S[ "Output Ceiling", number ] )
+            
+            # If specified, P Term is calculated on error (traditional PID Controller - Faster, but less precise).
+            local Output = 0
+            if( S[ "Proportional on Error/Measurement", number ] == 0 ) { Output = S[ "Kp Internal", number ] * Error }
+            
+            # Calculate the D Term.
+            Output += OutputSum - S[ "Kd Internal", number ] * DInput
+            
+            # Calculate Feed Forward.
+            Output += ( S[ "Kf Internal", number ] * S[ "Set Point", number ] )
+            
+            # Apply a limit to the Control Variable.
+            Output = clamp( Output, S[ "Output Floor", number ], S[ "Output Ceiling", number ] )
+            
+            S[ "Control Variable", number ] = Output
+            
+            # Store some values to recall for the next time.
+            S[ "Output Sum", number ] = OutputSum
+            S[ "Previous Input", number ] = Input
+            S[ "Previous Tick", number ] = Now
+            
+        }
+        
+    }
+    
+    # PID Getters.
+    function number pidGetSetPoint(S:table)
+    {
+        local N = S["Set Point", number]
+        return N
+    }
+    
+    function number pidGetError(S:table)
+    {
+        local N = S["Set Point", number] - S["Process Variable", number]
+        return N
+    }
+    
+    function number pidGetProcessVariable(S:table)
+    {
+        local N = S["Process Variable", number]
+        return N
+    }
+    
+    function number pidGetControlVariable(S:table)
+    {
+        local N = S["Control Variable", number]
+        return N
+    }
+    
+    # PID Setters
+    function void pidSetSetPoint(S:table, N:number)
+    {
+        S["Set Point", number] = N
+    }
+    
+    function void pidSetProcessVariable(S:table, N:number)
+    {
+        S["Process Variable", number] = N
+    }
+    
+    function void pidSetControlVariable(S:table, N:number)
+    {
+        S["Control Variable", number] = N
+    }
+    
+    # These function definitions are for the Automatic Braking System.
+    function void abApply() {
+        local CE = entity():parent():getConnectedEntities( array( "axis", "rope" ) )
+        for( I = 1, CE:count() ) {
+
+            # Removed this statement, because it caused a train brake failure.
+            #[if( CE[ I, entity ]:mass() >= 11400 && CE[ I, entity ]:mass() <= 20000 ) {
+                CE[ I, entity ]:propPhysicalMaterial( "phx_tire_normal" )
+            }]#
+
+            # Replaced the above statement with this switch case, that identifies both locomotive & train bogeys, & directly applies their brakes.
+            switch( CE[ I, entity ]:model() ) {
+                case "models/magtrains/locobogey3.mdl",
+                case "models/gsgtrainprops/parts/trucks/barber_s2_28in_phx.mdl",
+                case "models/gsgtrainprops/parts/trucks/barber_s2hd_36in_phx.mdl",
+                case "models/magtrains/trucks/barber_s2_phx.mdl",
+                case "models/magtrains/trucks/barber_s2_rsg.mdl",
+                case "models/magtrainslocos/trucks/blomberg_m_phx.mdl",
+                case "models/magtrainslocos/trucks/blomberg_m_rsg.mdl",
+                    CE[ I, entity ]:propPhysicalMaterial( "phx_tire_normal" )
+                    break
+            }
+        }
+    }
+    function void abEmergency() {
+        local CE = entity():parent():getConnectedEntities( array( "axis", "rope" ) )
+        for( I = 1, CE:count() ) {
+
+            # Removed this statement, because it caused a train brake failure.
+            #[if( CE[ I, entity ]:mass() >= 11400 && CE[ I, entity ]:mass() <= 20000 ) {
+                CE[ I, entity ]:propPhysicalMaterial( "slipperyslime" )
+            }]#
+
+            # Replaced the above statement with this switch case, that identifies both locomotive & train bogeys, & directly applies their emergency brakes.
+            switch( CE[ I, entity ]:model() ) {
+                case "models/magtrains/locobogey3.mdl",
+                case "models/gsgtrainprops/parts/trucks/barber_s2_28in_phx.mdl",
+                case "models/gsgtrainprops/parts/trucks/barber_s2hd_36in_phx.mdl",
+                case "models/magtrains/trucks/barber_s2_phx.mdl",
+                case "models/magtrains/trucks/barber_s2_rsg.mdl",
+                case "models/magtrainslocos/trucks/blomberg_m_phx.mdl",
+                case "models/magtrainslocos/trucks/blomberg_m_rsg.mdl",
+                    CE[ I, entity ]:propPhysicalMaterial( "slipperyslime" )
+                    break
+            }
+        }
+    }
+    
+    function void abRelease() {
+        local CE = entity():parent():getConnectedEntities( array( "axis", "rope" ) )
+        for( I = 1, CE:count() ) {
+
+            # Removed this statement, because it caused a train brake failure.
+            #[if( CE[ I, entity ]:mass() >= 11400 && CE[ I, entity ]:mass() <= 20000 ) {
+                CE[ I, entity ]:propPhysicalMaterial( "friction_00" )
+            }]#
+
+            # Replaced the above statement with this switch case, that identifies both locomotive & train bogeys, & directly releases their brakes.
+            switch( CE[ I, entity ]:model() ) {
+                case "models/magtrains/locobogey3.mdl",
+                case "models/gsgtrainprops/parts/trucks/barber_s2_28in_phx.mdl",
+                case "models/gsgtrainprops/parts/trucks/barber_s2hd_36in_phx.mdl",
+                case "models/magtrains/trucks/barber_s2_phx.mdl",
+                case "models/magtrains/trucks/barber_s2_rsg.mdl",
+                case "models/magtrainslocos/trucks/blomberg_m_phx.mdl",
+                case "models/magtrainslocos/trucks/blomberg_m_rsg.mdl",
+                    CE[ I, entity ]:propPhysicalMaterial( "friction_00" )
+                    break
+            }
+        }
+    }
+    
+    function void emergencyMode(On)
+    {
+        if (On)
+        {
+            PreviousSetPoint = 0
+            PreviousIndex = -1
+            PreviousDirection = -2
+            SpeedsIndex = 0
+            SetPoint = 0
+            Emergency = 1
+        }
+        else
+        {
+            Emergency = 0
+        }
+    }
+
+    # This function prints messages to the chat; alerting the engineer to the state of this controller.
+    function void printError( Type:string, Message:string ) {
+        Type = Type:lower()
+        switch( Type ) {
+            case "alert",
+                printColor( vec( 255, 220, 0 ), "[PID | ALERT]", vec( 255 ), ": " + Message )
+                break
+            case "error",
+                printColor( vec( 255, 0, 0 ), "[PID | ERROR]", vec( 255 ), ": " + Message )
+                break
+            case "info",
+                printColor( vec( 0, 255, 0 ), "[PID | INFO]", vec( 255 ), ": " + Message )
+                break
+            case "notice",
+                printColor( vec( 0, 180, 255 ), "[PID | NOTICE]", vec( 255 ), ": " + Message )
+                break
+            default,
+                printColor( vec( 255, 0, 0 ), "[PID | ERROR]", vec( 255 ), ": Invalid message category." )
+                break
+        }
+    }
+
+    # These functions are for the PID Observer.
+    function void observerEnable()
+    {
+        timer("observer", ObserverSampleRateMillis)
+    }
+
+    function void observerDisable()
+    {
+        stoptimer("observer")
+    }
+
+    function void observerHandler()
+    {
+        #[
+            TODO:
+                > Finish Finite State Machine - Add in runaway conditions.
+                    Include a threshold (& hysteresis) as to what constitutes a "runaway condition", to help the Finite State Machine differentiate that from normal disturbances - EG Grade changes.
+                > Help the Finite State Machine differentiate between a change in the Set Point & when a genuine disturbance happens.
+                    This will stop the Finite State Machine from raising false positives on detection of disturbances when the Set Point changes.
+                > The Finite State Machine needs to track the Error & Process Variable, as these two values mirror each other during deceleration.
+                    Again, include a threshold (& a hysteresis) as to what constitutes "in track" & what constitutes "out of track".
+                    The latter of which should have a state of its own & print an error to the chat.
+                > Add in stall conditions.
+                    Include a threshold (& hysteresis) as to what constitutes a "stall condiiton". Possibly two types of stall conditions could be used:
+                        1.) A stall can occur when the Set Point is at the desired speed for some time & a disturbance happens; causing the Process Variable to fall below a given threshold.
+                        2.) The Set Point has caused an acceleration from a Full Stop to the desired speed, but this speed cannot be reached.
+                > Certain states could trigger warnings.
+                > Certain states could trigger Emergency Mode.
+        ]#
+        
+        observerDisable()
+        
+        # Read a sample of PID telemetry.
+        Observer["This Set Point", number] = pidGetSetPoint(PID)
+        Observer["This Process Variable", number] = pidGetProcessVariable(PID)
+        Observer["This Error", number] = pidGetError(PID)
+        Observer["This Control Variable", number] = pidGetControlVariable(PID)
+        
+        # Increment to the next index in the buffer.
+        ObserverBufferIndex++
+        
+        # Check that the buffer has not overflowed.
+        assert(ObserverBufferIndex <= ObserverBufferSize, "Observer Buffer overflowed.")
+        
+        # Store the sample of PID telemetry in the buffer at this index.
+        Observer["Set Point buffer", array][ObserverBufferIndex, number] = Observer["This Set Point", number]
+        Observer["Process Variable buffer", array][ObserverBufferIndex, number] = Observer["This Process Variable", number]
+        Observer["Error buffer", array][ObserverBufferIndex, number] = Observer["This Error", number]
+        Observer["Control Variable buffer", array][ObserverBufferIndex, number] = Observer["This Control Variable", number]
+        
+        # End of the buffer.
+        if (ObserverBufferIndex == ObserverBufferSize)
+        {
+            # Reset the buffer index.
+            ObserverBufferIndex = 0
+            
+            # All telemetry data has been recorded, therefore it can be processed here.
+            #[for (I = 1, ObserverBufferSize)
+            {
+            }]#
+        }
+        
+        #[
+            TEMPORARILY DISABLED:
+            local THR = 0
+            local THR_HYS = 0.5
+            local THR_HYST_H = THR + THR_HYS
+            local THR_HYST_L = 0 - THR_HYST_H
+            
+            local SP = pidGetSetPoint(PID)
+            local PV = pidGetProcessVariable(PID)
+            local ER = pidGetError(PID)
+            local CV = pidGetControlVariable(PID)
+            
+            local STALL_WARNING_THR_PERCENTAGE = 50
+            local STALL_WARNING_THR_DECIMAL = (STALL_WARNING_THR_PERCENTAGE / 100) * SP
+            local STALL_WARNING_THR = SP - STALL_WARNING_THR_DECIMAL
+            local STALL_WARNING_THR_HYST = STALL_WARNING_THR_DECIMAL / 4
+            local STALL_WARNING_THR_HYST_H = SP - (STALL_WARNING_THR_DECIMAL - STALL_WARNING_THR_HYST)
+            local STALL_WARNING_THR_HYST_L = SP - (STALL_WARNING_THR_DECIMAL + STALL_WARNING_THR_HYST)
+            
+            # Acceleration (from a stand still).
+            if (SP > 0 && ER > THR_HYST_H && PV <= THR_HYST_H && CV > 0)
+            {
+                # Tested.
+                # This works.
+                ObserverState = 1
+            }
+            
+            # Constant Speed (Process Variable almost equals Set Point)
+            elseif (SP > 0 && (ER > THR_HYST_L && ER <= THR_HYST_H) && (PV > (SP - THR_HYST_H) && PV <= (SP + THR_HYST_H)))
+            {
+                # Tested.
+                # This works.
+                ObserverState = 2
+            }
+            
+            # Disturbance (Process Variable is greater than the Set Point)
+            elseif (SP > 0 && ER <= THR_HYST_L && PV > (SP + THR_HYST_H) && CV < 0)
+            {
+                # Tested.
+                # This works, but it cannot differentiate between a deceleration & a genuine disturbance.
+                ObserverState = 3
+            }
+            
+            # Disturbance (Process Variable is less than the Set Point)
+            elseif (SP > 0 && ER > THR_HYST_H && PV <= (SP - THR_HYST_H) && CV > 0)
+            {
+                # Tested.
+                # This works, but it cannot differentiate between an acceleration & a genuine disturbance.
+                ObserverState = 4
+            }
+            
+            # Deceleration (to a full stop).
+            elseif (SP == 0 && ER <= THR_HYST_L && PV > THR_HYST_H && CV < 0)
+            {
+                # Tested.
+                # This works, but need to find a way of tracking the Error & Process Variable as these two mirror each other, as the train halts.
+                ObserverState = 5
+            }
+            
+            # Locomotive has stopped (Error can be ignored).
+            elseif (SP == 0 && (PV <= THR_HYST_H && PV > THR_HYST_L) && CV == 0)
+            {
+                # Tested.
+                # This works.
+                ObserverState = 6
+            }
+        ]#
+        
+        if (ObserverState != ObserverStateQ)
+        {
+            ObserverStateQ = ObserverState
+            switch (ObserverState)
+            {
+            case 1,
+                printError("notice", "Accelerating to Set Point from a full stop.")
+                break
+            case 2,
+                printError("notice", "Set Point achieved.")
+                break
+            case 3,
+                printError("notice", "Disturbance detected -> PV > SP.")
+                break
+            case 4,
+                printError("notice", "Disturbance detected -> PV < SP.")
+                break
+            case 5,
+                printError("notice", "Decelerating to a full stop.")
+                break
+            case 6,
+                printError("notice", "Full stop.")
+                break
+            case 7,
+                printError("alert", "Stall-all.")
+                break
+            }
+        }
+        
+        observerEnable()
+    }
+    
+    E = entity()
+    O = owner()
+    
+    # Anti-theft. This E2 is not for redistribution.
+    if( O:name() == "ZZ Cat [CFH] [FC&N]" ) {
+        
+        local LockE2 = 0
+        if( isSinglePlayer() == 1 ) { LockE2 = 0 }
+        else { LockE2 = 1 }
+        
+        E:propNotSolid( LockE2 )
+        E:propDraw( !LockE2 )
+        E:propShadow( !LockE2 )
+        
+    } else { selfDestructAll() }
+    
+    # Automatic parenting.
+    if( !E:parent() ) {
+        local W = E:isWeldedTo()
+        if( W ) {
+            E:constraintBreak( "weld", W )
+            E:parentTo( W )
+        }
+    }
+    
+    # Smart Entity Discovery.
+    local P = E:parent()
+    local CE = P:getConnectedEntities( "axis" )
+    if( CE[ 1, entity ] == P ) { CE:remove( 1 ) }
+    assert( CE:count() )
+    for( I = 1, CE:count() ) {
+        if( P:toLocal( CE[ I, entity ]:pos() ):x() < 0 ) { ControlEntities[ 1, entity ] = CE[ I, entity ] }
+        else { ControlEntities[ 2, entity ] = CE[ I, entity ] }
+    }
+    
+    pidCreateInstance( PID, millis() )
+    pidSetSampleTime( PID, SampleRate )
+    pidSetOutputLimits( PID, Range - ( Range * 2 ), Range )
+    pidSetTunings( PID, Kp, Ki, Kd, Kf, PoN )
+    
+    PreviousIndex = -1
+    PreviousSetPoint = 0
+    PreviousDirection = -2
+    
+    ABthreshold = 0.5
+    ABhysteresis = ( 1 / 100 ) * ABthreshold
+    abApply()
+    ABapplied = 1
+    
+    ObserverState = 6
+    ObserverStateQ = ObserverState
+    
+    Keys = array(
+        Controls[ "Increase Speed", string ],
+        Controls[ "Decrease Speed", string ],
+        Controls[ "Stop",           string ],
+        Controls[ "Forwards",       string ],
+        Controls[ "Neutral",        string ],
+        Controls[ "Reverse",        string ],
+        Controls[ "Emergency Stop", string ]
+    )
+    
+    printError( "info", "Observer sample rate: " + round(ObserverSampleRate, 0) + " Hz.")
+    printError( "info", "Observer sample size: " + ObserverBufferSize)
+    
+    # Enable clocks.
+    runOnTick( 1 )
+    runOnChat( 1 )
+    runOnKeys( O, 1, Keys )
+    observerEnable()
+    
+}
+
+if( tickClk() ) {
+    
+    # Get the current speed.
+    Speed = toUnit( "mph", abs( ControlEntities[ 1, entity ]:velL():y() ) ) * 4 / 3
+    
+    # Store the Speed in the PID Controller.
+    pidSetProcessVariable(PID, Speed)
+    pidSetSetPoint(PID, SetPoint)
+    
+    # Normal Operation.
+    if( !Emergency ) {
+        
+        # Apply the Auto Brake, when the speed crosses a pre-defined threshold.
+        if( Speed <= ( ABthreshold - ABhysteresis ) && SetPoint == 0 ) {
+            
+            if( !ABapplied ) {
+                pidSetMode( PID, 0 )
+                pidSetControlVariable(PID, 0)
+                abApply()
+                ABapplied = 1
+            }
+        }
+        
+        # Release the Auto Brake, when either the speed or the Set Point crosses their respective pre-defined thresholds.
+        elseif( Speed > ( ABthreshold + ABhysteresis ) || SetPoint > 0 ) {
+            
+            if( ABapplied ) {
+                abRelease()
+                pidSetMode( PID, 1 )
+                ABapplied = 0
+            }
+        }
+        
+        # Calculate PID.
+        pidCompute( PID, millis() )
+        
+        # Get the Control Variable from the PID.
+        ControlVariable = pidGetControlVariable(PID)
+        
+        # Apply the Control Variable to the Control Vectors, based on the chosen direction.
+        switch( Direction ) {
+            
+            case -1,
+                CV = array( vec( 0, ControlVariable, 0 ), vec( 0, 0-ControlVariable, 0 ) )
+                break
+            
+            case 1,
+                CV = array( vec( 0, 0-ControlVariable, 0 ), vec( 0, ControlVariable, 0 ) )
+                break
+            
+            default,
+                CV = array( vec( 0, 0, 0 ), vec( 0, 0, 0 ) )
+                break
+            
+        }
+        
+        # Apply a directional force based on the Control Vectors.
+        for( I = 1, ControlEntities:count() ) {
+            
+            ControlEntities[ I, entity ]:applyForce( ControlEntities[ I, entity ]:toWorldAxis( CV[ I, vector ] ) )
+            
+        }
+    }
+    
+    # Emergency override.
+    else {
+        if( !ABapplied ) {
+            
+            # Disable the PID.
+            pidSetMode( PID, 0 )
+            
+            # Reset the Control Variable (prevents runaways)
+            ControlVariable = 0
+            pidSetControlVariable(PID, ControlVariable)
+            
+            # Apply the Emergency Brakes.
+            abEmergency()
+            ABapplied = 1
+            
+            # Enable Emergency Mode.
+            printError( "alert", "Emergency Mode activated." )
+            timer( "Emergency Active", 100 )
+        }
+    }
+}
+
+elseif( clk( "Emergency Active" ) ) {
+    
+    stoptimer( "Emergency Active" )
+    timer( "Emergency Active", 100 )
+    
+    if( Speed > ( ABthreshold + ABhysteresis ) ) {
+        stoptimer( "Emergency Reset" )
+    }
+    
+    elseif( Speed <= ( ABthreshold - ABhysteresis ) ) {
+        stoptimer( "Emergency Active" )
+        timer( "Emergency Reset", 30000 )
+    }
+}
+
+elseif( clk( "Emergency Reset" ) ) {
+    
+    stoptimer( "Emergency Reset" )
+    emergencyMode(0)
+    printError( "alert", "Emergency Mode deactivated." )
+    
+}
+
+elseif( clk( "observer" ) ) {
+
+    observerHandler()
+
+}
+
+elseif( chatClk( O ) ) {
+    
+    local CommandPrefix = "."
+    local CommandDelimiter = " "
+    
+    local LastSaid = O:lastSaid():lower()
+    if(LastSaid:find(CommandPrefix:lower()) == 1)
+    {
+        hideChat(1)
+        local CommandLine = LastSaid:sub(CommandPrefix:length() + 1)
+        local CommandLineKeywords = CommandLine:explode(CommandDelimiter)
+        switch (CommandLineKeywords[1, string])
+        {
+            case "pid",
+                switch (CommandLineKeywords[2, string])
+                {
+                    case "set",
+                    if (CommandLineKeywords[3, string]:find("="))
+                    {
+                        local PIDsettings = CommandLineKeywords[3, string]:explode("=")
+                        switch (PIDsettings[1, string])
+                        {
+                            case "scale",
+                            Scale = PIDsettings[2, string]:toNumber(10)
+                            pidSetTunings( PID, Kp, Ki, Kd, Kf )
+                            break
+                            
+                            case "kp",
+                            Kp = PIDsettings[2, string]:toNumber(10)
+                            pidSetTunings( PID, Kp, Ki, Kd, Kf )
+                            break
+                            
+                            case "ki",
+                            Ki = PIDsettings[2, string]:toNumber(10)
+                            pidSetTunings( PID, Kp, Ki, Kd, Kf )
+                            break
+                            
+                            case "kd",
+                            Kd = PIDsettings[2, string]:toNumber(10)
+                            pidSetTunings( PID, Kp, Ki, Kd, Kf )
+                            break
+                            
+                            case "kf",
+                            Kf = PIDsettings[2, string]:toNumber(10)
+                            pidSetTunings( PID, Kp, Ki, Kd, Kf )
+                            break
+                        }
+                    }
+                    elseif (CommandLineKeywords[3, string]:find("+"))
+                    {
+                        local PIDsettings = CommandLineKeywords[3, string]:explode("+")
+                        switch (PIDsettings[1, string])
+                        {
+                            case "scale",
+                            Scale += PIDsettings[2, string]:toNumber(10)
+                            pidSetTunings( PID, Kp, Ki, Kd, Kf )
+                            break
+                            
+                            case "kp",
+                            Kp += PIDsettings[2, string]:toNumber(10)
+                            pidSetTunings( PID, Kp, Ki, Kd, Kf )
+                            break
+                            
+                            case "ki",
+                            Ki += PIDsettings[2, string]:toNumber(10)
+                            pidSetTunings( PID, Kp, Ki, Kd, Kf )
+                            break
+                            
+                            case "kd",
+                            Kd += PIDsettings[2, string]:toNumber(10)
+                            pidSetTunings( PID, Kp, Ki, Kd, Kf )
+                            break
+                            
+                            case "kf",
+                            Kf += PIDsettings[2, string]:toNumber(10)
+                            pidSetTunings( PID, Kp, Ki, Kd, Kf )
+                            break
+                        }
+                    }
+                    elseif (CommandLineKeywords[3, string]:find("-"))
+                    {
+                        local PIDsettings = CommandLineKeywords[3, string]:explode("-")
+                        switch (PIDsettings[1, string])
+                        {
+                            case "scale",
+                            Scale -= PIDsettings[2, string]:toNumber(10)
+                            if (Scale <= 1)
+                            {
+                                Scale = 1
+                            }
+                            pidSetTunings( PID, Kp, Ki, Kd, Kf )
+                            break
+                            
+                            case "kp",
+                            Kp -= PIDsettings[2, string]:toNumber(10)
+                            if (Kp <= 0)
+                            {
+                                Kp = 0
+                            }
+                            pidSetTunings( PID, Kp, Ki, Kd, Kf )
+                            break
+                            
+                            case "ki",
+                            Ki -= PIDsettings[2, string]:toNumber(10)
+                            if (Ki <= 0)
+                            {
+                                Ki = 0
+                            }
+                            pidSetTunings( PID, Kp, Ki, Kd, Kf )
+                            break
+                            
+                            case "kd",
+                            Kd -= PIDsettings[2, string]:toNumber(10)
+                            if (Kd <= 0)
+                            {
+                                Kd = 0
+                            }
+                            pidSetTunings( PID, Kp, Ki, Kd, Kf )
+                            break
+                            
+                            case "kf",
+                            Kf -= PIDsettings[2, string]:toNumber(10)
+                            if (Kf <= 0)
+                            {
+                                Kf = 0
+                            }
+                            pidSetTunings( PID, Kp, Ki, Kd, Kf )
+                            break
+                        }
+                    }
+                    break
+                }
+            break
+        }
+    }
+}
+
+elseif( keyClk() ) {
+    
+    local KeyPressed = keyClkPressed()
+    local KeyState = keyClk( O ) == 1 ? 1 : 0
+    
+    switch( KeyPressed ) {
+        
+        case Controls[ "Increase Speed", string ],
+            if( KeyState ) {
+                
+                if( Direction != 0 && Emergency == 0 ) {
+                    
+                    if (SpeedsIndex == 0)
+                    {
+                        printError("alert", "Automatic Brake disengaged.")
+                    }
+                    
+                    SpeedsIndex++
+                    if( SpeedsIndex > Speeds:count() ) {
+                        SpeedsIndex = Speeds:count()
+                        printError( "alert", "Maximum speed has been reached." )
+                    }
+                    
+                    else {
+                        switch( SpeedsIndex ) {
+                            
+                            case 1,
+                                SetPoint = Speeds[ "Coupler Approach", number ]
+                                break
+                            
+                            case 2,
+                                SetPoint = Speeds[ "Yard Speed", number ]
+                                break
+                            
+                            case 3,
+                                SetPoint = Speeds[ "Speed 1", number ]
+                                break
+                            
+                            case 4,
+                                SetPoint = Speeds[ "Speed 2", number ]
+                                break
+                            
+                            case 5,
+                                SetPoint = Speeds[ "Speed 3", number ]
+                                break
+                            
+                            case 6,
+                                SetPoint = Speeds[ "Maximum", number ]
+                                break
+                            
+                        }
+                        printError( "info", "Set Speed: " + SetPoint + " mph." )
+                    }
+                }
+                
+                elseif( Direction == 0 ) {
+                    printError( "error", "Unable to increase speed while no direction is selected." )
+                }
+                
+                elseif( Emergency == 1 ) {
+                    printError( "error", "Unable to increase speed while Emergency Mode is active." )
+                }
+            }
+            break
+        
+        case Controls[ "Decrease Speed", string ],
+            if( KeyState ) {
+                
+                if( Direction != 0 && Emergency == 0 && SetPoint > 0 ) {
+                    
+                    SpeedsIndex--
+                    if( SpeedsIndex < 1 ) {
+                        SpeedsIndex = 1
+                        printError( "alert", "Minimum speed has been reached." )
+                    }
+                    
+                    else {
+                        switch( SpeedsIndex ) {
+                            
+                            case 1,
+                                SetPoint = Speeds[ "Coupler Approach", number ]
+                                break
+                            
+                            case 2,
+                                SetPoint = Speeds[ "Yard Speed", number ]
+                                break
+                            
+                            case 3,
+                                SetPoint = Speeds[ "Speed 1", number ]
+                                break
+                            
+                            case 4,
+                                SetPoint = Speeds[ "Speed 2", number ]
+                                break
+                            
+                            case 5,
+                                SetPoint = Speeds[ "Speed 3", number ]
+                                break
+                            
+                        }
+                        printError( "info", "Set Speed: " + SetPoint + " mph." )
+                    }
+                }
+                
+                elseif( Direction == 0 ) {
+                    printError( "error", "Unable to decrease speed while no direction is selected." )
+                }
+                
+                elseif( Emergency == 1 ) {
+                    printError( "error", "Unable to decrease speed while Emergency Mode is active." )
+                }
+                
+                elseif( SetPoint == 0 ) {
+                    printError( "error", "Unable to decrease speed while the locomotive is not moving." )
+                }
+            }
+            break
+        
+        case Controls[ "Stop", string ],
+            if( KeyState ) {
+                
+                if( Direction != 0 && Emergency == 0 ) {
+                    
+                    if( SetPoint > 0 ) {
+                        
+                        PreviousIndex = SpeedsIndex
+                        PreviousSetPoint = SetPoint
+                        PreviousDirection = Direction
+                        SpeedsIndex = 0
+                        SetPoint = 0
+                        printError( "alert", "Automatic Brake engaged." )
+                        
+                    }
+                    
+                    else {
+                        
+                        if( Direction == PreviousDirection ) {
+                        
+                            if( Speed <= ( ABthreshold - ABhysteresis ) && PreviousSetPoint > 0 ) {
+                                SpeedsIndex = PreviousIndex
+                                SetPoint = PreviousSetPoint
+                                printError( "alert", "Automatic Brake disengaged." )
+                                printError( "info", "Set Speed: " + SetPoint + " mph." )
+                            }
+                            
+                            elseif( Speed > ( ABthreshold + ABhysteresis ) ) {
+                                printError( "error", "The Automatic Brake is already engaged." )
+                            }
+                            
+                            else {
+                                printError( "error", "The Automatic Brake is already engaged." )
+                            }
+                        }
+                        
+                        else {
+                            printError( "error", "The Automatic Brake is already engaged." )
+                        }
+                    }
+                }
+                
+                else {
+                    printError( "error", "The Automatic Brake is already engaged." )
+                }
+            }
+            break
+        
+        case Controls[ "Forwards", string ],
+            if( KeyState ) {
+                
+                if( Emergency == 0 ) {
+                    
+                    if( Speed <= ( ABthreshold - ABhysteresis ) && SetPoint == 0 ) {
+                        if( Direction != 1 ) {
+                            Direction = 1
+                            PreviousDirection = Direction # -2
+                            printError( "info", "Direction: Forwards" )
+                        } else {
+                            printError( "error", "Direction is already set: Forwards" )
+                        }
+                    }
+                    
+                    elseif( Speed > ( ABthreshold + ABhysteresis ) || SetPoint > 0 ) {
+                        printError( "error", "Unable to change direction while the locomotive is moving." )
+                    }
+                }
+                
+                else {
+                    printError( "error", "Unable to change direction while Emergency Mode is active." )
+                }
+            }
+            break
+        
+        case Controls[ "Neutral", string ],
+            if( KeyState ) {
+                
+                if( Emergency == 0 ) {
+                    
+                    if( Speed <= ( ABthreshold - ABhysteresis ) && SetPoint == 0 ) {
+                        if( Direction != 0 ) {
+                            Direction = 0
+                            PreviousDirection = -2
+                            printError( "info", "Direction: Neutral" )
+                        } else {
+                            printError( "error", "Direction is already set: Neutral" )
+                        }
+                    }
+                    
+                    elseif( Speed > ( ABthreshold + ABhysteresis ) || SetPoint > 0 ) {
+                        printError( "error", "Unable to change direction while the locomotive is moving." )
+                    }
+                }
+                
+                else {
+                    printError( "error", "Unable to change direction while Emergency Mode is active." )
+                }
+            }
+            break
+        
+        case Controls[ "Reverse", string ],
+            if( KeyState ) {
+                
+                if( Emergency == 0 ) {
+                    
+                    if( Speed <= ( ABthreshold - ABhysteresis ) && SetPoint == 0 ) {
+                        if( Direction != -1 ) {
+                            Direction = -1
+                            PreviousDirection = Direction # -2
+                            printError( "info", "Direction: Reverse" )
+                        } else {
+                            printError( "error", "Direction is already set: Reverse" )
+                        }
+                    }
+                    
+                    elseif( Speed > ( ABthreshold + ABhysteresis ) || SetPoint > 0 ) {
+                        printError( "error", "Unable to change direction while the locomotive is moving." )
+                    }
+                }
+                
+                else {
+                    printError( "error", "Unable to change direction while Emergency Mode is active." )
+                }
+            }
+            break
+        
+        case Controls[ "Emergency Stop", string ],
+            if( KeyState ) {
+                
+                if( Emergency == 0 ) {
+                    
+                    if( Speed > ( ABthreshold + ABhysteresis ) ) {
+                        
+                        emergencyMode(1)
+                        
+                    }
+                    
+                    elseif( Speed <= ( ABthreshold - ABhysteresis ) ) {
+                        printError( "error", "Emergency Mode cannot be activated while the locomotive is not moving." )
+                    }
+                }
+                
+                else {
+                    printError( "error", "Emergency Mode is already active." )
+                }
+            }
+            break
+        
+    }
+}
