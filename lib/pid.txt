@@ -184,9 +184,34 @@ function number pidSetGains(S:table, PtermGain, ItermGain, DtermGain)
     return 1
 }
 
-function number pidSetGains(S:table, PtermGain, ItermGain, DtermGain, FFgain)
+function number pidSetFeedforward(S:table, FFaccel, FFyawRate, FFpitchAngle, FFthr, FFbrk)
 {
-    return 0
+    if (pidSetGains(S, "acceleration feedforward", FFaccel) == 0)
+    {
+        return 0
+    }
+
+    if (pidSetGains(S, "yaw rate feedforward", FFyawRate) == 0)
+    {
+        return 0
+    }
+
+    if (pidSetGains(S, "pitch angle feedforward", FFpitchAngle) == 0)
+    {
+        return 0
+    }
+
+    if (pidSetGains(S, "throttle feedforward", FFthr) == 0)
+    {
+        return 0
+    }
+
+    if (pidSetGains(S, "brake feedforward", FFbrk) == 0)
+    {
+        return 0
+    }
+
+    return 1
 }
 
 function number pidSetSampleTime(S:table, T)
