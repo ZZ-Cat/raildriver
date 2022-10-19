@@ -603,7 +603,7 @@ if( first() | duped() ) {
     PreviousDirection = -2
     
     ABthreshold = 0.5
-    ABhysteresis = ( 1 / 100 ) * ABthreshold
+    ABhysteresis = ( 15 / 100 ) * ABthreshold
     abApply()
     ABapplied = 1
     
