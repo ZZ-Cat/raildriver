@@ -28,9 +28,9 @@ if( first() | duped() ) {
     PoN = 1                                         # Determines where the Proportional term is applied: 
                                                     #    > 0 - Proportional on Error (Faster, but less accurate),
                                                     #    > 1 - Proportional on Measurement (Slower, but more accurate).
-    ItermDecayRate = 100                            # Determines how fast the I term will bleed off.
-    ItermDecayThreshold = 8.0                       # The speed threshold in which the I Term will start bleeding off.
-    ItermDecayHysteresis = (3/100)*ItermDecayThreshold # A Hysteresis. Because sensors be noisy.
+    ItermDecayRate = 0.01                           # Determines how fast the I term will bleed off.
+    ItermDecayThreshold = 5.0                       # The speed threshold in which the I Term will start bleeding off.
+    ItermDecayHysteresis = (1/100)*ItermDecayThreshold # A Hysteresis. Because sensors be noisy.
     
     #----------------------------- Control Bindings -----------------------------#
     Controls[ "Increase Speed", string ] = "pad_8"  # 
@@ -202,7 +202,10 @@ if( first() | duped() ) {
             {
                 if (S["Process Variable", number] <= (ItermDecayThreshold-ItermDecayHysteresis) & S["Set Point", number] == 0)
                 {
-                    S[ "Output Sum", number ] -= S[ "Output Sum", number ] * ItermDecayRate
+                    local Iterm = S["Output Sum", number]
+                    Iterm -= Iterm * ItermDecayRate
+                    S["Output Sum", number] = Iterm
+                    
                 }
             }
 
