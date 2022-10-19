@@ -19,9 +19,9 @@ function table pidCreateInstance()
     S["Integral", number] = 850
     S["Derivative", number] = 10
     S["Feed Forward", number] = 14
-    S["Proportional Mode", string] = "proportional on error"
-    S["Direction", string] = "forward"
-    S["Mode", string] = "automatic"
+    S["Proportional Mode", number] = 0
+    S["Direction", number] = 1
+    S["Mode", number] = 1
 
     # Default CV properties:
     S["CV Floor", number] = -75000
