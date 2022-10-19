@@ -118,7 +118,7 @@ function number pidSetProportionalMode(S:table, PMode:string)
         case "measure",
         case "measurement",
         case "proportional on measurement",
-        case "proportional on measure"
+        case "proportional on measure",
             S["Proportional Mode", number] = 1
             return 1
         break
@@ -132,53 +132,53 @@ function number pidSetProportionalMode(S:table, PMode:string)
 function number pidSetGains(S:table, Gains:string, Value)
 {
     local MillisToSeconds = S["Sample Time", number] / 1000
-    gains:lower()
-    switch (gains)
+    Gains:lower()
+    switch (Gains)
     {
         case "proportional",
-            S["Proportional", number] = value
+            S["Proportional", number] = Value
             S["Internal P Gain", number] = S["Proportional", number] * S["Scale", number]
             return S["Proportional", number]
         break
 
         case "integral",
-            S["Integral", number] = value
+            S["Integral", number] = Value
             S["Internal I Gain", number] = (S["Integral", number] * S["Scale", number]) * MillisToSeconds
             return S["Integral", number]
         break
         
         case "derivative",
-            S["Derivative", number] = value
+            S["Derivative", number] = Value
             S["Internal D Gain", number] = (S["Derivative", number] * S["Scale", number]) / MillisToSeconds
             return S["Derivative", number]
         break
 
         case "acceleration feedforward",
-            S["Acceleration Feedforward", number] = value * S["Scale", number]
+            S["Acceleration Feedforward", number] = Value * S["Scale", number]
             S["Internal FF Accel", number] = S["Acceleration Feedforward", number]
             return S["Internal FF Accel", number]
         break
 
         case "yaw rate feedforward",
-            S["Yaw Rate Feedforward", number] = value
+            S["Yaw Rate Feedforward", number] = Value
             S["Internal FF Yaw Rate", number] = S["Yaw Rate Feedforward", number] * S["Scale", number]
             return S["Yaw Rate Feedforward", number]
         break
 
         case "pitch angle feedforward",
-            S["Pitch Angle Feedforward", number] = value
+            S["Pitch Angle Feedforward", number] = Value
             S["Internal FF Pitch Angle", number] = S["Pitch Angle Feedforward", number] * S["Scale", number]
             return S["Pitch Angle Feedforward", number]
         break
 
         case "throttle feedforward",
-            S["Throttle Feedforward", number] = value
+            S["Throttle Feedforward", number] = Value
             S["Internal FF Thr", number] = S["Throttle Feedforward", number] * S["Scale", number]
             return S["Throttle Feedforward", number]
         break
 
         case "brake feedforward",
-            S["Brake Feedforward", number] = value
+            S["Brake Feedforward", number] = Value
             S["Internal FF Brk", number] = S["Brake Feedforward", number] * S["Scale", number]
             return S["Brake Feedforward", number]
         break
@@ -349,7 +349,9 @@ function void pidUpdate(S:table)
 
         # Calculate I-Term.
         local PVdelta = S["Process Variable", number] - S["Last Process Variable", number]
-        S["I-Term", number] += (S["Internal I Gain", number] * Error)
+        local Iterm = S["I-Term", number]
+        Iterm += (S["Internal I Gain", number] * Error)
+        S["I-Term", number] = Iterm
 
         # Calculate Proportional on Measurement, if specified.
         if (S["Proportional Mode", number] == 1)
