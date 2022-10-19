@@ -644,7 +644,7 @@ if( tickClk() ) {
     if( !Emergency ) {
         
         # Apply the Auto Brake, when the speed crosses a pre-defined threshold.
-        if( Speed <= ( ABthreshold - ABhysteresis ) && SetPoint == 0 ) {
+        if( Speed <= ( ABthreshold - ABhysteresis ) & SetPoint == 0 ) {
             
             if( !ABapplied ) {
                 pidSetMode( PID, 0 )
@@ -655,7 +655,7 @@ if( tickClk() ) {
         }
         
         # Release the Auto Brake, when either the speed or the Set Point crosses their respective pre-defined thresholds.
-        elseif( Speed > ( ABthreshold + ABhysteresis ) || SetPoint > 0 ) {
+        elseif( Speed > ( ABthreshold + ABhysteresis ) | SetPoint > 0 ) {
             
             if( ABapplied ) {
                 abRelease()
@@ -921,7 +921,7 @@ elseif( keyClk() ) {
         case Controls[ "Increase Speed", string ],
             if( KeyState ) {
                 
-                if( Direction != 0 && Emergency == 0 ) {
+                if( Direction != 0 & Emergency == 0 ) {
                     
                     if (SpeedsIndex == 0)
                     {
@@ -979,7 +979,7 @@ elseif( keyClk() ) {
         case Controls[ "Decrease Speed", string ],
             if( KeyState ) {
                 
-                if( Direction != 0 && Emergency == 0 && SetPoint > 0 ) {
+                if( Direction != 0 & Emergency == 0 & SetPoint > 0 ) {
                     
                     SpeedsIndex--
                     if( SpeedsIndex < 1 ) {
@@ -1032,7 +1032,7 @@ elseif( keyClk() ) {
         case Controls[ "Stop", string ],
             if( KeyState ) {
                 
-                if( Direction != 0 && Emergency == 0 ) {
+                if( Direction != 0 & Emergency == 0 ) {
                     
                     if( SetPoint > 0 ) {
                         
@@ -1049,7 +1049,7 @@ elseif( keyClk() ) {
                         
                         if( Direction == PreviousDirection ) {
                         
-                            if( Speed <= ( ABthreshold - ABhysteresis ) && PreviousSetPoint > 0 ) {
+                            if( Speed <= ( ABthreshold - ABhysteresis ) & PreviousSetPoint > 0 ) {
                                 SpeedsIndex = PreviousIndex
                                 SetPoint = PreviousSetPoint
                                 printError( "alert", "Automatic Brake disengaged." )
@@ -1082,7 +1082,7 @@ elseif( keyClk() ) {
                 
                 if( Emergency == 0 ) {
                     
-                    if( Speed <= ( ABthreshold - ABhysteresis ) && SetPoint == 0 ) {
+                    if( Speed <= ( ABthreshold - ABhysteresis ) & SetPoint == 0 ) {
                         if( Direction != 1 ) {
                             Direction = 1
                             PreviousDirection = Direction # -2
@@ -1108,7 +1108,7 @@ elseif( keyClk() ) {
                 
                 if( Emergency == 0 ) {
                     
-                    if( Speed <= ( ABthreshold - ABhysteresis ) && SetPoint == 0 ) {
+                    if( Speed <= ( ABthreshold - ABhysteresis ) & SetPoint == 0 ) {
                         if( Direction != 0 ) {
                             Direction = 0
                             PreviousDirection = -2
@@ -1118,7 +1118,7 @@ elseif( keyClk() ) {
                         }
                     }
                     
-                    elseif( Speed > ( ABthreshold + ABhysteresis ) || SetPoint > 0 ) {
+                    elseif( Speed > ( ABthreshold + ABhysteresis ) | SetPoint > 0 ) {
                         printError( "error", "Unable to change direction while the locomotive is moving." )
                     }
                 }
@@ -1134,7 +1134,7 @@ elseif( keyClk() ) {
                 
                 if( Emergency == 0 ) {
                     
-                    if( Speed <= ( ABthreshold - ABhysteresis ) && SetPoint == 0 ) {
+                    if( Speed <= ( ABthreshold - ABhysteresis ) & SetPoint == 0 ) {
                         if( Direction != -1 ) {
                             Direction = -1
                             PreviousDirection = Direction # -2
@@ -1144,7 +1144,7 @@ elseif( keyClk() ) {
                         }
                     }
                     
-                    elseif( Speed > ( ABthreshold + ABhysteresis ) || SetPoint > 0 ) {
+                    elseif( Speed > ( ABthreshold + ABhysteresis ) | SetPoint > 0 ) {
                         printError( "error", "Unable to change direction while the locomotive is moving." )
                     }
                 }
