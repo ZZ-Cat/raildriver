@@ -262,7 +262,9 @@ function number pidSetSampleTime(S:table, T)
 
 function number pidInitialize(S:table)
 {
-    return 0
+    S["Last Process Variable", number] = S["Process Variable", number]
+    S["Control Variable", number] = clamp(S["Control Variable", number], S["CV Floor", number], S["CV Ceiling", number])
+    return 1
 }
 
 function number pidSetMode(S:table, M:string)
