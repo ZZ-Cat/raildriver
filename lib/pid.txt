@@ -241,7 +241,23 @@ function number pidSetFeedforward(S:table, FFaccel, FFyawRate, FFpitchAngle, FFt
 
 function number pidSetSampleTime(S:table, T)
 {
-    return 0
+    if (T <= 0)
+    {
+        return 0
+    }
+
+    local GetRatioedMotherfucker = T/S["Sample Time", number]
+    local Ki = S["Internal I Gain", number]
+    local Kd = S["Internal D Gain", number]
+
+    Ki *= GetRatioedMotherfucker
+    Kd /= GetRatioedMotherfucker
+
+    S["Internal I Gain", number] = Ki
+    S["Internal D Gain", number] = Kd
+    S["Sample Time", number] = T
+
+    return S["Sample Time", number]
 }
 
 function number pidInitialize(S:table)
