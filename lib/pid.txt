@@ -55,6 +55,11 @@ function table pidCreateInstance()
     S["Internal P Gain", number] = 0
     S["Internal I Gain", number] = 0
     S["Internal D Gain", number] = 0
+    S["Internal FF Accel", number] = 0
+    S["Internal FF Yaw Rate", number] = 0
+    S["Internal FF Pit Ang", number] = 0
+    S["Internal FF Thr", number] = 0
+    S["Internal FF Brk", number] = 0
 
     # Last known variables:
     S["Last Time", number] = 0
