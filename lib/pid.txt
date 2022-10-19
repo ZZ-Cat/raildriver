@@ -104,6 +104,31 @@ function number pidSetControlVariableLimits(S:table, Floor, Ceiling)
     }
 }
 
+function number pidSetProportionalMode(S:table, PMode:string)
+{
+    PMode:lower()
+    switch (PMode)
+    {
+        case "error",
+        case "proportional on error",
+            S["Proportional Mode", number] = 0
+            return 1
+        break
+
+        case "measure",
+        case "measurement",
+        case "proportional on measurement",
+        case "proportional on measure"
+            S["Proportional Mode", number] = 1
+            return 1
+        break
+
+        default,
+            return 0
+        break
+    }
+}
+
 function number pidSetGains(S:table, Gains:string, Value)
 {
     local MillisToSeconds = S["Sample Time", number] / 1000
