@@ -706,6 +706,42 @@ if( tickClk() ) {
             printError( "alert", "Emergency Mode activated." )
             timer( "Emergency Active", 100 )
         }
+        
+        # Disable the PID when the locomotive has stopped.
+        if( Speed <= ( ABthreshold - ABhysteresis )) {
+            pidSetMode( PID, 0 )
+            pidSetControlVariable(PID, 0)
+        }
+
+        # Calculate PID.
+        pidCompute( PID, millis() )
+        
+        # Get the Control Variable from the PID.
+        ControlVariable = pidGetControlVariable(PID)
+        
+        # Apply the Control Variable to the Control Vectors, based on the chosen direction.
+        switch( Direction ) {
+            
+            case -1,
+                CV = array( vec( 0, ControlVariable, 0 ), vec( 0, 0-ControlVariable, 0 ) )
+                break
+            
+            case 1,
+                CV = array( vec( 0, 0-ControlVariable, 0 ), vec( 0, ControlVariable, 0 ) )
+                break
+            
+            default,
+                CV = array( vec( 0, 0, 0 ), vec( 0, 0, 0 ) )
+                break
+            
+        }
+        
+        # Apply a directional force based on the Control Vectors.
+        for( I = 1, ControlEntities:count() ) {
+            
+            ControlEntities[ I, entity ]:applyForce( ControlEntities[ I, entity ]:toWorldAxis( CV[ I, vector ] ) )
+            
+        }
     }
 }
 
