@@ -287,7 +287,7 @@ if( first() | duped() ) {
     
     # These function definitions are for the Automatic Braking System.
     function void abApply() {
-        local CE = entity():parent():getConnectedEntities( array( "axis", "rope" ) )
+        local CE = entity():parent():getConnectedEntities( array( "axis", "rope", "AdvBallsocket" ) )
         for( I = 1, CE:count() ) {
 
             # Removed this statement, because it caused a train brake failure.
@@ -310,7 +310,7 @@ if( first() | duped() ) {
         }
     }
     function void abEmergency() {
-        local CE = entity():parent():getConnectedEntities( array( "axis", "rope" ) )
+        local CE = entity():parent():getConnectedEntities( array( "axis", "rope", "AdvBallsocket" ) )
         for( I = 1, CE:count() ) {
 
             # Removed this statement, because it caused a train brake failure.
@@ -334,7 +334,7 @@ if( first() | duped() ) {
     }
     
     function void abRelease() {
-        local CE = entity():parent():getConnectedEntities( array( "axis", "rope" ) )
+        local CE = entity():parent():getConnectedEntities( array( "axis", "rope", "AdvBallsocket" ) )
         for( I = 1, CE:count() ) {
 
             # Removed this statement, because it caused a train brake failure.
