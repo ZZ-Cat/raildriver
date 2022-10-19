@@ -269,7 +269,27 @@ function number pidInitialize(S:table)
 
 function number pidSetMode(S:table, M:string)
 {
-    return 0
+    M:lower()
+    switch(M)
+    {
+        case "manual",
+            S["Mode", number] = 0
+            return 1
+        break
+
+        case "automatic",
+            if (S["Mode", number] == 0)
+            {
+                pidInitialize(PID)
+            }
+            S["Mode", number] = 1
+            return 1
+        break
+
+        default,
+            return 0
+        break
+    }
 }
 
 function void pidUpdate(S:table)
