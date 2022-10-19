@@ -698,14 +698,6 @@ if( tickClk() ) {
     # Emergency override.
     else {
         if( !ABapplied ) {
-            
-            # Disable the PID.
-            pidSetMode( PID, 0 )
-            
-            # Reset the Control Variable (prevents runaways)
-            ControlVariable = 0
-            pidSetControlVariable(PID, ControlVariable)
-            
             # Apply the Emergency Brakes.
             abEmergency()
             ABapplied = 1
