@@ -2,6 +2,7 @@
 @model models/beer/wiremod/gate_e2_nano.mdl
 @inputs 
 @outputs SampleRate PoN Scale Kp Ki Kd Kf SetPoint Error Speed ControlVariable
+@persist ItermDecayRate ItermDecayThreshold ItermDecayHysteresis
 @persist PID:table Direction Range
 @persist ABthreshold ABhysteresis ABapplied
 @persist Emergency
@@ -27,6 +28,9 @@ if( first() | duped() ) {
     PoN = 1                                         # Determines where the Proportional term is applied: 
                                                     #    > 0 - Proportional on Error (Faster, but less accurate),
                                                     #    > 1 - Proportional on Measurement (Slower, but more accurate).
+    ItermDecayRate = 100                            # Determines how fast the I term will bleed off.
+    ItermDecayThreshold = 8.0                       # The speed threshold in which the I Term will start bleeding off.
+    ItermDecayHysteresis = (3/100)*ItermDecayThreshold # A Hysteresis. Because sensors be noisy.
     
     #----------------------------- Control Bindings -----------------------------#
     Controls[ "Increase Speed", string ] = "pad_8"  # 
@@ -192,7 +196,16 @@ if( first() | duped() ) {
             # Calculate Error.
             local Input = S[ "Process Variable", number ]
                   Error = S[ "Set Point", number ] - Input
-            
+
+            # Calculate I Term Decay.
+            if (ItermDecayRate > 0)
+            {
+                if (S["Process Variable", number] <= (ItermDecayThreshold-ItermDecayHysteresis) & S["Set Point", number] == 0)
+                {
+                    S[ "Output Sum", number ] -= S[ "Output Sum", number ] * ItermDecayRate
+                }
+            }
+
             # Calculate I Term.
             local DInput = Input - S[ "Previous Input", number ]
             local OutputSum = S[ "Output Sum", number ]
