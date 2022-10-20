@@ -292,7 +292,7 @@ function number pidSetMode(S:table, M:string)
     }
 }
 
-function void pidUpdate(S:table)
+function number pidUpdate(S:table)
 {
     # PID Controller can have several operating modes.
     # These modes can include, but aren't limited to:
@@ -331,7 +331,8 @@ function void pidUpdate(S:table)
 
     if (S["Mode", number] == 0)
     {
-        return
+        # Return false when the control loop has stopped running.
+        return 0
     }
 
     local Now = millis()
@@ -426,4 +427,7 @@ function void pidUpdate(S:table)
         S["Last Time", number] = Now
 
     }
+
+    # Return true when the control loop is running.
+    return 1
 }
