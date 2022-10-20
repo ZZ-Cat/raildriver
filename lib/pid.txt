@@ -135,52 +135,68 @@ function number pidSetCoefficients(S:table, Gains:string, Value)
     Gains:lower()
     switch (Gains)
     {
+        case "kp",
+        case "pidf coefficient kp",
         case "proportional",
             S["Proportional", number] = Value
             S["Internal P Gain", number] = S["Proportional", number] * S["Scale", number]
             return S["Proportional", number]
         break
 
+        case "ki",
+        case "pidf coefficient ki",
         case "integral",
             S["Integral", number] = Value
             S["Internal I Gain", number] = (S["Integral", number] * S["Scale", number]) * MillisToSeconds
             return S["Integral", number]
         break
-        
+
+        case "kd",
+        case "pidf coefficient kd",
         case "derivative",
             S["Derivative", number] = Value
             S["Internal D Gain", number] = (S["Derivative", number] * S["Scale", number]) / MillisToSeconds
             return S["Derivative", number]
         break
 
+        case "kf accel",
+        case "pidf coefficient kf acceleration",
         case "acceleration feedforward",
-            S["Acceleration Feedforward", number] = Value * S["Scale", number]
-            S["Internal FF Accel", number] = S["Acceleration Feedforward", number]
+            S["PIDF Coefficient Kf Acceleration", number] = Value * S["Scale", number]
+            S["Internal FF Accel", number] = S["PIDF Coefficient Kf Acceleration", number]
             return S["Internal FF Accel", number]
         break
 
+        case "kf yaw rate",
+        case "pidf coefficient kf yaw rate",
         case "yaw rate feedforward",
-            S["Yaw Rate Feedforward", number] = Value
-            S["Internal FF Yaw Rate", number] = S["Yaw Rate Feedforward", number] * S["Scale", number]
-            return S["Yaw Rate Feedforward", number]
+            S["PIDF Coefficient Kf Yaw Rate", number] = Value
+            S["Internal FF Yaw Rate", number] = S["PIDF Coefficient Kf Yaw Rate", number] * S["Scale", number]
+            return S["PIDF Coefficient Kf Yaw Rate", number]
         break
 
+        case "kf pit ang",
+        case "pidf coefficient kf pitch angle",
         case "pitch angle feedforward",
-            S["Pitch Angle Feedforward", number] = Value
-            S["Internal FF Pitch Angle", number] = S["Pitch Angle Feedforward", number] * S["Scale", number]
-            return S["Pitch Angle Feedforward", number]
+            S["PIDF Coefficient Kf Pitch Angle", number] = Value
+            S["Internal FF Pitch Angle", number] = S["PIDF Coefficient Kf Pitch Angle", number] * S["Scale", number]
+            return S["PIDF Coefficient Kf Pitch Angle", number]
         break
 
+        case "kf thr",
+        case "pidf coefficient kf throttle",
         case "throttle feedforward",
-            S["Throttle Feedforward", number] = Value
-            S["Internal FF Thr", number] = S["Throttle Feedforward", number] * S["Scale", number]
-            return S["Throttle Feedforward", number]
+            S["PIDF Coefficient Kf Throttle", number] = Value
+            S["Internal FF Thr", number] = S["PIDF Coefficient Kf Throttle", number] * S["Scale", number]
+            return S["PIDF Coefficient Kf Throttle", number]
         break
 
+        case "kf brk",
+        case "pidf coefficient kf brake",
         case "brake feedforward",
-            S["Brake Feedforward", number] = Value
-            S["Internal FF Brk", number] = S["Brake Feedforward", number] * S["Scale", number]
-            return S["Brake Feedforward", number]
+            S["PIDF Coefficient Kf Brake", number] = Value
+            S["Internal FF Brk", number] = S["PIDF Coefficient Kf Brake", number] * S["Scale", number]
+            return S["PIDF Coefficient Kf Brake", number]
         break
 
         default,
