@@ -280,7 +280,7 @@ function number pidSetMode(S:table, M:string)
         case "automatic",
             if (S["Mode", number] == 0)
             {
-                pidInitialize(PID)
+                pidInitialize(S)
             }
             S["Mode", number] = 1
             return 1
@@ -349,15 +349,13 @@ function void pidUpdate(S:table)
 
         # Calculate I-Term.
         local PVdelta = S["Process Variable", number] - S["Last Process Variable", number]
-        local Iterm = S["I-Term", number]
-        Iterm += (S["Internal I Gain", number] * Error)
-        S["I-Term", number] = Iterm
+        S["I-Term", number] = S["I-Term", number] + (S["Internal I Gain", number] * Error)
 
         # Calculate Proportional on Measurement, if specified.
         if (S["Proportional Mode", number] == 1)
         {
             S["P-Term", number] = S["Internal P Gain", number] * PVdelta
-            S["I-Term", number] -= S["P-Term", number]
+            S["I-Term", number] = S["I-Term", number] - S["P-Term", number]
         }
 
         # Calculate & apply I-Term Limit.
@@ -399,7 +397,7 @@ function void pidUpdate(S:table)
 
         # Calculate D-Term.
         S["D-Term", number] = S["I-Term", number] - S["Internal D Gain", number] * PVdelta
-        S["CV Sum", number] += S["D-Term", number]
+        S["CV Sum", number] = S["CV Sum", number] + S["D-Term", number]
 
         # TODO: Calculate Feedforward - This may come from several sources. This can include, but isn't limited to:
         #       > Acceleration Data (taken from an accelerometer).
@@ -417,7 +415,7 @@ function void pidUpdate(S:table)
         # Traditional Set Point based feedforward is used for the time being.
         S["FF Thr", number] = S["Internal FF Thr", number] * S["Set Point", number]
         S["FF Sum", number] = S["FF Thr", number]
-        S["CV Sum", number] += S["FF Sum", number]
+        S["CV Sum", number] = S["CV Sum", number] + S["FF Sum", number]
 
         # Apply a limit to the Control Variable.
         S["CV Sum", number] = clamp(S["CV Sum", number], S["CV Floor", number], S["CV Ceiling", number])
