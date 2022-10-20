@@ -45,11 +45,11 @@ function table pidCreateInstance()
     S["Control Variable", number] = 0
 
     # Feedforward Gains:
-    S["Acceleration Feedforward", number] = 0
-    S["Yaw Rate Feedforward", number] = 0
-    S["Pitch Angle Feedforward", number] = 0
-    S["Throttle Feedforward", number] = 0
-    S["Brake Feedforward", number] = 0
+    S["PIDF Coefficient Kf Acceleration", number] = 0
+    S["PIDF Coefficient Kf Yaw Rate", number] = 0
+    S["PIDF Coefficient Kf Pitch Angle", number] = 0
+    S["PIDF Coefficient Kf Throttle", number] = 0
+    S["PIDF Coefficient Kf Brake", number] = 0
 
     # Internal Gains:
     S["Internal P Gain", number] = 0
