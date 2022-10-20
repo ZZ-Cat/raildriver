@@ -129,7 +129,7 @@ function number pidSetProportionalMode(S:table, PMode:string)
     }
 }
 
-function number pidSetGains(S:table, Gains:string, Value)
+function number pidSetCoefficients(S:table, Gains:string, Value)
 {
     local MillisToSeconds = S["Sample Time", number] / 1000
     Gains:lower()
@@ -189,19 +189,19 @@ function number pidSetGains(S:table, Gains:string, Value)
     }
 }
 
-function number pidSetGains(S:table, PtermGain, ItermGain, DtermGain)
+function number pidSetCoefficients(S:table, PtermGain, ItermGain, DtermGain)
 {
-    if (pidSetGains(S, "proportional", PtermGain) == 0)
+    if (pidSetCoefficients(S, "proportional", PtermGain) == 0)
     {
         return 0
     }
 
-    if (pidSetGains(S, "integral", ItermGain) == 0)
+    if (pidSetCoefficients(S, "integral", ItermGain) == 0)
     {
         return 0
     }
 
-    if (pidSetGains(S, "derivative", DtermGain) == 0)
+    if (pidSetCoefficients(S, "derivative", DtermGain) == 0)
     {
         return 0
     }
@@ -209,29 +209,29 @@ function number pidSetGains(S:table, PtermGain, ItermGain, DtermGain)
     return 1
 }
 
-function number pidSetFeedforward(S:table, FFaccel, FFyawRate, FFpitchAngle, FFthr, FFbrk)
+function number pidSetCoefficients(S:table, FFaccel, FFyawRate, FFpitchAngle, FFthr, FFbrk)
 {
-    if (pidSetGains(S, "acceleration feedforward", FFaccel) == 0)
+    if (pidSetCoefficients(S, "acceleration feedforward", FFaccel) == 0)
     {
         return 0
     }
 
-    if (pidSetGains(S, "yaw rate feedforward", FFyawRate) == 0)
+    if (pidSetCoefficients(S, "yaw rate feedforward", FFyawRate) == 0)
     {
         return 0
     }
 
-    if (pidSetGains(S, "pitch angle feedforward", FFpitchAngle) == 0)
+    if (pidSetCoefficients(S, "pitch angle feedforward", FFpitchAngle) == 0)
     {
         return 0
     }
 
-    if (pidSetGains(S, "throttle feedforward", FFthr) == 0)
+    if (pidSetCoefficients(S, "throttle feedforward", FFthr) == 0)
     {
         return 0
     }
 
-    if (pidSetGains(S, "brake feedforward", FFbrk) == 0)
+    if (pidSetCoefficients(S, "brake feedforward", FFbrk) == 0)
     {
         return 0
     }
