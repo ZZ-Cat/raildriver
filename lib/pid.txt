@@ -323,29 +323,30 @@ function void pidSetFeedforward(S:table, FFname:string, Value)
     {
         case "acceleration",
             S["FF Accel", number] = S["Internal FF Accel", number] * Value
-            FeedForwardSum += S["FF Accel", number]
         break
 
         case "brake",
             S["FF Brk", number] = S["Internal FF Brk", number] * Value
-            FeedForwardSum += S["FF Brk", number]
         break
 
         case "pitch angle",
             S["FF Pit Ang", number] = S["Internal FF Pit Ang", number] * Value
-            FeedForwardSum += S["FF Pit Ang", number]
         break
 
         case "throttle",
            S["FF Thr", number] = S["Internal FF Thr", number] * Value
-            FeedForwardSum += S["FF Thr", number]
         break
 
         case "yaw rate",
             S["FF Yaw Rate", number] = S["Internal FF Yaw Rate", number] * Value
-            FeedForwardSum += S["FF Yaw Rate", number]
         break
     }
+
+    FeedForwardSum += S["FF Accel", number]
+    FeedForwardSum += S["FF Brk", number]
+    FeedForwardSum += S["FF Pit Ang", number]
+    FeedForwardSum += S["FF Thr", number]
+    FeedForwardSum += S["FF Yaw Rate", number]
 
     if (S["Use Feedforward Limit", number] != 0)
     {
