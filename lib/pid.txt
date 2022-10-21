@@ -467,9 +467,7 @@ function number pidUpdate(S:table)
         #           This is something that I want to explore, at some point.
         #           Factoring the locomotive's trailing weight into the feedforward.
         # 
-        # Traditional Set Point based feedforward is used for the time being.
-        S["FF Thr", number] = S["Internal FF Thr", number] * S["Set Point", number]
-        S["FF Sum", number] = S["FF Thr", number]
+        # Feedforward has moved to another function.
         S["CV Sum", number] = S["CV Sum", number] + S["FF Sum", number]
 
         # Apply a limit to the Control Variable.
