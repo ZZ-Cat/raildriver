@@ -512,20 +512,8 @@ function number pidUpdate(S:table)
         S["D-Term", number] = S["I-Term", number] - S["Internal D Gain", number] * PVdelta
         S["CV Sum", number] = S["CV Sum", number] + S["D-Term", number]
 
-        # TODO: Calculate Feedforward - This may come from several sources. This can include, but isn't limited to:
-        #       > Acceleration Data (taken from an accelerometer).
-        #           This is useful for aiding the control loop with accelerating the locomotive to the desired Set Point.
-        #           This will only be available when a change in Set Point has been detected.
-        #       > Rotation Rate Data (taken from a gyroscope).
-        #           This will aid in cornering stability.
-        #       > Orientation Data (taken from an inclinometer).
-        #           This will aid the locomotive in climbing & descending hills.
-        #           As the hill gets steeper, more feedforward will be applied.
-        #       > Trailing weight?
-        #           This is something that I want to explore, at some point.
-        #           Factoring the locomotive's trailing weight into the feedforward.
-        # 
-        # Feedforward has moved to another function.
+        # Apply feedforward to the Control Variable Summing Bus.
+        # NB: Feedforward is calculated elsewhere.
         S["CV Sum", number] = S["CV Sum", number] + S["FF Sum", number]
 
         # Apply a limit to the Control Variable.
