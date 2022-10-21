@@ -51,6 +51,11 @@ function table pidCreateInstance()
     S["PIDF Coefficient Kf Throttle", number] = 0
     S["PIDF Coefficient Kf Brake", number] = 0
 
+    # Feedforward Limits:
+    S["Use Feedforward Limit", number] = 1
+    S["Feedforward Limit Max", number] = 75000
+    S["Feedforward Limit Min", number] = -75000
+
     # Internal Gains:
     S["Internal P Gain", number] = 0
     S["Internal I Gain", number] = 0
@@ -340,6 +345,11 @@ function void pidSetFeedforward(S:table, FFname:string, Value)
             S["FF Yaw Rate", number] = S["Internal FF Yaw Rate", number] * Value
             FeedForwardSum += S["FF Yaw Rate", number]
         break
+    }
+
+    if (S["Use Feedforward Limit", number] != 0)
+    {
+        FeedForwardSum = clamp(FeedForwardSum, S["Feedforward Limit Min", number], S["Feedforward Limit Max", number])
     }
 
     S["FF Sum", number] = FeedForwardSum
