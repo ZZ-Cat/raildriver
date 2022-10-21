@@ -88,6 +88,27 @@ function table pidCreateInstance()
     return S
 }
 
+function number pidSetItermLimits(S:table, Min, Max)
+{
+    if (Min > Max)
+    {
+        return 0
+    }
+
+    else
+    {
+        S["I-Term Limit Min", number] = Min
+        S["I-Term Limit Max", number] = Max
+
+        if (S["Use I-Term Limit", number] != 0)
+        {
+            S["I-Term", number] = clamp(S["I-Term", number], S["I-Term Limit Min", number], S["I-Term Limit Max", number])
+        }
+
+        return 1
+    }
+}
+
 function number pidSetControlVariableLimits(S:table, Floor, Ceiling)
 {
     if (Floor > Ceiling)
