@@ -44,7 +44,7 @@ function table pidCreateInstance()
     S["Control Variable", number] = 0
 
     # Feedforward Gains:
-    S["PIDF Coefficient Kf Master"] = 100
+    S["PIDF Coefficient Kf Master", number] = 100
     S["PIDF Coefficient Kf Acceleration", number] = 0
     S["PIDF Coefficient Kf Yaw Rate", number] = 0
     S["PIDF Coefficient Kf Pitch Angle", number] = 0
