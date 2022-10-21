@@ -177,9 +177,9 @@ function number pidSetCoefficients(S:table, Gains:string, Value)
         case "kf accel",
         case "pidf coefficient kf acceleration",
         case "acceleration feedforward",
-            S["PIDF Coefficient Kf Acceleration", number] = Value * S["Scale", number]
-            S["Internal FF Accel", number] = S["PIDF Coefficient Kf Acceleration", number]
-            return S["Internal FF Accel", number]
+            S["PIDF Coefficient Kf Acceleration", number] = Value 
+            S["Internal FF Accel", number] = S["PIDF Coefficient Kf Acceleration", number] * S["Scale", number]
+            return S["PIDF Coefficient Kf Acceleration", number]
         break
 
         case "kf yaw rate",
