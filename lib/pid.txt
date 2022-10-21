@@ -444,10 +444,6 @@ function number pidUpdate(S:table)
     # PID needs a lot of processing power for its real-time requirements.
     if (TimeDelta >= S["Sample Time", number])
     {
-        # TODO: Measure Process Variable - This will happen elsewhere. NOT in the main PID Control Loop.
-        #       The process being measured is the locomotive's speed.
-        #       Speed data comes from the speed counter that's mounted to one of the trucks' bearings.
-
         # Calculate Error from Set Point & Process Variable delta.
         local Error = S["Set Point", number] - S["Process Variable", number]
 
@@ -493,20 +489,6 @@ function number pidUpdate(S:table)
         # TODO: Calculate & apply I-Term Relax.
         #         I-Term Relax will benefit the locomotive when it's on flat & level sections of track, or other situations where
         #         the Control Loop does not need to be as reactive.
-        # TODO: Calculate & apply I-Term Decay.
-        #         This will bleed off the I-Term when the locomotive is decelerating to a full stop.
-        #         My theory with this is, it will help with preventing the locomotive from rolling backwards.
-        #         When this happens, the I-Term has already wound back in the opposite direction from slowing the locomotive down.
-        #         But, the Control Loop hasn't had time to react to the fact that the locomotive has actually stopped.
-        #         The I-Term continues to wind back until it hits its lowermost limit (this is even worse, when it already has hit
-        #         its lowermost limit from decelerating the train from a high speed), because the control loop still thinks that the
-        #         locomotive is still moving. I mean... it's not wrong, it's just that the locomotive is now moving in the opposite
-        #         direction to what the Control Loop thinks it's moving in. So, the locomotive continues to accelerate...
-        #         in the opposite direction... while the Control Loop has completely wound up & hit its lowermost limits.
-        #         If the locomotive is allowed to continue accelerating like this, it will do it to the point of derailing & causing
-        #         total destruction. I have been piloting a 1200 ton train when this has happened & it is not fun. ='^/,..,^=
-        #         I-Term Decay stops this from happening, by bleeding off the accumulated I-Term when the Set Point has been set to 0
-        #         & the Process Variable crosses a threshold that's close to the locomotive's actual stopping speed.
 
         # Calculate D-Term.
         S["D-Term", number] = S["I-Term", number] - S["Internal D Gain", number] * PVdelta
