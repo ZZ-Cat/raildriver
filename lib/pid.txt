@@ -45,6 +45,7 @@ function table pidCreateInstance()
     S["Control Variable", number] = 0
 
     # Feedforward Gains:
+    S["PIDF Coefficient Kf Master"] = 100
     S["PIDF Coefficient Kf Acceleration", number] = 0
     S["PIDF Coefficient Kf Yaw Rate", number] = 0
     S["PIDF Coefficient Kf Pitch Angle", number] = 0
@@ -60,6 +61,7 @@ function table pidCreateInstance()
     S["Internal P Gain", number] = 0
     S["Internal I Gain", number] = 0
     S["Internal D Gain", number] = 0
+    S["Internal FF Master", number] = 1.0
     S["Internal FF Accel", number] = 0
     S["Internal FF Yaw Rate", number] = 0
     S["Internal FF Pit Ang", number] = 0
@@ -162,6 +164,14 @@ function number pidSetCoefficients(S:table, Gains:string, Value)
             S["Derivative", number] = Value
             S["Internal D Gain", number] = (S["Derivative", number] * S["Scale", number]) / MillisToSeconds
             return S["Derivative", number]
+        break
+
+        case "kf",
+        case "pidf coefficient kf master",
+        case "master feedforward",
+            S["PIDF Coefficient Kf Master", number] = Value
+            S["Internal FF Master", number] = S["PIDF Coefficient Kf Master", number] / 100
+            return S["PIDF Coefficient Kf Master", number]
         break
 
         case "kf accel",
@@ -353,7 +363,7 @@ function void pidSetFeedforward(S:table, FFname:string, Value)
         FeedForwardSum = clamp(FeedForwardSum, S["Feedforward Limit Min", number], S["Feedforward Limit Max", number])
     }
 
-    S["FF Sum", number] = FeedForwardSum
+    S["FF Sum", number] = FeedForwardSum * S["Internal FF Master", number]
 
 }
 
