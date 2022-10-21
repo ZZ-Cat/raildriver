@@ -34,10 +34,9 @@ function table pidCreateInstance()
 
     # Default I-Term decay properties:
     S["Use I-Term Decay", number] = 1
-    S["I-Term Decay Time Millis", number] = 2000
-    S["I-Term Decay SP Threshold", number] = 0
-    S["I-Term Decay PV Threshold", number] = 8.0
-    S["I-Term Decay PV Hysteresis", number] = (2/100)*S["I-Term Decay PV Threshold", number]
+    S["I-Term Decay Rate", number] = 0.01
+    S["I-Term Decay Threshold", number] = 5.0
+    S["I-Term Decay Hysteresis", number] = (1/100)*S["I-Term Decay Threshold", number]
 
     # Primary variables:
     S["Set Point", number] = 0
@@ -86,6 +85,14 @@ function table pidCreateInstance()
 
     # Return the PID table that was created.
     return S
+}
+
+function number pidSetItermDecay(S:table, Rate, Threshold, Hysteresis)
+{
+    S["I-Term Decay Rate", number] = Rate
+    S["I-Term Decay Threshold", number] = Threshold
+    S["I-Term Decay Hysteresis", number] = (Hysteresis/100) * S["I-Term Decay Threshold", number]
+    return 1
 }
 
 function number pidSetItermLimits(S:table, Min, Max)
@@ -443,6 +450,15 @@ function number pidUpdate(S:table)
 
         # Calculate Error from Set Point & Process Variable delta.
         local Error = S["Set Point", number] - S["Process Variable", number]
+
+        # Calculate I Term Decay.
+        if (S["Use I-Term Decay", number] != 0 & S["I-Term Decay Rate", number] > 0)
+        {
+            if (S["Process Variable", number] <= (S["I-Term Decay Threshold", number] - S["I-Term Decay Hysteresis", number]) & S["Set Point", number] == 0)
+            {
+                S["I-Term", number] = S["I-Term", number] - (S["I-Term", number] * S["I-Term Decay Rate", number])
+            }
+        }
 
         # Calculate I-Term.
         local PVdelta = S["Process Variable", number] - S["Last Process Variable", number]
