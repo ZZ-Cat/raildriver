@@ -22,3 +22,26 @@ function table speedoCreateInstance(InputPos:entity, InputNeg:entity)
     S["Speed Data is Valid Flag", number] = 0
     return S
 }
+
+function number speedoSetSampleRate(S:table, ClockName:string, SampleRateMillis)
+{
+    local TimersInUse = getTimers()
+
+    for (I = 1, TimersInUse:count())
+    {
+        if (TimersInUse[I, string] == ClockName)
+        {
+            return 0
+        }
+    }
+
+    if (SampleRateMillis < (tickInterval() * 1000))
+    {
+        return 0
+    }
+
+    S["Clock Name", string] = ClockName
+    S["Clock Sampling Rate", number] = SampleRateMillis
+
+    return 1
+}
