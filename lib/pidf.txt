@@ -413,7 +413,7 @@ function number pidSetItermRelax(S:table, Iterm, ItermErrorRate, ProcessVariable
     }
     else
     {
-        local ItermRelaxType = S["I-Term Relax Type", number]:lower()
+        local ItermRelaxType = S["I-Term Relax Type", string]:lower()
         switch (ItermRelaxType)
         {
             case "set point",
