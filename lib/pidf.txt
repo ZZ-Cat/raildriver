@@ -38,13 +38,18 @@ function table pidCreateInstance()
     S["I-Term Decay Threshold", number] = 5.0
     S["I-Term Decay Hysteresis", number] = (1/100)*S["I-Term Decay Threshold", number]
 
+    # Default I-Term Relax properties:
+    S["Use I-Term Relax", number] = 0
+    S["I-Term Relax Threshold", number] = 40.0
+    S["I-Term Relax Type", number] = "Set Point"
+
     # Primary variables:
     S["Set Point", number] = 0
     S["Process Variable", number] = 0
     S["Control Variable", number] = 0
 
     # Feedforward Gains:
-    S["PIDF Coefficient Kf Master"] = 100
+    S["PIDF Coefficient Kf Master", number] = 100
     S["PIDF Coefficient Kf Acceleration", number] = 0
     S["PIDF Coefficient Kf Yaw Rate", number] = 0
     S["PIDF Coefficient Kf Pitch Angle", number] = 0
@@ -395,6 +400,31 @@ function void pidSetFeedforward(S:table, FFname:string, Value)
 
 }
 
+# Temporary placement of I Term Relax function, until I can decide to yeet it later.
+# Yes, I took this function from RotorFlight & adapted it to RailDriver.
+# If you would like to check out RotorFlight, visit their GitHub.
+function number pidSetItermRelax(Iterm, ItermErrorRate, ProcessVariable, SetPoint)
+{
+    local ItermRelaxFactor = max(0, 1.0 - SetPoint / S["I-Term Relax Threshold", number])
+
+    if (((Iterm > 0) & (ItermErrorRate < 0)) | ((Iterm < 0) & (ItermErrorRate > 0)))
+    {
+        # I-Term is decreasing. No changes are necessary.
+    }
+    else
+    {
+        local ItermRelaxType = S["I-Term Relax Type", number]:lower()
+        switch (ItermRelaxType)
+        {
+            case "set point",
+                ItermErrorRate *= ItermRelaxFactor
+            break
+        }
+    }
+
+    return ItermErrorRate
+}
+
 function number pidUpdate(S:table)
 {
     # PID Controller can have several operating modes.
@@ -446,6 +476,7 @@ function number pidUpdate(S:table)
     {
         # Calculate Error from Set Point & Process Variable delta.
         local Error = S["Set Point", number] - S["Process Variable", number]
+        local ITermError = S["Set Point", number] - S["Process Variable", number]
 
         # Calculate I Term Decay.
         if (S["Use I-Term Decay", number] != 0 & S["I-Term Decay Rate", number] > 0)
@@ -454,6 +485,13 @@ function number pidUpdate(S:table)
             {
                 S["I-Term", number] = S["I-Term", number] - (S["I-Term", number] * S["I-Term Decay Rate", number])
             }
+        }
+
+        # Calculate I Term Relax
+        if (S["Use I-Term Relax", number] != 0)
+        {
+            ITermError = pidSetItermRelax(S["I-Term", number], ITermError, S["Process Variable", number], S["Set Point", number])
+            Error = ITermError
         }
 
         # Calculate I-Term.
@@ -485,10 +523,6 @@ function number pidUpdate(S:table)
         {
             S["CV Sum", number] = 0
         }
-
-        # TODO: Calculate & apply I-Term Relax.
-        #         I-Term Relax will benefit the locomotive when it's on flat & level sections of track, or other situations where
-        #         the Control Loop does not need to be as reactive.
 
         # Calculate D-Term.
         S["D-Term", number] = S["I-Term", number] - S["Internal D Gain", number] * PVdelta
