@@ -50,3 +50,8 @@ function void speedoStartTimer(S:table)
 {
     timer(S["Clock Name", string], S["Clock Sampling Rate", number])
 }
+
+function string speedoGetClockId(S:table)
+{
+    return S["Clock Name", string]
+}
