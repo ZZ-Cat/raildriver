@@ -403,7 +403,7 @@ function void pidSetFeedforward(S:table, FFname:string, Value)
 # Temporary placement of I Term Relax function, until I can decide to yeet it later.
 # Yes, I took this function from RotorFlight & adapted it to RailDriver.
 # If you would like to check out RotorFlight, visit their GitHub.
-function number pidSetItermRelax(Iterm, ItermErrorRate, ProcessVariable, SetPoint)
+function number pidSetItermRelax(S:table, Iterm, ItermErrorRate, ProcessVariable, SetPoint)
 {
     local ItermRelaxFactor = max(0, 1.0 - SetPoint / S["I-Term Relax Threshold", number])
 
