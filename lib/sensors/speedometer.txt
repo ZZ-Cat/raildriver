@@ -55,3 +55,9 @@ function string speedoGetClockId(S:table)
 {
     return S["Clock Name", string]
 }
+
+function void speedoClearAndRestartTimer(S:table)
+{
+    stoptimer(S["Clock Name", string])
+    timer(S["Clock Name", string], S["Clock Sampling Rate", number])
+}
