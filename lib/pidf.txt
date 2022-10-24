@@ -490,7 +490,7 @@ function number pidUpdate(S:table)
         # Calculate I Term Relax
         if (S["Use I-Term Relax", number] != 0)
         {
-            ITermError = pidSetItermRelax(S["I-Term", number], ITermError, S["Process Variable", number], S["Set Point", number])
+            ITermError = pidSetItermRelax(S, S["I-Term", number], ITermError, S["Process Variable", number], S["Set Point", number])
             Error = ITermError
         }
 
