@@ -45,3 +45,8 @@ function number speedoSetSampleRate(S:table, ClockName:string, SampleRateMillis)
 
     return 1
 }
+
+function void speedoStartTimer(S:table)
+{
+    timer(S["Clock Name", string], S["Clock Sampling Rate", number])
+}
