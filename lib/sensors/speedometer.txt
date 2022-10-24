@@ -61,3 +61,32 @@ function void speedoClearAndRestartTimer(S:table)
     stoptimer(S["Clock Name", string])
     timer(S["Clock Name", string], S["Clock Sampling Rate", number])
 }
+
+function number speedoGetSpeed(S:table)
+{
+    # Differential inputs to speedometer.
+    local InPos = S["Differential Speed Positive Input", entity]:velL():y()
+    local InNeg = S["Differential Speed Negative Input", entity]:velL():y()
+    local Delta = InPos + InNeg
+
+    # An error is derived from the differential inputs.
+    local Error = abs(Delta)
+    local Output = 0
+
+    Output = (InPos - InNeg) / 2
+
+    # The error needs to be relatively small in order for the speedometer's data to be valid.
+    if (Error <= 1.0)
+    {
+        S["Speed Data is Valid Flag", number] = 1
+    }
+
+    else
+    {
+        S["Speed Data is Valid Flag", number] = 0
+    }
+
+    # [TO-DO]: Linear interpolation between values.
+
+    return Output
+}
