@@ -4,3 +4,21 @@
 ]#
 
 @name RailDriver/lib/sensors/speedometer
+
+function table speedoCreateInstance(InputPos:entity, InputNeg:entity)
+{
+    local S:table()
+    S:clear()
+    S["Clock Name", string] = "Speedometer"
+    S["Clock Sampling Rate", number] = 100
+    S["Differential Speed Positive Input", entity] = InputPos
+    S["Differential Speed Negative Input", entity] = InputNeg
+
+    S["Error Threshold", number] = 1.5
+    S["Error Hysteresis", number] = (5 / 100) * S["Error Threshold", number]
+    S["Error Hyst. High", number] = S["Error Threshold", number] + S["Error Hysteresis", number]
+    S["Error Hyst. Low", number] = S["Error Threshold", number] - S["Error Hysteresis", number]
+
+    S["Speed Data is Valid Flag", number] = 0
+    return S
+}
