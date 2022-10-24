@@ -41,7 +41,7 @@ function table pidCreateInstance()
     # Default I-Term Relax properties:
     S["Use I-Term Relax", number] = 0
     S["I-Term Relax Threshold", number] = 40.0
-    S["I-Term Relax Type", number] = "Set Point"
+    S["I-Term Relax Type", string] = "Set Point"
 
     # Primary variables:
     S["Set Point", number] = 0
