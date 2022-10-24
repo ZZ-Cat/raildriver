@@ -476,6 +476,7 @@ function number pidUpdate(S:table)
     {
         # Calculate Error from Set Point & Process Variable delta.
         local Error = S["Set Point", number] - S["Process Variable", number]
+        local ITermError = S["Set Point", number] - S["Process Variable", number]
 
         # Calculate I Term Decay.
         if (S["Use I-Term Decay", number] != 0 & S["I-Term Decay Rate", number] > 0)
@@ -484,6 +485,13 @@ function number pidUpdate(S:table)
             {
                 S["I-Term", number] = S["I-Term", number] - (S["I-Term", number] * S["I-Term Decay Rate", number])
             }
+        }
+
+        # Calculate I Term Relax
+        if (S["Use I-Term Relax", number] != 0)
+        {
+            ITermError = pidSetItermRelax(S["I-Term", number], ITermError, S["Process Variable", number], S["Set Point", number])
+            Error = ITermError
         }
 
         # Calculate I-Term.
@@ -515,10 +523,6 @@ function number pidUpdate(S:table)
         {
             S["CV Sum", number] = 0
         }
-
-        # TODO: Calculate & apply I-Term Relax.
-        #         I-Term Relax will benefit the locomotive when it's on flat & level sections of track, or other situations where
-        #         the Control Loop does not need to be as reactive.
 
         # Calculate D-Term.
         S["D-Term", number] = S["I-Term", number] - S["Internal D Gain", number] * PVdelta
