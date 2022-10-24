@@ -7,7 +7,7 @@
 
 if (first() | duped())
 {
-    #include "e2shared/RailDriver/lib/pid"
+    #include "e2shared/RailDriver/lib/pidf"
     runOnTick(1)
 }
 
