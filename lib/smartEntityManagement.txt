@@ -24,3 +24,22 @@ function void semLockE2()
     E:propDraw(!LockE2)
     E:propShadow(!LockE2)
 }
+
+function number semSmartParentE2toLocoBody()
+{
+    local E = entity()
+
+    if (!E:parent())
+    {
+        local W = E:isWeldedTo()
+        if (W:isValid() == 0 | !W)
+        {
+            return 0
+        }
+
+        E:constraintBreak("weld", W)
+        E:parentTo(W)
+    }
+
+    return 1
+}
