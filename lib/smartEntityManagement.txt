@@ -5,3 +5,22 @@
 
 @name RailDriver/lib/smartEntityManagement
 
+function void semLockE2()
+{
+    local E = entity()
+    local LockE2 = 0
+
+    if (isSinglePlayer() != 0)
+    {
+        LockE2 = 0
+    }
+
+    else
+    {
+        LockE2 = 1
+    }
+
+    E:propNotSolid(LockE2)
+    E:propDraw(!LockE2)
+    E:propShadow(!LockE2)
+}
