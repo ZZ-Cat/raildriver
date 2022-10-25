@@ -43,3 +43,43 @@ function number semSmartParentE2toLocoBody()
 
     return 1
 }
+
+function array semSmartDiscoverLocoTrucks()
+{
+    local E = entity()
+    local P = E:parent()
+    local CE = getConnectedEntities("axis")
+
+    if (!CE[1, entity] | !CE[1, entity]:isValid())
+    {
+        return array()
+    }
+
+    else
+    {
+        CE:remove(1)
+        if (CE:count() == 0)
+        {
+            return array()
+        }
+
+        else
+        {
+            local Ret = array()
+            for (I = 1, CE:count())
+            {
+                if (P:toLocal(CE[I, entity]:pos()):x() < 0)
+                {
+                    Ret[1, entity] = CE[I, entity]
+                }
+
+                else
+                {
+                    Ret[2, entity] = CE[I, entity]
+                }
+            }
+
+            return Ret
+        }
+    }
+}
