@@ -186,3 +186,8 @@ function number speedoDirectionIsValid(S:table)
 {
     return S["SPEEDOMETER FAULT: Speed Direction Incorrect", number] == 0 ? 1 : 0
 }
+
+function number speedoDataIsValid(S:table)
+{
+    return S["SPEEDOMETER FAULT: Speed Data Invalid", number] == 0 ? 1 : 0
+}
