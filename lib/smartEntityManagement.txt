@@ -48,7 +48,7 @@ function array semSmartDiscoverLocoTrucks()
 {
     local E = entity()
     local P = E:parent()
-    local CE = getConnectedEntities("axis")
+    local CE = P:getConnectedEntities("axis")
 
     if (!CE[1, entity] | !CE[1, entity]:isValid())
     {
