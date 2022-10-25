@@ -4,10 +4,23 @@
 
 @name RailDriver
 @model models/beer/wiremod/gate_e2_nano.mdl
+@persist Trucks:array
 
 if (first() | duped())
 {
+    #include "e2shared/RailDriver/lib/smartEntityManagement"
     #include "e2shared/RailDriver/lib/pidf"
+
+    semLockE2()
+
+    if (semSmartParentE2toLocoBody() == 1)
+    {
+        Trucks = semSmartDiscoverLocoTrucks()
+        assert(Trucks:count() == 2, "No trucks were found.")
+        assert((Trucks[1, entity]:isValid() & Trucks[1, entity]:isValidPhysics()), "Front truck entity data is invalid.")
+        assert((Trucks[2, entity]:isValid() & Trucks[2, entity]:isValidPhysics()), "Rear truck entity data is invalid.")
+    }
+
     runOnTick(1)
 }
 
