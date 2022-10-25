@@ -179,7 +179,5 @@ function number speedoGetSpeed(S:table, Direction)
         }
     }
 
-    # [TO-DO]: Linear interpolation between values.
-
     return Output
 }
