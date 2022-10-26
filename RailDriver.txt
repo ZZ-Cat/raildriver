@@ -5,10 +5,12 @@
 @name RailDriver
 @model models/beer/wiremod/gate_e2_nano.mdl
 @persist Trucks:array
+@persist Speedo:table SpeedRaw
 
 if (first() | duped())
 {
     #include "e2shared/RailDriver/lib/smartEntityManagement"
+    #include "e2shared/RailDriver/lib/sensors/speedometer"
     #include "e2shared/RailDriver/lib/pidf"
 
     semLockE2()
@@ -19,9 +21,18 @@ if (first() | duped())
         assert(Trucks:count() == 2, "No trucks were found.")
         assert((Trucks[1, entity]:isValid() & Trucks[1, entity]:isValidPhysics()), "Front truck entity data is invalid.")
         assert((Trucks[2, entity]:isValid() & Trucks[2, entity]:isValidPhysics()), "Rear truck entity data is invalid.")
+
+        Speedo = speedoCreateInstance(Trucks[1, entity], Trucks[2, entity])
+        speedoStartTimer(Speedo)
     }
 
     runOnTick(1)
+}
+
+if (clk(speedoGetClockId(Speedo)))
+{
+    speedoClearAndRestartTimer(Speedo)
+    SpeedRaw = speedoGetSpeed(Speedo, 1)
 }
 
 if (tickClk())
