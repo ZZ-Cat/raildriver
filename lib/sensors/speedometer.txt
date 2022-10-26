@@ -1,0 +1,210 @@
+#[
+    This file is a part of the RailDriver project.
+    Copyright © 2022, Cassandra "ZZ Cat" Robinson. All rights reserved.
+]#
+
+@name RailDriver/lib/sensors/speedometer
+
+function table speedoCreateInstance(InputPos:entity, InputNeg:entity)
+{
+    local S = table()
+    S:clear()
+    S["Clock Name", string] = "Speedometer"
+    S["Clock Sampling Rate", number] = 100
+    S["Differential Speed Positive Input", entity] = InputPos
+    S["Differential Speed Negative Input", entity] = InputNeg
+
+    S["Error Value", number] = 0
+    S["Error Threshold", number] = 1.5
+    S["Error Hysteresis", number] = (5 / 100) * S["Error Threshold", number]
+    S["Error Hyst. High", number] = S["Error Threshold", number] + S["Error Hysteresis", number]
+    S["Error Hyst. Low", number] = S["Error Threshold", number] - S["Error Hysteresis", number]
+    S["!Error Hyst. High", number] = -S["Error Hyst. High", number]
+    S["!Error Hyst. Low", number] = -S["Error Hyst. Low", number]
+
+    S["SPEEDOMETER FAULT: Speed Data Invalid", number] = 0
+    S["SPEEDOMETER FAULT: Speed Data Invalid Latch", number] = 0
+    S["SPEEDOMETER FAULT: Speed Direction Incorrect", number] = 0
+    S["SPEEDOMETER FAULT: Speed Direction Incorrect Latch", number] = 0
+    return S
+}
+
+function number speedoSetSampleRate(S:table, ClockName:string, SampleRateMillis)
+{
+    local TimersInUse = getTimers()
+
+    for (I = 1, TimersInUse:count())
+    {
+        if (TimersInUse[I, string] == ClockName)
+        {
+            return 0
+        }
+    }
+
+    if (SampleRateMillis < (tickInterval() * 1000))
+    {
+        return 0
+    }
+
+    S["Clock Name", string] = ClockName
+    S["Clock Sampling Rate", number] = SampleRateMillis
+
+    return 1
+}
+
+function void speedoStartTimer(S:table)
+{
+    timer(S["Clock Name", string], S["Clock Sampling Rate", number])
+}
+
+function string speedoGetClockId(S:table)
+{
+    return S["Clock Name", string]
+}
+
+function void speedoClearAndRestartTimer(S:table)
+{
+    stoptimer(S["Clock Name", string])
+    timer(S["Clock Name", string], S["Clock Sampling Rate", number])
+}
+
+function number speedoGetSpeed(S:table, Direction)
+{
+    # Differential inputs to speedometer.
+    local InPos = -S["Differential Speed Positive Input", entity]:velL():y()
+    local InNeg = -S["Differential Speed Negative Input", entity]:velL():y()
+
+    # Differential inputs are inverted in reverse.
+    if (Direction < 0)
+    {
+        InPos = -InPos
+        InNeg = -InNeg
+    }
+
+    # An error is derived from the differential inputs.
+    # This error needs to be relatively small in order for the speedometer's data to be valid.
+    local Error = abs(InPos + InNeg)
+    S["Error Value", number] = Error
+
+    # Speed data is calculated from the differential inputs.
+    local Output = 0
+    Output = (InPos - InNeg) / 2
+
+    # Locomotive's direction needs to be correctly set.
+    # If the locomotive's direction is not correctly set, this will trigger a latching fault.
+    # This fault will remain asserted for the entire time that the locomotive is moving in the direction opposite to what it was set to.
+    # This can help with reporting rollback runaways to the rest of RailDriver.
+    switch (Direction)
+    {
+        # Trip the fault when the direction is set for reverse.
+        case -1,
+            if (Output > S["Error Hyst. High", number] & S["SPEEDOMETER FAULT: Speed Direction Incorrect Latch", number] == 0)
+            {
+                if (S["SPEEDOMETER FAULT: Speed Direction Incorrect", number] == 0 & S["SPEEDOMETER FAULT: Speed Direction Incorrect Latch", number] == 0)
+                {
+                    S["SPEEDOMETER FAULT: Speed Direction Incorrect", number] = 1
+                    S["SPEEDOMETER FAULT: Speed Direction Incorrect Latch", number] = 1
+                }
+            }
+
+            elseif (Output <= S["Error Hyst. Low", number] & S["SPEEDOMETER FAULT: Speed Direction Incorrect Latch", number] == 1)
+            {
+                if (S["SPEEDOMETER FAULT: Speed Direction Incorrect", number] == 1 & S["SPEEDOMETER FAULT: Speed Direction Incorrect Latch", number] == 1)
+                {
+                    S["SPEEDOMETER FAULT: Speed Direction Incorrect", number] = 0
+                    S["SPEEDOMETER FAULT: Speed Direction Incorrect Latch", number] = 0
+                }
+            }
+        break
+
+        # Trip the fault when neutral is detected.
+        case 0,
+            if ((Output > S["Error Hyst. High", number] | Output < S["!Error Hyst. High", number]) & S["SPEEDOMETER FAULT: Speed Direction Incorrect Latch", number] == 0)
+            {
+                if (S["SPEEDOMETER FAULT: Speed Direction Incorrect", number] == 0 & S["SPEEDOMETER FAULT: Speed Direction Incorrect Latch", number] == 0)
+                {
+                    S["SPEEDOMETER FAULT: Speed Direction Incorrect", number] = 1
+                    S["SPEEDOMETER FAULT: Speed Direction Incorrect Latch", number] = 1
+                }
+            }
+
+            elseif ((Output <= S["Error Hyst. Low", number] | Output >= S["!Error Hyst. Low", number]) & S["SPEEDOMETER FAULT: Speed Direction Incorrect Latch", number] == 0)
+            {
+                if (S["SPEEDOMETER FAULT: Speed Direction Incorrect", number] == 1 & S["SPEEDOMETER FAULT: Speed Direction Incorrect Latch", number] == 1)
+                {
+                    S["SPEEDOMETER FAULT: Speed Direction Incorrect", number] = 0
+                    S["SPEEDOMETER FAULT: Speed Direction Incorrect Latch", number] = 0
+                }
+            }
+        break
+
+        # Trip the fault when the direction is set for forwards.
+        case 1,
+            if (Output < S["!Error Hyst. High", number] & S["SPEEDOMETER FAULT: Speed Direction Incorrect Latch", number] == 0)
+            {
+                if (S["SPEEDOMETER FAULT: Speed Direction Incorrect", number] == 0 & S["SPEEDOMETER FAULT: Speed Direction Incorrect Latch", number] == 0)
+                {
+                    S["SPEEDOMETER FAULT: Speed Direction Incorrect", number] = 1
+                    S["SPEEDOMETER FAULT: Speed Direction Incorrect Latch", number] = 1
+                }
+            }
+
+            elseif (Output >= S["!Error Hyst. Low", number] & S["SPEEDOMETER FAULT: Speed Direction Incorrect Latch", number] == 1)
+            {
+                if (S["SPEEDOMETER FAULT: Speed Direction Incorrect", number] == 1 & S["SPEEDOMETER FAULT: Speed Direction Incorrect Latch", number] == 1)
+                {
+                    S["SPEEDOMETER FAULT: Speed Direction Incorrect", number] = 0
+                    S["SPEEDOMETER FAULT: Speed Direction Incorrect Latch", number] = 0
+                }
+            }
+        break
+    }
+
+    # Speed error needs to be relatively small for the speedometer's data to be valid.
+    # When this error gets too large, it trips a latching fault condition.
+    # This fault will remain asserted until the error is reduced back to a small size again.
+    if (Error > S["Error Hyst. High", number] & S["SPEEDOMETER FAULT: Speed Data Invalid Latch", number] == 0)
+    {
+        if (S["SPEEDOMETER FAULT: Speed Data Invalid", number] == 0 & S["SPEEDOMETER FAULT: Speed Data Invalid Latch", number] == 0)
+        {
+            S["SPEEDOMETER FAULT: Speed Data Invalid", number] = 1
+            S["SPEEDOMETER FAULT: Speed Data Invalid Latch", number] = 1
+        }
+    }
+
+    elseif (Error <= S["Error Hyst. Low", number] & S["SPEEDOMETER FAULT: Speed Data Invalid Latch", number] == 1)
+    {
+        if (S["SPEEDOMETER FAULT: Speed Data Invalid", number] == 1 & S["SPEEDOMETER FAULT: Speed Data Invalid Latch", number] == 1)
+        {
+            S["SPEEDOMETER FAULT: Speed Data Invalid", number] = 0
+            S["SPEEDOMETER FAULT: Speed Data Invalid Latch", number] = 0
+        }
+    }
+
+    return abs(Output)
+}
+
+function number speedoDirectionIsValid(S:table)
+{
+    return S["SPEEDOMETER FAULT: Speed Direction Incorrect", number] == 0 ? 1 : 0
+}
+
+function number speedoDataIsValid(S:table)
+{
+    return S["SPEEDOMETER FAULT: Speed Data Invalid", number] == 0 ? 1 : 0
+}
+
+function number speedoGetRawPositiveInput(S:table)
+{
+    return -S["Differential Speed Positive Input", entity]:velL():y()
+}
+
+function number speedoGetRawNegativeInput(S:table)
+{
+    return -S["Differential Speed Negative Input", entity]:velL():y()
+}
+
+function number speedoGetDifferentialError(S:table)
+{
+    return S["Error Value", number]
+}
