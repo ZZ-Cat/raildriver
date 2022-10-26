@@ -71,8 +71,8 @@ function void speedoClearAndRestartTimer(S:table)
 function number speedoGetSpeed(S:table, Direction)
 {
     # Differential inputs to speedometer.
-    local InPos = S["Differential Speed Positive Input", entity]:velL():y()
-    local InNeg = S["Differential Speed Negative Input", entity]:velL():y()
+    local InPos = -S["Differential Speed Positive Input", entity]:velL():y()
+    local InNeg = -S["Differential Speed Negative Input", entity]:velL():y()
 
     # Differential inputs are inverted in reverse.
     if (Direction < 0)
