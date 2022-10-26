@@ -7,7 +7,7 @@
 
 function table speedoCreateInstance(InputPos:entity, InputNeg:entity)
 {
-    local S:table()
+    local S = table()
     S:clear()
     S["Clock Name", string] = "Speedometer"
     S["Clock Sampling Rate", number] = 100
