@@ -14,6 +14,7 @@ function table speedoCreateInstance(InputPos:entity, InputNeg:entity)
     S["Differential Speed Positive Input", entity] = InputPos
     S["Differential Speed Negative Input", entity] = InputNeg
 
+    S["Error Value", number] = 0
     S["Error Threshold", number] = 1.5
     S["Error Hysteresis", number] = (5 / 100) * S["Error Threshold", number]
     S["Error Hyst. High", number] = S["Error Threshold", number] + S["Error Hysteresis", number]
@@ -83,6 +84,7 @@ function number speedoGetSpeed(S:table, Direction)
     # An error is derived from the differential inputs.
     # This error needs to be relatively small in order for the speedometer's data to be valid.
     local Error = abs(InPos + InNeg)
+    S["Error Value", number] = Error
 
     # Speed data is calculated from the differential inputs.
     local Output = 0
@@ -190,4 +192,8 @@ function number speedoDirectionIsValid(S:table)
 function number speedoDataIsValid(S:table)
 {
     return S["SPEEDOMETER FAULT: Speed Data Invalid", number] == 0 ? 1 : 0
+}
+function number speedoGetDifferentialError(S:table)
+{
+    return S["Error Value", number]
 }
