@@ -193,6 +193,11 @@ function number speedoDataIsValid(S:table)
 {
     return S["SPEEDOMETER FAULT: Speed Data Invalid", number] == 0 ? 1 : 0
 }
+function number speedoGetRawNegativeInput(S:table)
+{
+    return -S["Differential Speed Negative Input", entity]:velL():y()
+}
+
 function number speedoGetDifferentialError(S:table)
 {
     return S["Error Value", number]
