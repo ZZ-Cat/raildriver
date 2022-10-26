@@ -181,7 +181,7 @@ function number speedoGetSpeed(S:table, Direction)
         }
     }
 
-    return Output
+    return abs(Output)
 }
 
 function number speedoDirectionIsValid(S:table)
