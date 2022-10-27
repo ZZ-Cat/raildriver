@@ -30,17 +30,44 @@ if (first() | duped())
 
     try
     {
+        # Lock E2 so it can't be edited by other players in multiplayer mode.
+        # This prevents players from accidentally breaking the E2.
+        if (!semLockE2())
+        {
+            error("Failed to lock E2.")
+        }
 
-    if (semSmartParentE2toLocoBody() == 1)
-    {
-        Trucks = semSmartDiscoverLocoTrucks()
-        assert(Trucks:count() == 2, "No trucks were found.")
-        assert((Trucks[1, entity]:isValid() & Trucks[1, entity]:isValidPhysics()), "Front truck entity data is invalid.")
-        assert((Trucks[2, entity]:isValid() & Trucks[2, entity]:isValidPhysics()), "Rear truck entity data is invalid.")
+        # Parent E2 to the locomotive so it moves with the locomotive.
+        if (!semSmartParentE2toLocoBody())
+        {
+            error("Could not find a valid locomotive body to parent to.")
+        }
 
-        Speedo = speedoCreateInstance(Trucks[1, entity], Trucks[2, entity])
-        speedoStartTimer(Speedo)
-    }
+        # Find all the trucks on the locomotive.
+        Trucks = semFindTrucks()
+        if (Trucks:count() < 2)
+        {
+            error("Could not find any trucks on the locomotive.")
+        }
+
+        # Check that the trucks are valid physics objects.
+        for (I = 1, I <= Trucks:count(), I++)
+        {
+            if (!Trucks[I, entity]:isValid() | !Trucks[I, entity]:isValidPhysics())
+            {
+                error("Truck " + I + " is not a valid physics object.")
+            }
+        }
+
+        # Initialize, configure and start the speedometer.
+        Speedo = speedometerInit(Trucks[1, entity], Trucks[2, entity])
+        if (!Speedo)
+        {
+            error("Failed to initialize speedometer.")
+        }
+        #speedometerSetUnits(Speedo, "mph")
+        #speedometerSetSmoothing(Speedo, 0.5)
+        speedometerStart(Speedo)
 
     }
     catch (Exception)
