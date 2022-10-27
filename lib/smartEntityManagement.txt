@@ -125,8 +125,20 @@ function number semSmartParentE2toLocoBody()
     return 1
 }
 
+function number semSmartUnparentE2fromLocoBody()
+{
+    # Unparent the E2 from the locomotive body.
+    if (!SemE2IsParentedTo)
+    {
+        # Not parented, nothing to do.
+        return 0
     }
 
+    # Replace the E2's parent with a weld.
+    SemE2:deparent(SemE2IsParentedTo)
+    weld(SemE2, SemE2IsParentedTo)
+    SemE2IsWeldedTo = SemE2IsParentedTo
+    SemE2IsParentedTo = noentity()
     return 1
 }
 
