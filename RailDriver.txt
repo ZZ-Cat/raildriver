@@ -20,6 +20,7 @@
 @model models/beer/wiremod/gate_e2_nano.mdl
 @persist Trucks:array
 @persist Speedo:table SpeedRaw
+@strict
 
 if (first() | duped())
 {
@@ -27,20 +28,57 @@ if (first() | duped())
     #include "e2shared/RailDriver/lib/sensors/speedometer"
     #include "e2shared/RailDriver/lib/pidf"
 
-    semLockE2()
-
-    if (semSmartParentE2toLocoBody() == 1)
+    try
     {
-        Trucks = semSmartDiscoverLocoTrucks()
-        assert(Trucks:count() == 2, "No trucks were found.")
-        assert((Trucks[1, entity]:isValid() & Trucks[1, entity]:isValidPhysics()), "Front truck entity data is invalid.")
-        assert((Trucks[2, entity]:isValid() & Trucks[2, entity]:isValidPhysics()), "Rear truck entity data is invalid.")
+        # Lock E2 so it can't be edited by other players in multiplayer mode.
+        # This prevents players from accidentally breaking the E2.
+        if (!semLockE2())
+        {
+            error("Failed to lock E2.")
+        }
 
-        Speedo = speedoCreateInstance(Trucks[1, entity], Trucks[2, entity])
-        speedoStartTimer(Speedo)
+        # Parent E2 to the locomotive so it moves with the locomotive.
+        if (!semSmartParentE2toLocoBody())
+        {
+            error("Could not find a valid locomotive body to parent to.")
+        }
+
+        # Find all the trucks on the locomotive.
+        Trucks = semFindTrucks()
+        if (Trucks:count() < 2)
+        {
+            error("Could not find any trucks on the locomotive.")
+        }
+
+        # Check that the trucks are valid physics objects.
+        for (I = 1, I <= Trucks:count(), I++)
+        {
+            if (!Trucks[I, entity]:isValid() | !Trucks[I, entity]:isValidPhysics())
+            {
+                error("Truck " + I + " is not a valid physics object.")
+            }
+        }
+
+        # Initialize, configure and start the speedometer.
+        Speedo = speedometerInit(Trucks[1, entity], Trucks[2, entity])
+        if (!Speedo)
+        {
+            error("Failed to initialize speedometer.")
+        }
+        #speedometerSetUnits(Speedo, "mph")
+        #speedometerSetSmoothing(Speedo, 0.5)
+        speedometerStart(Speedo)
+
     }
-
-    runOnTick(1)
+    catch (Exception)
+    {
+        # If an error occurs, unlock the E2 so it can be edited again.
+        # This prevents the E2 from being permanently locked.
+        # This also prevents the E2 from being permanently parented to the locomotive.
+        semUnlockE2()
+        semSmartUnparentE2FromLocoBody()
+        printColor(vec(255, 0, 0), "[RailDriver | Error]: ", vec(255, 255, 255), Exception)
+    }
 }
 
 if (clk(speedoGetClockId(Speedo)))

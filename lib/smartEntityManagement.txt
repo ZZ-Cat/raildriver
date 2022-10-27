@@ -19,47 +19,130 @@
 ]#
 
 @name RailDriver/lib/smartEntityManagement
+@persist SemE2Locked [SemE2IsWeldedTo SemE2IsParentedTo SemE2]:entity
 
-function void semLockE2()
+function number semInit()
 {
-    local E = entity()
-    local LockE2 = 0
+    if (SemE2Locked) {
+        return 0
+    }
 
-    if (isSinglePlayer() != 0)
+    SemE2Locked = 0
+    SemE2 = entity()
+    SemE2IsWeldedTo = SemE2:isWeldedTo()
+    SemE2IsParentedTo = SemE2:parent()
+    return 1
+}
+
+function number semE2IsLocked()
+{
+    return SemE2Locked
+}
+
+function number semUnlockE2()
+{
+    # Unlock the E2 so that it can be edited.
+    if (isSinglePlayer())
     {
-        LockE2 = 0
+        # Singleplayer mode, no need to lock/unlock
+        if (SemE2Locked)
+        {
+            SemE2Locked = 0
+            return 1
+        }
     }
 
     else
     {
-        LockE2 = 1
+        # Multiplayer mode, lock/unlock
+        if (SemE2Locked)
+        {
+            # Already locked, unlock it.
+            local E = entity()
+            E:propNotSolid(0)
+            E:propDraw(1)
+            E:propShadow(1)
+            SemE2Locked = 0
+            return 1
+        }
     }
 
-    E:propNotSolid(LockE2)
-    E:propDraw(!LockE2)
-    E:propShadow(!LockE2)
+    # Not locked, nothing to do.
+    return 0
+}
+
+function number semLockE2()
+{
+    # Lock the E2 so that it cannot be edited.
+    if (isSinglePlayer())
+    {
+        # Singleplayer mode, no need to lock/unlock
+        if (!SemE2Locked)
+        {
+            SemE2Locked = 1
+            return 1
+        }
+    }
+
+    else
+    {
+        # Multiplayer mode, lock/unlock
+        if (!SemE2Locked)
+        {
+            # Not locked, lock it.
+            local E = entity()
+            E:propNotSolid(1)
+            E:propDraw(0)
+            E:propShadow(0)
+            SemE2Locked = 1
+            return 1
+        }
+    }
+
+    # Already locked, nothing to do.
+    return 0
 }
 
 function number semSmartParentE2toLocoBody()
 {
-    local E = entity()
 
-    if (!E:parent())
+    # Parent the E2 to the locomotive body.
+    if (SemE2IsParentedTo)
     {
-        local W = E:isWeldedTo()
-        if (W:isValid() == 0 | !W)
-        {
-            return 0
-        }
-
-        E:constraintBreak("weld", W)
-        E:parentTo(W)
+        # Already parented, nothing to do.
+        return 0
     }
 
+    # If E2 is not parented, first remove any existing welds.
+    # Then, parent the E2 to the locomotive body.
+    if (SemE2IsWeldedTo)
+    {
+        SemE2:constraintBreak("weld", SemE2IsWeldedTo)
+    }
+
+    SemE2:parentTo(SemE2IsWeldedTo)
+    SemE2IsParentedTo = SemE2IsWeldedTo
     return 1
 }
 
-function array semSmartDiscoverLocoTrucks()
+function number semSmartUnparentE2fromLocoBody()
+{
+    # Unparent the E2 from the locomotive body.
+    if (!SemE2IsParentedTo)
+    {
+        # Not parented, nothing to do.
+        return 0
+    }
+
+    # Replace the E2's parent with a weld.
+    SemE2:deparent(SemE2IsParentedTo)
+    weld(SemE2, SemE2IsParentedTo)
+    SemE2IsWeldedTo = SemE2IsParentedTo
+    SemE2IsParentedTo = noentity()
+    return 1
+}
+
+function array semFindTrucks()
 {
     local E = entity()
     local P = E:parent()
