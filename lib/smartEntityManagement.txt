@@ -71,22 +71,38 @@ function number semUnlockE2()
     return 0
 }
 
-    E:propNotSolid(LockE2)
-    E:propDraw(!LockE2)
-    E:propShadow(!LockE2)
+function number semLockE2()
+{
+    # Lock the E2 so that it cannot be edited.
+    if (isSinglePlayer())
+    {
+        # Singleplayer mode, no need to lock/unlock
+        if (!SemE2Locked)
+        {
+            SemE2Locked = 1
+            return 1
+        }
+    }
+
+    else
+    {
+        # Multiplayer mode, lock/unlock
+        if (!SemE2Locked)
+        {
+            # Not locked, lock it.
+            local E = entity()
+            E:propNotSolid(1)
+            E:propDraw(0)
+            E:propShadow(0)
+            SemE2Locked = 1
+            return 1
+        }
+    }
+
+    # Already locked, nothing to do.
+    return 0
 }
 
-function number semSmartParentE2toLocoBody()
-{
-    local E = entity()
-
-    if (!E:parent())
-    {
-        local W = E:isWeldedTo()
-        if (W:isValid() == 0 | !W)
-        {
-            return 0
-        }
 
         E:constraintBreak("weld", W)
         E:parentTo(W)
