@@ -20,7 +20,7 @@
 
 @name RailDriver/lib/sensors/speedometer
 
-function table speedoCreateInstance(InputPos:entity, InputNeg:entity)
+function table speedometerInit(InputPos:entity, InputNeg:entity)
 {
     local S = table()
     S:clear()
