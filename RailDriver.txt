@@ -50,6 +50,7 @@ if (first() | duped())
         # This also prevents the E2 from being permanently parented to the locomotive.
         semUnlockE2()
         semSmartUnparentE2FromLocoBody()
+        printColor(vec(255, 0, 0), "[RailDriver | Error]: ", vec(255, 255, 255), Exception)
     }
 }
 
