@@ -45,6 +45,11 @@ if (first() | duped())
     }
     catch (Exception)
     {
+        # If an error occurs, unlock the E2 so it can be edited again.
+        # This prevents the E2 from being permanently locked.
+        # This also prevents the E2 from being permanently parented to the locomotive.
+        semUnlockE2()
+        semSmartUnparentE2FromLocoBody()
     }
 }
 
