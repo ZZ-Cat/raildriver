@@ -38,12 +38,38 @@ function number semE2IsLocked()
 {
     return SemE2Locked
 }
+
+function number semUnlockE2()
+{
+    # Unlock the E2 so that it can be edited.
+    if (isSinglePlayer())
+    {
+        # Singleplayer mode, no need to lock/unlock
+        if (SemE2Locked)
+        {
+            SemE2Locked = 0
+            return 1
+        }
     }
 
     else
     {
-        LockE2 = 1
+        # Multiplayer mode, lock/unlock
+        if (SemE2Locked)
+        {
+            # Already locked, unlock it.
+            local E = entity()
+            E:propNotSolid(0)
+            E:propDraw(1)
+            E:propShadow(1)
+            SemE2Locked = 0
+            return 1
+        }
     }
+
+    # Not locked, nothing to do.
+    return 0
+}
 
     E:propNotSolid(LockE2)
     E:propDraw(!LockE2)
