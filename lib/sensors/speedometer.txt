@@ -44,7 +44,7 @@ function table speedometerInit(InputPos:entity, InputNeg:entity)
     return S
 }
 
-function number speedoSetSampleRate(S:table, ClockName:string, SampleRateMillis)
+function number speedometerSetSampleRate(S:table, ClockName:string, SampleRateMillis)
 {
     local TimersInUse = getTimers()
 
@@ -67,23 +67,23 @@ function number speedoSetSampleRate(S:table, ClockName:string, SampleRateMillis)
     return 1
 }
 
-function void speedoStartTimer(S:table)
+function void speedometerStart(S:table)
 {
     timer(S["Clock Name", string], S["Clock Sampling Rate", number])
 }
 
-function string speedoGetClockId(S:table)
+function string speedometerGetClockId(S:table)
 {
     return S["Clock Name", string]
 }
 
-function void speedoClearAndRestartTimer(S:table)
+function void speedometerClearAndRestartTimer(S:table)
 {
     stoptimer(S["Clock Name", string])
     timer(S["Clock Name", string], S["Clock Sampling Rate", number])
 }
 
-function number speedoGetSpeed(S:table, Direction)
+function number speedometerGetSpeed(S:table, Direction)
 {
     # Differential inputs to speedometer.
     local InPos = -S["Differential Speed Positive Input", entity]:velL():y()
@@ -199,27 +199,27 @@ function number speedoGetSpeed(S:table, Direction)
     return abs(Output)
 }
 
-function number speedoDirectionIsValid(S:table)
+function number speedometerDirectionIsValid(S:table)
 {
     return S["SPEEDOMETER FAULT: Speed Direction Incorrect", number] == 0 ? 1 : 0
 }
 
-function number speedoDataIsValid(S:table)
+function number speedometerDataIsValid(S:table)
 {
     return S["SPEEDOMETER FAULT: Speed Data Invalid", number] == 0 ? 1 : 0
 }
 
-function number speedoGetRawPositiveInput(S:table)
+function number speedometerGetRawPositiveInput(S:table)
 {
     return -S["Differential Speed Positive Input", entity]:velL():y()
 }
 
-function number speedoGetRawNegativeInput(S:table)
+function number speedometerGetRawNegativeInput(S:table)
 {
     return -S["Differential Speed Negative Input", entity]:velL():y()
 }
 
-function number speedoGetDifferentialError(S:table)
+function number speedometerGetDifferentialError(S:table)
 {
     return S["Error Value", number]
 }
