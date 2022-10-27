@@ -34,9 +34,10 @@ function number semInit()
     return 1
 }
 
-    if (isSinglePlayer() != 0)
-    {
-        LockE2 = 0
+function number semE2IsLocked()
+{
+    return SemE2Locked
+}
     }
 
     else
