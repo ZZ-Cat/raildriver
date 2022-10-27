@@ -103,9 +103,28 @@ function number semLockE2()
     return 0
 }
 
+function number semSmartParentE2toLocoBody()
+{
 
-        E:constraintBreak("weld", W)
-        E:parentTo(W)
+    # Parent the E2 to the locomotive body.
+    if (SemE2IsParentedTo)
+    {
+        # Already parented, nothing to do.
+        return 0
+    }
+
+    # If E2 is not parented, first remove any existing welds.
+    # Then, parent the E2 to the locomotive body.
+    if (SemE2IsWeldedTo)
+    {
+        SemE2:constraintBreak("weld", SemE2IsWeldedTo)
+    }
+
+    SemE2:parentTo(SemE2IsWeldedTo)
+    SemE2IsParentedTo = SemE2IsWeldedTo
+    return 1
+}
+
     }
 
     return 1
