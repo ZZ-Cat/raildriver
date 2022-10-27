@@ -1,3 +1,39 @@
+#[
+    A standalone PIDF Controller script.
+
+    This E2 script is not a part of RailDriver.
+    It is merely a script for testing purposes & demonstrating a proof-of-concept.
+    That proof-of-concept was to exclusively control a locomotive using a PIDF controller.
+
+    Adaptations:
+    This script is largely based on Brett Beauregard's Arduino PID Library & it has been adapted to Expression2.
+    Set Point based Feedforward is based on the feedforward that is used in RotorFlight.
+    I Term Decay is based on I Term Decay that is used in RotorFlight.
+
+    Attribution:
+    - Arduino PID Library <https://github.com/br3ttb/Arduino-PID-Library> - Brett Beauregard.
+        The library in which this E2 is based on.
+    - RotorFlight <https://github.com/rotorflight/rotorflight-firmware> - RotorFlight Development Team.
+        Feedforward & I Term Decay used here is based on the same feedforward & I Term Decay that is used in RotorFlight.
+    
+    License:
+    PIDF Controller. A standalone PIDF Controller Expression2 script.
+    Copyright © 2022, Cassandra "ZZ Cat" Robinson. All rights reserved.
+
+    This E2 script is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This E2 script is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this E2 script.  If not, see <https://www.gnu.org/licenses/>.
+]#
+
 @name PID Controller
 @model models/beer/wiremod/gate_e2_nano.mdl
 @inputs 
