@@ -19,11 +19,20 @@
 ]#
 
 @name RailDriver/lib/smartEntityManagement
+@persist SemE2Locked [SemE2IsWeldedTo SemE2IsParentedTo SemE2]:entity
 
-function void semLockE2()
+function number semInit()
 {
-    local E = entity()
-    local LockE2 = 0
+    if (SemE2Locked) {
+        return 0
+    }
+
+    SemE2Locked = 0
+    SemE2 = entity()
+    SemE2IsWeldedTo = SemE2:isWeldedTo()
+    SemE2IsParentedTo = SemE2:parent()
+    return 1
+}
 
     if (isSinglePlayer() != 0)
     {
