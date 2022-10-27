@@ -59,7 +59,7 @@ function number semSmartParentE2toLocoBody()
     return 1
 }
 
-function array semSmartDiscoverLocoTrucks()
+function array semFindTrucks()
 {
     local E = entity()
     local P = E:parent()
