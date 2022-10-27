@@ -20,6 +20,7 @@
 @model models/beer/wiremod/gate_e2_nano.mdl
 @persist Trucks:array
 @persist Speedo:table SpeedRaw
+@strict
 
 if (first() | duped())
 {
@@ -27,7 +28,8 @@ if (first() | duped())
     #include "e2shared/RailDriver/lib/sensors/speedometer"
     #include "e2shared/RailDriver/lib/pidf"
 
-    semLockE2()
+    try
+    {
 
     if (semSmartParentE2toLocoBody() == 1)
     {
@@ -40,7 +42,10 @@ if (first() | duped())
         speedoStartTimer(Speedo)
     }
 
-    runOnTick(1)
+    }
+    catch (Exception)
+    {
+    }
 }
 
 if (clk(speedoGetClockId(Speedo)))
