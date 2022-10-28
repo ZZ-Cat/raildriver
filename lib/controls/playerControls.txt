@@ -130,3 +130,25 @@ function number playerControlsGetDirection(Controls:table)
     return Controls["Direction", number]
 }
 
+# This function returns the player's throttle input based on the throttle map & what operating mode the PIDF controller is in.
+function number playerControlsGetThrottle(Controls:table, PIDFMode:number)
+{
+    # If the PIDF controller is in velocity mode, return the throttle map value.
+    if (PIDFMode == 0)
+    {
+        return Controls["ThrottleMap", array][Controls["Throttle", number], number]
+    }
+
+    # If the PIDF controller is in acceleration mode, return the throttle map value.
+    elseif (PIDFMode == 1)
+    {
+        return Controls["ThrottleMap", array][Controls["Throttle", number], number]
+    }
+
+    # If the PIDF controller is in torque mode, return the throttle value.
+    elseif (PIDFMode == 2)
+    {
+        return Controls["Throttle", number]
+    }
+}
+
