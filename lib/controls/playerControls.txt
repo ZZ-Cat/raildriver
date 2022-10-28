@@ -174,3 +174,15 @@ function number playerControlsGetBrake(Controls:table, PIDFMode:number)
     }
 }
 
+# This function is used to decode the keyboard controls.
+function array decodeKeyboardControls(KeyboardControls:table)
+{
+    local Controls = array()
+
+    foreach(K, V:string = KeyboardControls)
+    {
+        
+    }
+
+    return Controls
+}
