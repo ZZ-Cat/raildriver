@@ -19,7 +19,7 @@
 @name RailDriver
 @model models/beer/wiremod/gate_e2_nano.mdl
 @persist Trucks:array
-@persist Speedo:table SpeedRaw
+@outputs Debugger:table
 @strict
 
 if (first() | duped())
@@ -69,6 +69,8 @@ if (first() | duped())
         #speedometerSetSmoothing(Speedo, 0.5)
         speedometerStart(Speedo)
 
+        timer("Debug", 100)
+
     }
     catch (Exception)
     {
@@ -89,4 +91,10 @@ if (clk(speedoGetClockId(Speedo)))
 
 if (tickClk())
 {
+}
+
+if (clk("Debug"))
+{
+    stoptimer("Debug")
+    timer("Debug", 100)
 }
