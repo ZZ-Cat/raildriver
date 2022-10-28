@@ -37,6 +37,10 @@ function table speedometerInit(InputPos:entity, InputNeg:entity)
     S["!Error Hyst. High", number] = -S["Error Hyst. High", number]
     S["!Error Hyst. Low", number] = -S["Error Hyst. Low", number]
 
+    S["Filter Output", number] = 0
+    S["Filter Coefficient", number] = 0.5
+    S["Filter Time Constant", number] = 1 / (2 * pi() * S["Filter Coefficient", number])
+
     S["SPEEDOMETER FAULT: Speed Data Invalid", number] = 0
     S["SPEEDOMETER FAULT: Speed Data Invalid Latch", number] = 0
     S["SPEEDOMETER FAULT: Speed Direction Incorrect", number] = 0
@@ -197,6 +201,105 @@ function number speedometerGetSpeed(S:table, Direction)
     }
 
     return abs(Output)
+}
+
+# This function applies a low-pass filter to the speedometer's data.
+# This is done to reduce the amount of noise that is present in the speedometer's data.
+function number speedometerFilter(S:table, Input)
+{
+    # The filter's output is calculated from the filter's input.
+    local Output = 0
+    Output = (Input * S["Filter Coefficient", number]) + (S["Filter Output", number] * (1 - S["Filter Coefficient", number]))
+
+    # The filter's output is stored for use in the next iteration of the filter.
+    S["Filter Output", number] = Output
+
+    return Output
+}
+
+# This function calculates the low-pass filter's coefficient.
+# This is done to ensure that the filter's cutoff frequency is correct.
+function void speedometerFilterCoefficient(S:table, CutoffFrequency)
+{
+    # The filter's cutoff frequency is calculated from the filter's coefficient.
+    local Coefficient = 0
+    Coefficient = 1 / (2 * pi() * CutoffFrequency * S["Filter Time Constant", number])
+
+    # The filter's coefficient is stored for use in the filter.
+    S["Filter Coefficient", number] = Coefficient
+
+}
+
+# This function calculates the low-pass filter's time constant.
+# This is done to ensure that the filter's cutoff frequency is correct.
+function void speedometerFilterTimeConstant(S:table, CutoffFrequency)
+{
+    # The filter's cutoff frequency is calculated from the filter's time constant.
+    local TimeConstant = 0
+    TimeConstant = 1 / (2 * pi() * CutoffFrequency * S["Filter Coefficient", number])
+
+    # The filter's time constant is stored for use in the filter.
+    S["Filter Time Constant", number] = TimeConstant
+}
+
+# This function calculates the low-pass filter's cutoff frequency.
+# This is done to ensure that the filter's cutoff frequency is correct.
+function number speedometerFilterCutoffFrequency(S:table, Coefficient, TimeConstant)
+{
+    # The filter's cutoff frequency is calculated from the filter's coefficient and time constant.
+    local CutoffFrequency = 0
+    CutoffFrequency = 1 / (2 * pi() * Coefficient * TimeConstant)
+
+    return CutoffFrequency
+}
+
+# This function gets the low-pass filter's coefficient.
+function number speedometerGetFilterCoefficient(S:table)
+{
+    return S["Filter Coefficient", number]
+}
+
+# This function gets the low-pass filter's time constant.
+function number speedometerGetFilterTimeConstant(S:table)
+{
+    return S["Filter Time Constant", number]
+}
+
+# This function gets the low-pass filter's cutoff frequency.
+function number speedometerGetFilterCutoffFrequency(S:table)
+{
+    return speedometerFilterCutoffFrequency(S, S["Filter Coefficient", number], S["Filter Time Constant", number])
+}
+
+# This function gets the low-pass filter's cutoff frequency in hertz.
+function number speedometerGetFilterCutOffFrequencyHz(S:table)
+{
+    return speedometerFilterCutoffFrequency(S, S["Filter Coefficient", number], S["Filter Time Constant", number]) / 1000
+}
+
+# This function gets the low-pass filter's time constant in milliseconds.
+function number speedometerGetFilterTimeConstantMs(S:table)
+{
+    return S["Filter Time Constant", number]
+}
+
+# This function sets the low-pass filter's coefficient.
+function void speedometerSetFilterCoefficient(S:table, Coefficient)
+{
+    S["Filter Coefficient", number] = Coefficient
+}
+
+# This function sets the low-pass filter's time constant.
+function void speedometerSetFilterTimeConstant(S:table, TimeConstant)
+{
+    S["Filter Time Constant", number] = TimeConstant
+}
+
+# This function sets the low-pass filter's cutoff frequency.
+function void speedometerSetFilterCutoffFrequency(S:table, CutoffFrequency)
+{
+    speedometerFilterCoefficient(S, CutoffFrequency)
+    speedometerFilterTimeConstant(S, CutoffFrequency)
 }
 
 function number speedometerDirectionIsValid(S:table)
