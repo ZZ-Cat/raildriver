@@ -131,7 +131,7 @@ function number semSmartUnparentE2fromLocoBody()
     if (!SemE2IsParentedTo)
     {
         # Not parented, nothing to do.
-        return 0
+        return 1
     }
 
     # Replace the E2's parent with a weld.
