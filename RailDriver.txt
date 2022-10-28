@@ -19,7 +19,8 @@
 @name RailDriver
 @model models/beer/wiremod/gate_e2_nano.mdl
 @persist Trucks:array
-@persist Speedo:table SpeedRaw
+@persist Speedo:table SpeedRaw SpeedFiltered
+@outputs Debugger:table
 @strict
 
 if (first() | duped())
@@ -74,7 +75,10 @@ if (first() | duped())
         }
         #speedometerSetUnits(Speedo, "mph")
         #speedometerSetSmoothing(Speedo, 0.5)
+        speedometerSetFilterCutoffFrequency(Speedo, 10) 
         speedometerStart(Speedo)
+
+        timer("Debug", 100)
 
     }
     catch (Exception)
@@ -84,16 +88,30 @@ if (first() | duped())
         # This also prevents the E2 from being permanently parented to the locomotive.
         semUnlockE2()
         semSmartUnparentE2fromLocoBody()
-        printColor(vec(255, 0, 0), "[RailDriver | Error]: ", vec(255, 255, 255), Exception)
+        printColor(vec(255, 0, 0), "[RailDriver | Error]", vec(255, 255, 255), ": " + Exception)
     }
 }
 
-if (clk(speedoGetClockId(Speedo)))
+if (clk(speedometerGetClockId(Speedo)))
 {
-    speedoClearAndRestartTimer(Speedo)
-    SpeedRaw = speedoGetSpeed(Speedo, 1)
+    speedometerClearAndRestartTimer(Speedo)
+    SpeedRaw = speedometerGetSpeed(Speedo, 1)
+
+    # Apply a low-pass filter to the raw speed.
+    SpeedFiltered = speedometerFilter(Speedo, SpeedRaw)
+
 }
 
 if (tickClk())
 {
+}
+
+if (clk("Debug"))
+{
+    stoptimer("Debug")
+    timer("Debug", 100)
+    Debugger["Speed Raw", number] = SpeedRaw
+    Debugger["Speed Filtered", number] = SpeedFiltered
+    Debugger["Speed Final", number] = SpeedFinal
+    Debugger["Speed Filter Cut-off Frequency (Hz)", number] = speedometerGetFilterCutOffFrequencyHz(Speedo)
 }
