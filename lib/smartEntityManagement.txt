@@ -135,7 +135,7 @@ function number semSmartUnparentE2fromLocoBody()
     }
 
     # Replace the E2's parent with a weld.
-    SemE2:deparent(SemE2IsParentedTo)
+    SemE2:deparent()
     weld(SemE2, SemE2IsParentedTo)
     SemE2IsWeldedTo = SemE2IsParentedTo
     SemE2IsParentedTo = noentity()
