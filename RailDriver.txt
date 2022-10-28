@@ -30,6 +30,12 @@ if (first() | duped())
 
     try
     {
+        # Initialize Smart Entity Management library.
+        if(!semInit())
+        {
+            error("Failed to initialize Smart Entity Management library.")
+        }
+
         # Lock E2 so it can't be edited by other players in multiplayer mode.
         # This prevents players from accidentally breaking the E2.
         if (!semLockE2())
