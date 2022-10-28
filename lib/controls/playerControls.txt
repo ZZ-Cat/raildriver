@@ -21,3 +21,24 @@
 @name RailDriver/lib/controls/playerControls
 @persist PCDirection PCThrottle PCBrake PCEmergencyBrake PCHorn PCHeadlights PCDitchLights
 @persist PCTrainDriver:entity
+
+# This function initializes the player controls.
+# This function should be called once per player.
+function table playerControlsInit(KeyboardControls:table, ThrottleMap:table, BrakeMap:table, TrainDriver:entity)
+{
+    local Controls = table()
+    Controls["Direction", number] = 0
+    Controls["Throttle", number] = 0
+    Controls["Brake", number] = 0
+    Controls["Horn", number] = 0
+    Controls["Bell", number] = 0
+    Controls["Headlights", number] = 0
+    Controls["DitchLights", number] = 0
+    Controls["TrainDriver", entity] = TrainDriver
+    Controls["Controls", array] = KeyboardControls:toArray()
+    Controls["ThrottleMap", array] = ThrottleMap:toArray()
+    Controls["BrakeMap", array] = BrakeMap:toArray()
+    runOnKeys(Controls["TrainDriver", entity], 1)
+    return Controls
+}
+
