@@ -110,7 +110,7 @@ function number semSmartParentE2toLocoBody()
     if (SemE2IsParentedTo)
     {
         # Already parented, nothing to do.
-        return 0
+        return 1
     }
 
     # If E2 is not parented, first remove any existing welds.
