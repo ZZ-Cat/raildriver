@@ -19,7 +19,7 @@
 @name RailDriver
 @model models/beer/wiremod/gate_e2_nano.mdl
 @persist Trucks:array
-@persist Speedo:table SpeedRaw SpeedFiltered
+@persist [PlayerControls ThrottleMap BrakeMap]:table TrainDriver:entity SpeedFiltered
 @outputs Debugger:table
 @strict
 
@@ -27,6 +27,7 @@ if (first() | duped())
 {
     #include "e2shared/RailDriver/lib/smartEntityManagement"
     #include "e2shared/RailDriver/lib/sensors/speedometer"
+    #include "e2shared/RailDriver/lib/controls/playerControls"
     #include "e2shared/RailDriver/lib/pidf"
 
     try
@@ -78,6 +79,39 @@ if (first() | duped())
         speedometerSetFilterCutoffFrequency(Speedo, 10) 
         speedometerStart(Speedo)
 
+        # Setup throttle and brake maps.
+        ThrottleMap["Throttle Input Type", string] = "Velocity"
+        ThrottleMap["Velocity Setpoint", array] = array(0, 5, 15, 20, 30, 40, 60)
+        ThrottleMap["Acceleration Setpoint", array] = array(0, 0.5, 1, 1.5, 2, 2.5, 3)
+        BrakeMap["Brake Input Type", string] = "Velocity"
+        BrakeMap["Velocity Setpoint", array] = array(0, 5, 15, 20, 30, 40, 60)
+        BrakeMap["Deceleration Setpoint", array] = array(0, -0.5, -1, -1.5, -2, -2.5, -3)
+
+        # Setup default key bindings.
+        local KeyboardControls = table()
+        KeyboardControls["Increase Reverser", string] = "W"
+        KeyboardControls["Decrease Reverser", string] = "S"
+        KeyboardControls["Increase Throttle", string] = "D"
+        KeyboardControls["Decrease Throttle", string] = "A"
+        KeyboardControls["Increase Train Brake", string] = "left shift + D"
+        KeyboardControls["Decrease Train Brake", string] = "left shift + A"
+        KeyboardControls["Increase Engine Brake", string] = "left ctrl + D"
+        KeyboardControls["Decrease Engine Brake", string] = "left ctrl + A"
+        KeyboardControls["Emergency Brake", string] = "space"
+        KeyboardControls["Horn", string] = "H"
+        KeyboardControls["bell", string] = "left alt"
+        KeyboardControls["Headlights", string] = "F"
+        KeyboardControls["Ditch Lights", string] = "left shift + F"
+
+        # Set the driver to the player who spawned the E2.
+        TrainDriver = owner()
+
+        # Initialize and configure the player controls with keyboard controls, throttle and brake maps, and the driver.
+        PlayerControls = playerControlsInit(KeyboardControls, ThrottleMap, BrakeMap, TrainDriver)
+        if (!PlayerControls)
+        {
+            error("Failed to initialize player controls.")
+        }
         timer("Debug", 100)
 
     }
@@ -100,6 +134,12 @@ if (clk(speedometerGetClockId(Speedo)))
     # Apply a low-pass filter to the raw speed.
     SpeedFiltered = speedometerFilter(Speedo, SpeedRaw)
 
+}
+
+if (keyClk())
+{
+    # Update the player controls.
+    playerControlsUpdate(PlayerControls)
 }
 
 if (tickClk())
