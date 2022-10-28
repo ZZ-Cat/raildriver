@@ -124,3 +124,9 @@ function void playerControlsUpdate(Controls:table)
     }
 }
 
+# This function returns the direction of the locomotive.
+function number playerControlsGetDirection(Controls:table)
+{
+    return Controls["Direction", number]
+}
+
