@@ -30,6 +30,12 @@ if (first() | duped())
 
     try
     {
+        # Initialize Smart Entity Management library.
+        if(!semInit())
+        {
+            error("Failed to initialize Smart Entity Management library.")
+        }
+
         # Lock E2 so it can't be edited by other players in multiplayer mode.
         # This prevents players from accidentally breaking the E2.
         if (!semLockE2())
@@ -51,9 +57,10 @@ if (first() | duped())
         }
 
         # Check that the trucks are valid physics objects.
-        for (I = 1, I <= Trucks:count(), I++)
+        for (I = 1, Trucks:count())
         {
-            if (!Trucks[I, entity]:isValid() | !Trucks[I, entity]:isValidPhysics())
+            # Use an alternative version, to prevent false positives.
+            if (Trucks[I, entity] == noentity())
             {
                 error("Truck " + I + " is not a valid physics object.")
             }
@@ -76,7 +83,7 @@ if (first() | duped())
         # This prevents the E2 from being permanently locked.
         # This also prevents the E2 from being permanently parented to the locomotive.
         semUnlockE2()
-        semSmartUnparentE2FromLocoBody()
+        semSmartUnparentE2fromLocoBody()
         printColor(vec(255, 0, 0), "[RailDriver | Error]: ", vec(255, 255, 255), Exception)
     }
 }
