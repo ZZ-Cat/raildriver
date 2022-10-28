@@ -57,9 +57,10 @@ if (first() | duped())
         }
 
         # Check that the trucks are valid physics objects.
-        for (I = 1, I <= Trucks:count(), I++)
+        for (I = 1, Trucks:count())
         {
-            if (!Trucks[I, entity]:isValid() | !Trucks[I, entity]:isValidPhysics())
+            # Use an alternative version, to prevent false positives.
+            if (Trucks[I, entity] == noentity())
             {
                 error("Truck " + I + " is not a valid physics object.")
             }
