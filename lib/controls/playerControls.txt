@@ -152,3 +152,25 @@ function number playerControlsGetThrottle(Controls:table, PIDFMode:number)
     }
 }
 
+# This function returns the player's brake input based on the brake map & what operating mode the PIDF controller is in.
+function number playerControlsGetBrake(Controls:table, PIDFMode:number)
+{
+    # Brake is always 0 if the PIDF controller is in velocity mode.
+    if (PIDFMode == 0)
+    {
+        return 0
+    }
+
+    # If the PIDF controller is in acceleration mode, return the brake map value.
+    elseif (PIDFMode == 1)
+    {
+        return Controls["BrakeMap", array][Controls["Brake", number], number]
+    }
+
+    # If the PIDF controller is in torque mode, return the brake value.
+    elseif (PIDFMode == 2)
+    {
+        return Controls["Brake", number]
+    }
+}
+
