@@ -30,8 +30,6 @@ if (first() | duped())
     #include "e2shared/RailDriver/lib/controls/playerControls"
     #include "e2shared/RailDriver/lib/pidf"
 
-    # I am just putting this here, to test something. I'll yeet it when I'm done.
-
     try
     {
         # Initialize Smart Entity Management library.
