@@ -77,15 +77,63 @@ function void playerControlsUpdate(Controls:table)
             # Increase throttle if the increase throttle key is pressed.
             if (KeyState == 1 & KeyPressed == Controls["Controls", array][3, string])
             {
+                # Increase throttle by 1.
                 Controls["Throttle", number] = Controls["Throttle", number] + 1
-                Controls["Throttle", number] = clamp(Controls["Throttle", number], 0, Controls["ThrottleMap", array]:count())
+
+                # Get the throttle map.
+                local ThrMap = Controls["ThrottleMap", table]
+
+                # Clamp the throttle to the maximum value in the throttle map.
+                # Each throttle map has its own minimum & maximum values.
+                switch(ThrMap["Throttle Input Type", string])
+                {
+                    # Velocity Mode.
+                    case "Velocity",
+                        Controls["Throttle", number] = clamp(Controls["Throttle", number], 0, ThrMap["Velocity Setpoint", array]:count())
+                    break
+
+                    # Acceleration Mode.
+                    case "Acceleration",
+                        Controls["Throttle", number] = clamp(Controls["Throttle", number], 0, ThrMap["Acceleration Setpoint", array]:count())
+                    break
+
+                    # Torque Mode.
+                    case "Torque",
+                        Controls["Throttle", number] = clamp(Controls["Throttle", number], 0, ThrMap["Torque Setpoint", array]:count())
+                    break
+                }
             }
 
             # Decrease throttle if the decrease throttle key is pressed.
             if (KeyState == 1 & KeyPressed == Controls["Controls", array][4, string])
             {
+                # Decrease throttle by 1.
                 Controls["Throttle", number] = Controls["Throttle", number] - 1
-                Controls["Throttle", number] = clamp(Controls["Throttle", number], 0, Controls["ThrottleMap", array]:count())
+
+                # Get the throttle map.
+                local ThrMap = Controls["ThrottleMap", table]
+
+                # Clamp the throttle to the minimum value in the throttle map.
+                # Each throttle map has its own minimum & maximum values.
+                switch(ThrMap["Throttle Input Type", string])
+                {
+                    # Velocity Mode.
+                    case "Velocity",
+                        Controls["Throttle", number] = clamp(Controls["Throttle", number], 0, ThrMap["Velocity Setpoint", array]:count())
+                    break
+
+                    # Acceleration Mode.
+                    case "Acceleration",
+                        Controls["Throttle", number] = clamp(Controls["Throttle", number], 0, ThrMap["Acceleration Setpoint", array]:count())
+                    break
+
+                    # Torque Mode.
+                    case "Torque",
+                        Controls["Throttle", number] = clamp(Controls["Throttle", number], 0, ThrMap["Torque Setpoint", array]:count())
+                    break
+                }
+            }
+
             }
 
             # Set emergency brake if the emergency brake key is pressed.
