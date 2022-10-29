@@ -35,9 +35,12 @@ function table playerControlsInit(KeyboardControls:table, ThrottleMap:table, Bra
     Controls["Headlights", number] = 0
     Controls["DitchLights", number] = 0
     Controls["TrainDriver", entity] = TrainDriver
-    Controls["Controls", array] = KeyboardControls:toArray()
-    Controls["ThrottleMap", array] = ThrottleMap:toArray()
-    Controls["BrakeMap", array] = BrakeMap:toArray()
+    Controls["Controls", table] = KeyboardControls
+
+    # 'table:toArray()' is bugged, so I am directly using the throttle and brake maps.
+    Controls["ThrottleMap", table] = ThrottleMap
+    Controls["BrakeMap", table] = BrakeMap
+
     runOnKeys(Controls["TrainDriver", entity], 1)
     return Controls
 }
