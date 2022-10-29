@@ -198,37 +198,37 @@ function void playerControlsUpdate(Controls:table)
             }
 
             # Set emergency brake if the emergency brake key is pressed.
-            if (KeyState == 1 & KeyPressed == Controls["Controls", array][5, string])
+            if (KeyState == 1 & KeyPressed == Controls["Controls", array][7, string])
             {
                 Controls["EmergencyBrake", number] = 1
             }
 
             # Set horn if the horn key is pressed.
-            if (KeyState == 1 & KeyPressed == Controls["Controls", array][6, string])
+            if (KeyState == 1 & KeyPressed == Controls["Controls", array][8, string])
             {
                 Controls["Horn", number] = 1
             }
 
             # Release horn if the horn key is released.
-            elseif (KeyState == -1 & KeyPressed == Controls["Controls", array][6, string])
+            if (KeyState == 0 & KeyPressed == Controls["Controls", array][8, string])
             {
                 Controls["Horn", number] = 0
             }
 
             # Toggle bell if the bell key is pressed.
-            if (KeyState == 1 & KeyPressed == Controls["Controls", array][7, string])
+            if (KeyState == 1 & KeyPressed == Controls["Controls", array][9, string])
             {
                 Controls["Bell", number] = Controls["Bell", number] == 0 ? 1 : 0
             }
 
             # Toggle headlights if the headlights key is pressed.
-            if (KeyState == 1 & KeyPressed == Controls["Controls", array][8, string])
+            if (KeyState == 1 & KeyPressed == Controls["Controls", array][10, string])
             {
                 Controls["Headlights", number] = Controls["Headlights", number] == 0 ? 1 : 0
             }
 
             # Toggle ditch lights if the ditch lights key is pressed.
-            if (KeyState == 1 & KeyPressed == Controls["Controls", array][9, string])
+            if (KeyState == 1 & KeyPressed == Controls["Controls", array][11, string])
             {
                 Controls["DitchLights", number] = Controls["DitchLights", number] == 0 ? 1 : 0
             }
