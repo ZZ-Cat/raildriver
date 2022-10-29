@@ -134,6 +134,66 @@ function void playerControlsUpdate(Controls:table)
                 }
             }
 
+            # Increase brake if the increase brake key is pressed.
+            if (KeyState == 1 & KeyPressed == Controls["Controls", array][5, string])
+            {
+                # Increase brake by 1.
+                Controls["Brake", number] = Controls["Brake", number] + 1
+
+                # Get the brake map.
+                local BrkMap = Controls["BrakeMap", table]
+
+                # Clamp the brake to the maximum value in the brake map.
+                # Each brake map has its own minimum & maximum values.
+                switch(BrkMap["Brake Input Type", string])
+                {
+                    # Velocity Mode.
+                    case "Velocity",
+                        # Brake is disabled in this mode.
+                        Controls["Brake", number] = clamp(Controls["Brake", number], 0, 0)
+                    break
+
+                    # Acceleration Mode.
+                    case "Acceleration",
+                        Controls["Brake", number] = clamp(Controls["Brake", number], 0, BrkMap["Deceleration Setpoint", array]:count())
+                    break
+
+                    # Torque Mode.
+                    case "Torque",
+                        Controls["Brake", number] = clamp(Controls["Brake", number], 0, BrkMap["Torque Setpoint", array]:count())
+                    break
+                }
+            }
+
+            # Decrease brake if the decrease brake key is pressed.
+            if (KeyState == 1 & KeyPressed == Controls["Controls", array][6, string])
+            {
+                # Decrease brake by 1.
+                Controls["Brake", number] = Controls["Brake", number] - 1
+
+                # Get the brake map.
+                local BrkMap = Controls["BrakeMap", table]
+
+                # Clamp the brake to the minimum value in the brake map.
+                # Each brake map has its own minimum & maximum values.
+                switch(BrkMap["Brake Input Type", string])
+                {
+                    # Velocity Mode.
+                    case "Velocity",
+                        # Brake is disabled in this mode.
+                        Controls["Brake", number] = clamp(Controls["Brake", number], 0, 0)
+                    break
+
+                    # Acceleration Mode.
+                    case "Acceleration",
+                        Controls["Brake", number] = clamp(Controls["Brake", number], 0, BrkMap["Deceleration Setpoint", array]:count())
+                    break
+
+                    # Torque Mode.
+                    case "Torque",
+                        Controls["Brake", number] = clamp(Controls["Brake", number], 0, BrkMap["Torque Setpoint", array]:count())
+                    break
+                }
             }
 
             # Set emergency brake if the emergency brake key is pressed.
