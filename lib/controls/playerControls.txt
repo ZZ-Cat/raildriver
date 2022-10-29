@@ -30,6 +30,7 @@ function table playerControlsInit(KeyboardControls:table, ThrottleMap:table, Bra
     Controls["Direction", number] = 0
     Controls["Throttle", number] = 0
     Controls["Brake", number] = 0
+    Controls["EmergencyBrake", number] = 0
     Controls["Horn", number] = 0
     Controls["Bell", number] = 0
     Controls["Headlights", number] = 0
@@ -199,7 +200,7 @@ function void playerControlsUpdate(Controls:table)
             # Set emergency brake if the emergency brake key is pressed.
             if (KeyState == 1 & KeyPressed == Controls["Controls", array][5, string])
             {
-                Controls["Brake", number] = -1
+                Controls["EmergencyBrake", number] = 1
             }
 
             # Set horn if the horn key is pressed.
