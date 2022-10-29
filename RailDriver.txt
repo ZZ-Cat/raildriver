@@ -83,8 +83,10 @@ if (first() | duped())
         ThrottleMap["Throttle Input Type", string] = "Velocity"
         ThrottleMap["Velocity Setpoint", array] = array(0, 5, 15, 20, 30, 40, 60)
         ThrottleMap["Acceleration Setpoint", array] = array(0, 0.5, 1, 1.5, 2, 2.5, 3)
+        ThrottleMap["Torque Setpoint", array] = array(0, 1000, 2000, 3000, 4000, 5000, 6000)
         BrakeMap["Brake Input Type", string] = "Velocity"
         BrakeMap["Deceleration Setpoint", array] = array(0, -0.5, -1, -1.5, -2, -2.5, -3)
+        BrakeMap["Torque Setpoint", array] = array(0, -1000, -2000, -3000, -4000, -5000, -6000)
 
         # Setup default key bindings.
         local KeyboardControls = table()
