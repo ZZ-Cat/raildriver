@@ -42,6 +42,14 @@ function table playerControlsInit(KeyboardControls:table, ThrottleMap:table, Bra
     Controls["ThrottleMap", table] = ThrottleMap
     Controls["BrakeMap", table] = BrakeMap
 
+    # Fault Reporting for the player controls.
+    Controls["Faults", table] = table()
+    Controls["Faults", table]["Direction", number] = 0
+    Controls["Faults", table]["Throttle", number] = 0
+    Controls["Faults", table]["Brake", number] = 0
+    Controls["Faults", table]["EmergencyBrake", number] = 0
+    Controls["Faults", table]["Message", string] = ""
+
     runOnKeys(Controls["TrainDriver", entity], 1)
     return Controls
 }
@@ -282,4 +290,277 @@ function number playerControlsGetHeadlights(Controls:table)
 function number playerControlsGetDitchLights(Controls:table)
 {
     return Controls["DitchLights", number]
+}
+
+# This function checks whether or not the player controls are valid.
+function number playerControlsValid(Controls:table, Speed)
+{
+    # Get the direction, throttle, brake, and emergency brake.
+    local Direction = Controls["Direction", number]
+    local Throttle = Controls["Throttle", number]
+    local Brake = Controls["Brake", number]
+    local EmergencyBrake = Controls["EmergencyBrake", number]
+
+    # Get the throttle & brake maps.
+    local ThrMap = Controls["ThrottleMap", table]
+    local BrkMap = Controls["BrakeMap", table]
+
+    # Get the throttle & brake input types.
+    local ThrInputType = ThrMap["Throttle Input Type", string]
+    local BrkInputType = BrkMap["Brake Input Type", string]
+
+    # Direction cannot be set higher than 1 or lower than -1.
+    if (Direction > 1)
+    {
+        Controls["Direction", number] = 1
+        Controls["Faults", table]["Message", string] = "Direction is already set to forward."
+        Controls["Faults", table]["Direction", number] = 1
+        return 0
+    }
+
+    elseif (Direction < -1)
+    {
+        Controls["Direction", number] = -1
+        Controls["Faults", table]["Message", string] = "Direction is already set to reverse."
+        Controls["Faults", table]["Direction", number] = 1
+        return 0
+    }
+
+    # Direction must remain set to forward when the locomotive is moving forward,
+    # and direction must remain set to reverse when the locomotive is moving in reverse.
+    if (Direction != 1 & Speed > 0)
+    {
+        Controls["Direction", number] = 1
+        Controls["Faults", table]["Message", string] = "Cannot set direction whilst the locomotive is moving."
+        Controls["Faults", table]["Direction", number] = 1
+        return 0
+    }
+
+    elseif (Direction != -1 & Speed > 0)
+    {
+        Controls["Direction", number] = -1
+        Controls["Faults", table]["Message", string] = "Cannot set direction whilst the locomotive is moving."
+        Controls["Faults", table]["Direction", number] = 1
+        return 0
+    }
+
+    # Throttle is invalid when the locomotive's direction is neutral.
+    if (Throttle > 0 & Direction == 0)
+    {
+        Controls["Throttle", number] = 0
+        Controls["Faults", table]["Message", string] = "Throttle is invalid when the locomotive's direction is neutral."
+        Controls["Faults", table]["Throttle", number] = 1
+        return 0
+    }
+
+    # Throttle is invalid when its value is higher than or less than the size of the throttle maps for each throttle input type.
+    switch(ThrInputType)
+    {
+        # Velocity Mode.
+        case "Velocity",
+            # Throttle cannot be set higher than the maximum size of the Throttle Map.
+            if (Throttle > ThrMap["Velocity Setpoint", array]:count())
+            {
+                Controls["Throttle", number] = ThrMap["Velocity Setpoint", array]:count()
+                Controls["Faults", table]["Message", string] = "Throttle is already set to maximum."
+                Controls["Faults", table]["Throttle", number] = 1
+                return 0
+            }
+
+            # Throttle cannot be set lower than 0.
+            elseif (Throttle < 0)
+            {
+                Controls["Throttle", number] = 0
+                Controls["Faults", table]["Message", string] = "Throttle is already set to minimum."
+                Controls["Faults", table]["Throttle", number] = 1
+                return 0
+            }
+        break
+
+        # Acceleration Mode.
+        case "Acceleration",
+            # Throttle cannot be set higher than the maximum size of the Throttle Map.
+            if (Throttle > ThrMap["Acceleration Setpoint", array]:count())
+            {
+                Controls["Throttle", number] = ThrMap["Acceleration Setpoint", array]:count()
+                Controls["Faults", table]["Message", string] = "Throttle is already set to maximum."
+                Controls["Faults", table]["Throttle", number] = 1
+                return 0
+            }
+
+            # Throttle cannot be set lower than 0.
+            elseif (Throttle < 0)
+            {
+                Controls["Throttle", number] = 0
+                Controls["Faults", table]["Message", string] = "Throttle is already set to minimum."
+                Controls["Faults", table]["Throttle", number] = 1
+                return 0
+            }
+        break
+
+        # Torque Mode.
+        case "Torque",
+            # Throttle cannot be set higher than the maximum size of the Throttle Map.
+            if (Throttle > ThrMap["Torque Setpoint", array]:count())
+            {
+                Controls["Throttle", number] = ThrMap["Torque Setpoint", array]:count()
+                Controls["Faults", table]["Message", string] = "Throttle is already set to maximum."
+                Controls["Faults", table]["Throttle", number] = 1
+                return 0
+            }
+
+            # Throttle cannot be set lower than 0.
+            elseif (Throttle < 0)
+            {
+                Controls["Throttle", number] = 0
+                Controls["Faults", table]["Message", string] = "Throttle is already set to minimum."
+                Controls["Faults", table]["Throttle", number] = 1
+                return 0
+            }
+        break
+    }
+
+    # Brake is invalid when its value is higher than or less than the size of the brake maps for each brake input type.
+    switch(BrkInputType)
+    {
+        # Velocity Mode.
+        case "Velocity",
+            # Brake is disabled in Velocity Mode. Any value set to the brake is invalid.
+            if (Brake > 0)
+            {
+                Controls["Brake", number] = 0
+                Controls["Faults", table]["Message", string] = "Brake is disabled in Velocity Mode."
+                Controls["Faults", table]["Brake", number] = 1
+                return 0
+            }
+        break
+
+        # Acceleration Mode.
+        case "Acceleration",
+            # Brake cannot be set higher than the maximum size of the Brake Map.
+            if (Brake > BrkMap["Acceleration Setpoint", array]:count())
+            {
+                Controls["Brake", number] = BrkMap["Deceleration Setpoint", array]:count()
+                Controls["Faults", table]["Message", string] = "Brake is already set to maximum."
+                Controls["Faults", table]["Brake", number] = 1
+                return 0
+            }
+
+            # Brake cannot be set lower than 0.
+            elseif (Brake < 0)
+            {
+                Controls["Brake", number] = 0
+                Controls["Faults", table]["Message", string] = "Brake is already set to minimum."
+                Controls["Faults", table]["Brake", number] = 1
+                return 0
+            }
+        break
+
+        # Torque Mode.
+        case "Torque",
+            # Brake cannot be set higher than the maximum size of the Brake Map.
+            if (Brake > BrkMap["Torque Setpoint", array]:count())
+            {
+                Controls["Brake", number] = BrkMap["Torque Setpoint", array]:count()
+                Controls["Faults", table]["Message", string] = "Brake is already set to maximum."
+                Controls["Faults", table]["Brake", number] = 1
+                return 0
+            }
+        break
+    }
+
+    # Return 1 if all checks have passed.
+    return 1
+}
+
+# This function returns the fault message.
+function string playerControlsGetFaultMessage(Controls:table)
+{
+    return Controls["Faults", table]["Message", string]
+}
+
+# This function returns the direction fault.
+function number playerControlsGetDirectionFault(Controls:table)
+{
+    return Controls["Faults", table]["Direction", number]
+}
+
+# This function returns the throttle fault.
+function number playerControlsGetThrottleFault(Controls:table)
+{
+    return Controls["Faults", table]["Throttle", number]
+}
+
+# This function returns the brake fault.
+function number playerControlsGetBrakeFault(Controls:table)
+{
+    return Controls["Faults", table]["Brake", number]
+}
+
+# This function clears the fault message.
+# Returns true if the fault message was cleared.
+# False if no fault message was found.
+function number playerControlsClearFaultMessage(Controls:table)
+{
+    if (Controls["Faults", table]["Message", string] != "")
+    {
+        Controls["Faults", table]["Message", string] = ""
+        return 1
+    }
+    else
+    {
+        Controls["Faults", table]["Message", string] = "No fault message found."
+        return 0
+    }
+}
+
+# This function clears the direction fault.
+# Returns true if the direction fault was cleared.
+# False if the direction fault was not previously set.
+function number playerControlsClearDirectionFault(Controls:table)
+{
+    if (Controls["Faults", table]["Direction", number] == 1)
+    {
+        Controls["Faults", table]["Direction", number] = 0
+        return 1
+    }
+    else
+    {
+        Controls["Faults", table]["Message", string] = "Direction fault was not previously set."
+        return 0
+    }
+}
+
+# This function clears the throttle fault.
+# Returns true if the throttle fault was cleared.
+# False if the throttle fault was not previously set.
+function number playerControlsClearThrottleFault(Controls:table)
+{
+    if (Controls["Faults", table]["Throttle", number] == 1)
+    {
+        Controls["Faults", table]["Throttle", number] = 0
+        return 1
+    }
+    else
+    {
+        Controls["Faults", table]["Message", string] = "Throttle fault was not previously set."
+        return 0
+    }
+}
+
+# This function clears the brake fault.
+# Returns true if the brake fault was cleared.
+# False if the brake fault was not previously set.
+function number playerControlsClearBrakeFault(Controls:table)
+{
+    if (Controls["Faults", table]["Brake", number] == 1)
+    {
+        Controls["Faults", table]["Brake", number] = 0
+        return 1
+    }
+    else
+    {
+        Controls["Faults", table]["Message", string] = "Brake fault was not previously set."
+        return 0
+    }
 }

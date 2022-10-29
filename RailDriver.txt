@@ -141,6 +141,19 @@ if (keyClk())
 {
     # Update the player controls.
     playerControlsUpdate(PlayerControls)
+
+    try
+    {
+        # Check if the player controls are valid.
+        if (!playerControlsValid(PlayerControls, SpeedFiltered))
+        {
+            error(playerControlsGetFaultMessage(PlayerControls))
+        }
+    }
+    catch (Exception)
+    {
+        printColor(vec(255, 0, 0), "[RailDriver | Error]", vec(255, 255, 255), ": " + Exception)
+    }
 }
 
 if (tickClk())
