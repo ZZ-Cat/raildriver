@@ -84,7 +84,6 @@ if (first() | duped())
         ThrottleMap["Velocity Setpoint", array] = array(0, 5, 15, 20, 30, 40, 60)
         ThrottleMap["Acceleration Setpoint", array] = array(0, 0.5, 1, 1.5, 2, 2.5, 3)
         BrakeMap["Brake Input Type", string] = "Velocity"
-        BrakeMap["Velocity Setpoint", array] = array(0, 5, 15, 20, 30, 40, 60)
         BrakeMap["Deceleration Setpoint", array] = array(0, -0.5, -1, -1.5, -2, -2.5, -3)
 
         # Setup default key bindings.
