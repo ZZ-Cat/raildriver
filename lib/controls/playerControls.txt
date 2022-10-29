@@ -242,59 +242,44 @@ function number playerControlsGetDirection(Controls:table)
     return Controls["Direction", number]
 }
 
-# This function returns the player's throttle input based on the throttle map & what operating mode the PIDF controller is in.
-function number playerControlsGetThrottle(Controls:table, PIDFMode:number)
+# This function returns the throttle of the locomotive.
+function number playerControlsGetThrottle(Controls:table)
 {
-    # If the PIDF controller is in velocity mode, return the throttle map value.
-    if (PIDFMode == 0)
-    {
-        return Controls["ThrottleMap", array][Controls["Throttle", number], number]
-    }
-
-    # If the PIDF controller is in acceleration mode, return the throttle map value.
-    elseif (PIDFMode == 1)
-    {
-        return Controls["ThrottleMap", array][Controls["Throttle", number], number]
-    }
-
-    # If the PIDF controller is in torque mode, return the throttle value.
-    elseif (PIDFMode == 2)
-    {
-        return Controls["Throttle", number]
-    }
+    return Controls["Throttle", number]
 }
 
-# This function returns the player's brake input based on the brake map & what operating mode the PIDF controller is in.
-function number playerControlsGetBrake(Controls:table, PIDFMode:number)
+# This function returns the brake of the locomotive.
+function number playerControlsGetBrake(Controls:table)
 {
-    # Brake is always 0 if the PIDF controller is in velocity mode.
-    if (PIDFMode == 0)
-    {
-        return 0
-    }
-
-    # If the PIDF controller is in acceleration mode, return the brake map value.
-    elseif (PIDFMode == 1)
-    {
-        return Controls["BrakeMap", array][Controls["Brake", number], number]
-    }
-
-    # If the PIDF controller is in torque mode, return the brake value.
-    elseif (PIDFMode == 2)
-    {
-        return Controls["Brake", number]
-    }
+    return Controls["Brake", number]
 }
 
-# This function is used to decode the keyboard controls.
-function array decodeKeyboardControls(KeyboardControls:table)
+# This function returns the emergency brake of the locomotive.
+function number playerControlsGetEmergencyBrake(Controls:table)
 {
-    local Controls = array()
+    return Controls["EmergencyBrake", number]
+}
 
-    foreach(K, V:string = KeyboardControls)
-    {
-        
-    }
+# This function returns the horn of the locomotive.
+function number playerControlsGetHorn(Controls:table)
+{
+    return Controls["Horn", number]
+}
 
-    return Controls
+# This function returns the bell of the locomotive.
+function number playerControlsGetBell(Controls:table)
+{
+    return Controls["Bell", number]
+}
+
+# This function returns the headlights of the locomotive.
+function number playerControlsGetHeadlights(Controls:table)
+{
+    return Controls["Headlights", number]
+}
+
+# This function returns the ditch lights of the locomotive.
+function number playerControlsGetDitchLights(Controls:table)
+{
+    return Controls["DitchLights", number]
 }
