@@ -153,6 +153,5 @@ if (clk("Debug"))
     timer("Debug", 100)
     Debugger["Speed Raw", number] = SpeedRaw
     Debugger["Speed Filtered", number] = SpeedFiltered
-    Debugger["Speed Final", number] = SpeedFinal
     Debugger["Speed Filter Cut-off Frequency (Hz)", number] = speedometerGetFilterCutOffFrequencyHz(Speedo)
 }
