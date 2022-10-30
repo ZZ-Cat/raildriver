@@ -22,6 +22,600 @@
 @persist PCDirection PCThrottle PCBrake PCEmergencyBrake PCHorn PCHeadlights PCDitchLights
 @persist PCTrainDriver:entity
 
+function table encodeKeyboardControls(KeyboardControls:table)
+{
+    local ControlTable = table()
+    foreach(K, V:string = KeyboardControls)
+    {
+        if (K == "Increase Reverser")
+        {
+            if (V:find("left shift + "))
+            {
+                ControlTable["Increase Direction Modifier", string] = "lshift"
+                ControlTable["Increase Direction Key", string] = V:sub(13)
+            }
+
+            elseif (V:find("right shift + "))
+            {
+                ControlTable["Increase Direction Modifier", string] = "rshift"
+                ControlTable["Increase Direction Key", string] = V:sub(14)
+            }
+
+            elseif (V:find("left ctrl + "))
+            {
+                ControlTable["Increase Direction Modifier", string] = "lctrl"
+                ControlTable["Increase Direction Key", string] = V:sub(12)
+            }
+
+            elseif (V:find("right ctrl + "))
+            {
+                ControlTable["Increase Direction Modifier", string] = "rctrl"
+                ControlTable["Increase Direction Key", string] = V:sub(13)
+            }
+
+            elseif (V:find("left alt + "))
+            {
+                ControlTable["Increase Direction Modifier", string] = "lalt"
+                ControlTable["Increase Direction Key", string] = V:sub(11)
+            }
+
+            elseif (V:find("right alt + "))
+            {
+                ControlTable["Increase Direction Modifier", string] = "ralt"
+                ControlTable["Increase Direction Key", string] = V:sub(12)
+            }
+
+            else
+            {
+                ControlTable["Increase Direction Modifier", string] = ""
+                ControlTable["Increase Direction Key", string] = V
+            }
+        }
+
+        if (K == "Decrease Reverser")
+        {
+            if (V:find("left shift + "))
+            {
+                ControlTable["Decrease Direction Modifier", string] = "lshift"
+                ControlTable["Decrease Direction Key", string] = V:sub(13)
+            }
+
+            elseif (V:find("right shift + "))
+            {
+                ControlTable["Decrease Direction Modifier", string] = "rshift"
+                ControlTable["Decrease Direction Key", string] = V:sub(14)
+            }
+
+            elseif (V:find("left ctrl + "))
+            {
+                ControlTable["Decrease Direction Modifier", string] = "lctrl"
+                ControlTable["Decrease Direction Key", string] = V:sub(12)
+            }
+
+            elseif (V:find("right ctrl + "))
+            {
+                ControlTable["Decrease Direction Modifier", string] = "rctrl"
+                ControlTable["Decrease Direction Key", string] = V:sub(13)
+            }
+
+            elseif (V:find("left alt + "))
+            {
+                ControlTable["Decrease Direction Modifier", string] = "lalt"
+                ControlTable["Decrease Direction Key", string] = V:sub(11)
+            }
+
+            elseif (V:find("right alt + "))
+            {
+                ControlTable["Decrease Direction Modifier", string] = "ralt"
+                ControlTable["Decrease Direction Key", string] = V:sub(12)
+            }
+
+            else
+            {
+                ControlTable["Decrease Direction Modifier", string] = ""
+                ControlTable["Decrease Direction Key", string] = V
+            }
+        }
+
+        if (K == "Increase Throttle")
+        {
+            if (V:find("left shift + "))
+            {
+                ControlTable["Increase Throttle Modifier", string] = "lshift"
+                ControlTable["Increase Throttle Key", string] = V:sub(13)
+            }
+
+            elseif (V:find("right shift + "))
+            {
+                ControlTable["Increase Throttle Modifier", string] = "rshift"
+                ControlTable["Increase Throttle Key", string] = V:sub(14)
+            }
+
+            elseif (V:find("left ctrl + "))
+            {
+                ControlTable["Increase Throttle Modifier", string] = "lctrl"
+                ControlTable["Increase Throttle Key", string] = V:sub(12)
+            }
+
+            elseif (V:find("right ctrl + "))
+            {
+                ControlTable["Increase Throttle Modifier", string] = "rctrl"
+                ControlTable["Increase Throttle Key", string] = V:sub(13)
+            }
+
+            elseif (V:find("left alt + "))
+            {
+                ControlTable["Increase Throttle Modifier", string] = "lalt"
+                ControlTable["Increase Throttle Key", string] = V:sub(11)
+            }
+
+            elseif (V:find("right alt + "))
+            {
+                ControlTable["Increase Throttle Modifier", string] = "ralt"
+                ControlTable["Increase Throttle Key", string] = V:sub(12)
+            }
+
+            else
+            {
+                ControlTable["Increase Throttle Modifier", string] = ""
+                ControlTable["Increase Throttle Key", string] = V
+            }
+        }
+
+        if (K == "Decrease Throttle")
+        {
+            if (V:find("left shift + "))
+            {
+                ControlTable["Decrease Throttle Modifier", string] = "lshift"
+                ControlTable["Decrease Throttle Key", string] = V:sub(13)
+            }
+
+            elseif (V:find("right shift + "))
+            {
+                ControlTable["Decrease Throttle Modifier", string] = "rshift"
+                ControlTable["Decrease Throttle Key", string] = V:sub(14)
+            }
+
+            elseif (V:find("left ctrl + "))
+            {
+                ControlTable["Decrease Throttle Modifier", string] = "lctrl"
+                ControlTable["Decrease Throttle Key", string] = V:sub(12)
+            }
+
+            elseif (V:find("right ctrl + "))
+            {
+                ControlTable["Decrease Throttle Modifier", string] = "rctrl"
+                ControlTable["Decrease Throttle Key", string] = V:sub(13)
+            }
+
+            elseif (V:find("left alt + "))
+            {
+                ControlTable["Decrease Throttle Modifier", string] = "lalt"
+                ControlTable["Decrease Throttle Key", string] = V:sub(11)
+            }
+
+            elseif (V:find("right alt + "))
+            {
+                ControlTable["Decrease Throttle Modifier", string] = "ralt"
+                ControlTable["Decrease Throttle Key", string] = V:sub(12)
+            }
+
+            else
+            {
+                ControlTable["Decrease Throttle Modifier", string] = ""
+                ControlTable["Decrease Throttle Key", string] = V
+            }
+        }
+
+        if (K == "Increase Train Brake")
+        {
+            if (V:find("left shift + "))
+            {
+                ControlTable["Increase Train Brake Modifier", string] = "lshift"
+                ControlTable["Increase Train Brake Key", string] = V:sub(13)
+            }
+
+            elseif (V:find("right shift + "))
+            {
+                ControlTable["Increase Train Brake Modifier", string] = "rshift"
+                ControlTable["Increase Train Brake Key", string] = V:sub(14)
+            }
+
+            elseif (V:find("left ctrl + "))
+            {
+                ControlTable["Increase Train Brake Modifier", string] = "lctrl"
+                ControlTable["Increase Train Brake Key", string] = V:sub(12)
+            }
+
+            elseif (V:find("right ctrl + "))
+            {
+                ControlTable["Increase Train Brake Modifier", string] = "rctrl"
+                ControlTable["Increase Train Brake Key", string] = V:sub(13)
+            }
+
+            elseif (V:find("left alt + "))
+            {
+                ControlTable["Increase Train Brake Modifier", string] = "lalt"
+                ControlTable["Increase Train Brake Key", string] = V:sub(11)
+            }
+
+            elseif (V:find("right alt + "))
+            {
+                ControlTable["Increase Train Brake Modifier", string] = "ralt"
+                ControlTable["Increase Train Brake Key", string] = V:sub(12)
+            }
+
+            else
+            {
+                ControlTable["Increase Train Brake Modifier", string] = ""
+                ControlTable["Increase Train Brake Key", string] = V
+            }
+        }
+
+        if (K == "Decrease Train Brake")
+        {
+            if (V:find("left shift + "))
+            {
+                ControlTable["Decrease Train Brake Modifier", string] = "lshift"
+                ControlTable["Decrease Train Brake Key", string] = V:sub(13)
+            }
+
+            elseif (V:find("right shift + "))
+            {
+                ControlTable["Decrease Train Brake Modifier", string] = "rshift"
+                ControlTable["Decrease Train Brake Key", string] = V:sub(14)
+            }
+
+            elseif (V:find("left ctrl + "))
+            {
+                ControlTable["Decrease Train Brake Modifier", string] = "lctrl"
+                ControlTable["Decrease Train Brake Key", string] = V:sub(12)
+            }
+
+            elseif (V:find("right ctrl + "))
+            {
+                ControlTable["Decrease Train Brake Modifier", string] = "rctrl"
+                ControlTable["Decrease Train Brake Key", string] = V:sub(13)
+            }
+
+            elseif (V:find("left alt + "))
+            {
+                ControlTable["Decrease Train Brake Modifier", string] = "lalt"
+                ControlTable["Decrease Train Brake Key", string] = V:sub(11)
+            }
+
+            elseif (V:find("right alt + "))
+            {
+                ControlTable["Decrease Train Brake Modifier", string] = "ralt"
+                ControlTable["Decrease Train Brake Key", string] = V:sub(12)
+            }
+
+            else
+            {
+                ControlTable["Decrease Train Brake Modifier", string] = ""
+                ControlTable["Decrease Train Brake Key", string] = V
+            }
+        }
+
+        if (K == "Increase Engine Brake")
+        {
+            if (V:find("left shift + "))
+            {
+                ControlTable["Increase Engine Brake Modifier", string] = "lshift"
+                ControlTable["Increase Engine Brake Key", string] = V:sub(13)
+            }
+
+            elseif (V:find("right shift + "))
+            {
+                ControlTable["Increase Engine Brake Modifier", string] = "rshift"
+                ControlTable["Increase Engine Brake Key", string] = V:sub(14)
+            }
+
+            elseif (V:find("left ctrl + "))
+            {
+                ControlTable["Increase Engine Brake Modifier", string] = "lctrl"
+                ControlTable["Increase Engine Brake Key", string] = V:sub(12)
+            }
+
+            elseif (V:find("right ctrl + "))
+            {
+                ControlTable["Increase Engine Brake Modifier", string] = "rctrl"
+                ControlTable["Increase Engine Brake Key", string] = V:sub(13)
+            }
+
+            elseif (V:find("left alt + "))
+            {
+                ControlTable["Increase Engine Brake Modifier", string] = "lalt"
+                ControlTable["Increase Engine Brake Key", string] = V:sub(11)
+            }
+
+            elseif (V:find("right alt + "))
+            {
+                ControlTable["Increase Engine Brake Modifier", string] = "ralt"
+                ControlTable["Increase Engine Brake Key", string] = V:sub(12)
+            }
+
+            else
+            {
+                ControlTable["Increase Engine Brake Modifier", string] = ""
+                ControlTable["Increase Engine Brake Key", string] = V
+            }
+        }
+
+        if (K == "Decrease Engine Brake")
+        {
+            if (V:find("left shift + "))
+            {
+                ControlTable["Decrease Engine Brake Modifier", string] = "lshift"
+                ControlTable["Decrease Engine Brake Key", string] = V:sub(13)
+            }
+
+            elseif (V:find("right shift + "))
+            {
+                ControlTable["Decrease Engine Brake Modifier", string] = "rshift"
+                ControlTable["Decrease Engine Brake Key", string] = V:sub(14)
+            }
+
+            elseif (V:find("left ctrl + "))
+            {
+                ControlTable["Decrease Engine Brake Modifier", string] = "lctrl"
+                ControlTable["Decrease Engine Brake Key", string] = V:sub(12)
+            }
+
+            elseif (V:find("right ctrl + "))
+            {
+                ControlTable["Decrease Engine Brake Modifier", string] = "rctrl"
+                ControlTable["Decrease Engine Brake Key", string] = V:sub(13)
+            }
+
+            elseif (V:find("left alt + "))
+            {
+                ControlTable["Decrease Engine Brake Modifier", string] = "lalt"
+                ControlTable["Decrease Engine Brake Key", string] = V:sub(11)
+            }
+
+            elseif (V:find("right alt + "))
+            {
+                ControlTable["Decrease Engine Brake Modifier", string] = "ralt"
+                ControlTable["Decrease Engine Brake Key", string] = V:sub(12)
+            }
+
+            else
+            {
+                ControlTable["Decrease Engine Brake Modifier", string] = ""
+                ControlTable["Decrease Engine Brake Key", string] = V
+            }
+        }
+
+        if (K == "Emergency Brake")
+        {
+            if (V:find("left shift + "))
+            {
+                ControlTable["Emergency Brake Modifier", string] = "lshift"
+                ControlTable["Emergency Brake Key", string] = V:sub(13)
+            }
+
+            elseif (V:find("right shift + "))
+            {
+                ControlTable["Emergency Brake Modifier", string] = "rshift"
+                ControlTable["Emergency Brake Key", string] = V:sub(14)
+            }
+
+            elseif (V:find("left ctrl + "))
+            {
+                ControlTable["Emergency Brake Modifier", string] = "lctrl"
+                ControlTable["Emergency Brake Key", string] = V:sub(12)
+            }
+
+            elseif (V:find("right ctrl + "))
+            {
+                ControlTable["Emergency Brake Modifier", string] = "rctrl"
+                ControlTable["Emergency Brake Key", string] = V:sub(13)
+            }
+
+            elseif (V:find("left alt + "))
+            {
+                ControlTable["Emergency Brake Modifier", string] = "lalt"
+                ControlTable["Emergency Brake Key", string] = V:sub(11)
+            }
+
+            elseif (V:find("right alt + "))
+            {
+                ControlTable["Emergency Brake Modifier", string] = "ralt"
+                ControlTable["Emergency Brake Key", string] = V:sub(12)
+            }
+
+            else
+            {
+                ControlTable["Emergency Brake Modifier", string] = ""
+                ControlTable["Emergency Brake Key", string] = V
+            }
+        }
+
+        if (K == "Horn")
+        {
+            if (V:find("left shift + "))
+            {
+                ControlTable["Horn Modifier", string] = "lshift"
+                ControlTable["Horn Key", string] = V:sub(13)
+            }
+
+            elseif (V:find("right shift + "))
+            {
+                ControlTable["Horn Modifier", string] = "rshift"
+                ControlTable["Horn Key", string] = V:sub(14)
+            }
+
+            elseif (V:find("left ctrl + "))
+            {
+                ControlTable["Horn Modifier", string] = "lctrl"
+                ControlTable["Horn Key", string] = V:sub(12)
+            }
+
+            elseif (V:find("right ctrl + "))
+            {
+                ControlTable["Horn Modifier", string] = "rctrl"
+                ControlTable["Horn Key", string] = V:sub(13)
+            }
+
+            elseif (V:find("left alt + "))
+            {
+                ControlTable["Horn Modifier", string] = "lalt"
+                ControlTable["Horn Key", string] = V:sub(11)
+            }
+
+            elseif (V:find("right alt + "))
+            {
+                ControlTable["Horn Modifier", string] = "ralt"
+                ControlTable["Horn Key", string] = V:sub(12)
+            }
+
+            else
+            {
+                ControlTable["Horn Modifier", string] = ""
+                ControlTable["Horn Key", string] = V
+            }
+        }
+
+        if (K == "Bell")
+        {
+            if (V:find("left shift + "))
+            {
+                ControlTable["Bell Modifier", string] = "lshift"
+                ControlTable["Bell Key", string] = V:sub(13)
+            }
+
+            elseif (V:find("right shift + "))
+            {
+                ControlTable["Bell Modifier", string] = "rshift"
+                ControlTable["Bell Key", string] = V:sub(14)
+            }
+
+            elseif (V:find("left ctrl + "))
+            {
+                ControlTable["Bell Modifier", string] = "lctrl"
+                ControlTable["Bell Key", string] = V:sub(12)
+            }
+
+            elseif (V:find("right ctrl + "))
+            {
+                ControlTable["Bell Modifier", string] = "rctrl"
+                ControlTable["Bell Key", string] = V:sub(13)
+            }
+
+            elseif (V:find("left alt + "))
+            {
+                ControlTable["Bell Modifier", string] = "lalt"
+                ControlTable["Bell Key", string] = V:sub(11)
+            }
+
+            elseif (V:find("right alt + "))
+            {
+                ControlTable["Bell Modifier", string] = "ralt"
+                ControlTable["Bell Key", string] = V:sub(12)
+            }
+
+            else
+            {
+                ControlTable["Bell Modifier", string] = ""
+                ControlTable["Bell Key", string] = V
+            }
+        }
+
+        if (K == "Headlights")
+        {
+            if (V:find("left shift + "))
+            {
+                ControlTable["Headlights Modifier", string] = "lshift"
+                ControlTable["Headlights Key", string] = V:sub(13)
+            }
+
+            elseif (V:find("right shift + "))
+            {
+                ControlTable["Headlights Modifier", string] = "rshift"
+                ControlTable["Headlights Key", string] = V:sub(14)
+            }
+
+            elseif (V:find("left ctrl + "))
+            {
+                ControlTable["Headlights Modifier", string] = "lctrl"
+                ControlTable["Headlights Key", string] = V:sub(12)
+            }
+
+            elseif (V:find("right ctrl + "))
+            {
+                ControlTable["Headlights Modifier", string] = "rctrl"
+                ControlTable["Headlights Key", string] = V:sub(13)
+            }
+
+            elseif (V:find("left alt + "))
+            {
+                ControlTable["Headlights Modifier", string] = "lalt"
+                ControlTable["Headlights Key", string] = V:sub(11)
+            }
+
+            elseif (V:find("right alt + "))
+            {
+                ControlTable["Headlights Modifier", string] = "ralt"
+                ControlTable["Headlights Key", string] = V:sub(12)
+            }
+
+            else
+            {
+                ControlTable["Headlights Modifier", string] = ""
+                ControlTable["Headlights Key", string] = V
+            }
+        }
+
+        if (K == "Ditch Lights")
+        {
+            if (V:find("left shift + "))
+            {
+                ControlTable["Ditch Lights Modifier", string] = "lshift"
+                ControlTable["Ditch Lights Key", string] = V:sub(13)
+            }
+
+            elseif (V:find("right shift + "))
+            {
+                ControlTable["Ditch Lights Modifier", string] = "rshift"
+                ControlTable["Ditch Lights Key", string] = V:sub(14)
+            }
+
+            elseif (V:find("left ctrl + "))
+            {
+                ControlTable["Ditch Lights Modifier", string] = "lctrl"
+                ControlTable["Ditch Lights Key", string] = V:sub(12)
+            }
+
+            elseif (V:find("right ctrl + "))
+            {
+                ControlTable["Ditch Lights Modifier", string] = "rctrl"
+                ControlTable["Ditch Lights Key", string] = V:sub(13)
+            }
+
+            elseif (V:find("left alt + "))
+            {
+                ControlTable["Ditch Lights Modifier", string] = "lalt"
+                ControlTable["Ditch Lights Key", string] = V:sub(11)
+            }
+
+            elseif (V:find("right alt + "))
+            {
+                ControlTable["Ditch Lights Modifier", string] = "ralt"
+                ControlTable["Ditch Lights Key", string] = V:sub(12)
+            }
+
+            else
+            {
+                ControlTable["Ditch Lights Modifier", string] = ""
+                ControlTable["Ditch Lights Key", string] = V
+            }
+        }
+    }
+
+    return ControlTable
+}
+
 # This function initializes the player controls.
 # This function should be called once per player.
 function table playerControlsInit(KeyboardControls:table, ThrottleMap:table, BrakeMap:table, TrainDriver:entity)
@@ -36,7 +630,7 @@ function table playerControlsInit(KeyboardControls:table, ThrottleMap:table, Bra
     Controls["Headlights", number] = 0
     Controls["DitchLights", number] = 0
     Controls["TrainDriver", entity] = TrainDriver
-    Controls["Controls", table] = KeyboardControls
+    Controls["Controls", table] = encodeKeyboardControls(KeyboardControls)
 
     # 'table:toArray()' is bugged, so I am directly using the throttle and brake maps.
     Controls["ThrottleMap", table] = ThrottleMap
