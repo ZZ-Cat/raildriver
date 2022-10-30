@@ -932,7 +932,7 @@ function number playerControlsValid(Controls:table, Speed)
     }
 
     # Throttle is invalid when the locomotive's direction is neutral.
-    if (Throttle > 0 & Direction == 0)
+    if (Throttle != 0 & Direction == 0)
     {
         Controls["Throttle", number] = 0
         Controls["Faults", table]["Message", string] = "Throttle is invalid when the locomotive's direction is neutral."
