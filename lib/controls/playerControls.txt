@@ -652,187 +652,180 @@ function table playerControlsInit(KeyboardControls:table, ThrottleMap:table, Bra
 # This function should be called every key clock tick.
 function void playerControlsUpdate(Controls:table)
 {
-    local KeyPressed = keyClkPressed()
-    local KeyState = keyClk(Controls["TrainDriver", entity]) == 1 ? 1 : 0
+    local KeyboardControls = Controls["Controls", table]
+    local Driver = Controls["TrainDriver", entity]
 
-    local String = ""
-    String += "Key: " + KeyPressed + ", State: " + KeyState
-    #printColor(vec(0, 255, 0), "[RailDriver | DEBUG]", vec(255, 255, 255), ": " + String)
-
-    if (Controls["TrainDriver", entity]:inVehicle())
+    # Set the locomotive's direction.
+    # Here, the direction selector is no longer clamped.
+    # This is to allow the fault reporting system to alert the player when the direction selector is out of range.
+    if (KeyboardControls["Increase Direction Modifier", string] != "" & KeyboardControls["Increase Direction Key", string] != "")
     {
-        if (KeyPressed)
+        if (Driver:keyPressed(KeyboardControls["Increase Direction Modifier", string]) & Driver:keyPressed(KeyboardControls["Increase Direction Key", string]))
         {
-            # Set direction to forward if the forward key is pressed.
-            if (KeyState == 1 & KeyPressed == Controls["Controls", array][1, string])
+            Controls["Direction", number] = Controls["Direction", number] + 1
+        }
+    }
+
+    elseif (KeyboardControls["Increase Direction Key", string] != "")
+    {
+        if (Driver:keyPressed(KeyboardControls["Increase Direction Key", string]))
+        {
+            Controls["Direction", number] = Controls["Direction", number] + 1
+        }
+    }
+
+    if (KeyboardControls["Decrease Direction Modifier", string] != "" & KeyboardControls["Decrease Direction Key", string] != "")
+    {
+        if (Driver:keyPressed(KeyboardControls["Decrease Direction Modifier", string]) & Driver:keyPressed(KeyboardControls["Decrease Direction Key", string]))
+        {
+            Controls["Direction", number] = Controls["Direction", number] - 1
+        }
+    }
+
+    elseif (KeyboardControls["Decrease Direction Key", string] != "")
+    {
+        if (Driver:keyPressed(KeyboardControls["Decrease Direction Key", string]))
+        {
+            Controls["Direction", number] = Controls["Direction", number] - 1
+        }
+    }
+
+    # Set the locomotive's throttle.
+    # Here, the throttle selector is no longer clamped.
+    # This is to allow the fault reporting system to alert the player when the throttle selector is out of range.
+    if (KeyboardControls["Increase Throttle Modifier", string] != "" & KeyboardControls["Increase Throttle Key", string] != "")
+    {
+        if (Driver:keyPressed(KeyboardControls["Increase Throttle Modifier", string]) & Driver:keyPressed(KeyboardControls["Increase Throttle Key", string]))
+        {
+            Controls["Throttle", number] = Controls["Throttle", number] + 1
+        }
+    }
+
+    elseif (KeyboardControls["Increase Throttle Key", string] != "")
+    {
+        if (Driver:keyPressed(KeyboardControls["Increase Throttle Key", string]))
+        {
+            Controls["Throttle", number] = Controls["Throttle", number] + 1
+        }
+    }
+
+    if (KeyboardControls["Decrease Throttle Modifier", string] != "" & KeyboardControls["Decrease Throttle Key", string] != "")
+    {
+        if (Driver:keyPressed(KeyboardControls["Decrease Throttle Modifier", string]) & Driver:keyPressed(KeyboardControls["Decrease Throttle Key", string]))
+        {
+            Controls["Throttle", number] = Controls["Throttle", number] - 1
+        }
+    }
+
+    elseif (KeyboardControls["Decrease Throttle Key", string] != "")
+    {
+        if (Driver:keyPressed(KeyboardControls["Decrease Throttle Key", string]))
+        {
+            Controls["Throttle", number] = Controls["Throttle", number] - 1
+        }
+    }
+
+    # Set the train brake.
+    # Here, the brake selector is no longer clamped.
+    # This is to allow the fault reporting system to alert the player when the train brake selector is out of range.
+    if (KeyboardControls["Increase Train Brake Modifier", string] != "" & KeyboardControls["Increase Train Brake Key", string] != "")
+    {
+        if (Driver:keyPressed(KeyboardControls["Increase Train Brake Modifier", string]) & Driver:keyPressed(KeyboardControls["Increase Train Brake Key", string]))
+        {
+            Controls["Brake", number] = Controls["Brake", number] + 1
+        }
+    }
+
+    elseif (KeyboardControls["Increase Train Brake Key", string] != "")
+    {
+        if (Driver:keyPressed(KeyboardControls["Increase Train Brake Key", string]))
+        {
+            Controls["Brake", number] = Controls["Brake", number] + 1
+        }
+    }
+
+    if (KeyboardControls["Decrease Train Brake Modifier", string] != "" & KeyboardControls["Decrease Train Brake Key", string] != "")
+    {
+        if (Driver:keyPressed(KeyboardControls["Decrease Train Brake Modifier", string]) & Driver:keyPressed(KeyboardControls["Decrease Train Brake Key", string]))
+        {
+            Controls["Brake", number] = Controls["Brake", number] - 1
+        }
+    }
+
+    elseif (KeyboardControls["Decrease Train Brake Key", string] != "")
+    {
+        if (Driver:keyPressed(KeyboardControls["Decrease Train Brake Key", string]))
+        {
+            Controls["Brake", number] = Controls["Brake", number] - 1
+        }
+    }
+
+    # Set the engine brake.
+    # Here, the engine brake selector is no longer clamped.
+    # This is to allow the fault reporting system to alert the player when the engine brake selector is out of range.
+    if (KeyboardControls["Increase Engine Brake Modifier", string] != "" & KeyboardControls["Increase Engine Brake Key", string] != "")
+    {
+        if (Driver:keyPressed(KeyboardControls["Increase Engine Brake Modifier", string]) & Driver:keyPressed(KeyboardControls["Increase Engine Brake Key", string]))
+        {
+            Controls["Brake", number] = Controls["Brake", number] + 1
+        }
+    }
+
+    elseif (KeyboardControls["Increase Engine Brake Key", string] != "")
+    {
+        if (Driver:keyPressed(KeyboardControls["Increase Engine Brake Key", string]))
+        {
+            Controls["Brake", number] = Controls["Brake", number] + 1
+        }
+    }
+
+    if (KeyboardControls["Decrease Engine Brake Modifier", string] != "" & KeyboardControls["Decrease Engine Brake Key", string] != "")
+    {
+        if (Driver:keyPressed(KeyboardControls["Decrease Engine Brake Modifier", string]) & Driver:keyPressed(KeyboardControls["Decrease Engine Brake Key", string]))
+        {
+            Controls["Brake", number] = Controls["Brake", number] - 1
+        }
+    }
+
+    elseif (KeyboardControls["Decrease Engine Brake Key", string] != "")
+    {
+        if (Driver:keyPressed(KeyboardControls["Decrease Engine Brake Key", string]))
+        {
+            Controls["Brake", number] = Controls["Brake", number] - 1
+        }
+    }
+
+    # Set the emergency brake.
+    if (KeyboardControls["Emergency Brake Modifier", string] != "" & KeyboardControls["Emergency Brake Key", string] != "")
+    {
+        if (Driver:keyPressed(KeyboardControls["Emergency Brake Modifier", string]) & Driver:keyPressed(KeyboardControls["Emergency Brake Key", string]))
+        {
+            if (Controls["Emergency Brake", number] == 0)
             {
-                Controls["Direction", number] = Controls["Direction", number] + 1
-                Controls["Direction", number] = clamp(Controls["Direction", number], -1, 1)
+                Controls["Emergency Brake", number] = 1
             }
 
-            # Set direction to reverse if the reverse key is pressed.
-            if (KeyState == 1 & KeyPressed == Controls["Controls", array][2, string])
+            else
             {
-                Controls["Direction", number] = Controls["Direction", number] - 1
-                Controls["Direction", number] = clamp(Controls["Direction", number], -1, 1)
+                Controls["Faults", table]["Message", string] = "Emergency brake is already applied."
+                Controls["Faults", table]["EmergencyBrake", number] = 1
+            }
+        }
+    }
+
+    elseif (KeyboardControls["Emergency Brake Key", string] != "")
+    {
+        if (Driver:keyPressed(KeyboardControls["Emergency Brake Key", string]))
+        {
+            if (Controls["Emergency Brake", number] == 0)
+            {
+                Controls["Emergency Brake", number] = 1
             }
 
-            # Increase throttle if the increase throttle key is pressed.
-            if (KeyState == 1 & KeyPressed == Controls["Controls", array][3, string])
+            else
             {
-                # Increase throttle by 1.
-                Controls["Throttle", number] = Controls["Throttle", number] + 1
-
-                # Get the throttle map.
-                local ThrMap = Controls["ThrottleMap", table]
-
-                # Clamp the throttle to the maximum value in the throttle map.
-                # Each throttle map has its own minimum & maximum values.
-                switch(ThrMap["Throttle Input Type", string])
-                {
-                    # Velocity Mode.
-                    case "Velocity",
-                        Controls["Throttle", number] = clamp(Controls["Throttle", number], 0, ThrMap["Velocity Setpoint", array]:count())
-                    break
-
-                    # Acceleration Mode.
-                    case "Acceleration",
-                        Controls["Throttle", number] = clamp(Controls["Throttle", number], 0, ThrMap["Acceleration Setpoint", array]:count())
-                    break
-
-                    # Torque Mode.
-                    case "Torque",
-                        Controls["Throttle", number] = clamp(Controls["Throttle", number], 0, ThrMap["Torque Setpoint", array]:count())
-                    break
-                }
-            }
-
-            # Decrease throttle if the decrease throttle key is pressed.
-            if (KeyState == 1 & KeyPressed == Controls["Controls", array][4, string])
-            {
-                # Decrease throttle by 1.
-                Controls["Throttle", number] = Controls["Throttle", number] - 1
-
-                # Get the throttle map.
-                local ThrMap = Controls["ThrottleMap", table]
-
-                # Clamp the throttle to the minimum value in the throttle map.
-                # Each throttle map has its own minimum & maximum values.
-                switch(ThrMap["Throttle Input Type", string])
-                {
-                    # Velocity Mode.
-                    case "Velocity",
-                        Controls["Throttle", number] = clamp(Controls["Throttle", number], 0, ThrMap["Velocity Setpoint", array]:count())
-                    break
-
-                    # Acceleration Mode.
-                    case "Acceleration",
-                        Controls["Throttle", number] = clamp(Controls["Throttle", number], 0, ThrMap["Acceleration Setpoint", array]:count())
-                    break
-
-                    # Torque Mode.
-                    case "Torque",
-                        Controls["Throttle", number] = clamp(Controls["Throttle", number], 0, ThrMap["Torque Setpoint", array]:count())
-                    break
-                }
-            }
-
-            # Increase brake if the increase brake key is pressed.
-            if (KeyState == 1 & KeyPressed == Controls["Controls", array][5, string])
-            {
-                # Increase brake by 1.
-                Controls["Brake", number] = Controls["Brake", number] + 1
-
-                # Get the brake map.
-                local BrkMap = Controls["BrakeMap", table]
-
-                # Clamp the brake to the maximum value in the brake map.
-                # Each brake map has its own minimum & maximum values.
-                switch(BrkMap["Brake Input Type", string])
-                {
-                    # Velocity Mode.
-                    case "Velocity",
-                        # Brake is disabled in this mode.
-                        Controls["Brake", number] = clamp(Controls["Brake", number], 0, 0)
-                    break
-
-                    # Acceleration Mode.
-                    case "Acceleration",
-                        Controls["Brake", number] = clamp(Controls["Brake", number], 0, BrkMap["Deceleration Setpoint", array]:count())
-                    break
-
-                    # Torque Mode.
-                    case "Torque",
-                        Controls["Brake", number] = clamp(Controls["Brake", number], 0, BrkMap["Torque Setpoint", array]:count())
-                    break
-                }
-            }
-
-            # Decrease brake if the decrease brake key is pressed.
-            if (KeyState == 1 & KeyPressed == Controls["Controls", array][6, string])
-            {
-                # Decrease brake by 1.
-                Controls["Brake", number] = Controls["Brake", number] - 1
-
-                # Get the brake map.
-                local BrkMap = Controls["BrakeMap", table]
-
-                # Clamp the brake to the minimum value in the brake map.
-                # Each brake map has its own minimum & maximum values.
-                switch(BrkMap["Brake Input Type", string])
-                {
-                    # Velocity Mode.
-                    case "Velocity",
-                        # Brake is disabled in this mode.
-                        Controls["Brake", number] = clamp(Controls["Brake", number], 0, 0)
-                    break
-
-                    # Acceleration Mode.
-                    case "Acceleration",
-                        Controls["Brake", number] = clamp(Controls["Brake", number], 0, BrkMap["Deceleration Setpoint", array]:count())
-                    break
-
-                    # Torque Mode.
-                    case "Torque",
-                        Controls["Brake", number] = clamp(Controls["Brake", number], 0, BrkMap["Torque Setpoint", array]:count())
-                    break
-                }
-            }
-
-            # Set emergency brake if the emergency brake key is pressed.
-            if (KeyState == 1 & KeyPressed == Controls["Controls", array][7, string])
-            {
-                Controls["EmergencyBrake", number] = 1
-            }
-
-            # Set horn if the horn key is pressed.
-            if (KeyState == 1 & KeyPressed == Controls["Controls", array][8, string])
-            {
-                Controls["Horn", number] = 1
-            }
-
-            # Release horn if the horn key is released.
-            if (KeyState == 0 & KeyPressed == Controls["Controls", array][8, string])
-            {
-                Controls["Horn", number] = 0
-            }
-
-            # Toggle bell if the bell key is pressed.
-            if (KeyState == 1 & KeyPressed == Controls["Controls", array][9, string])
-            {
-                Controls["Bell", number] = Controls["Bell", number] == 0 ? 1 : 0
-            }
-
-            # Toggle headlights if the headlights key is pressed.
-            if (KeyState == 1 & KeyPressed == Controls["Controls", array][10, string])
-            {
-                Controls["Headlights", number] = Controls["Headlights", number] == 0 ? 1 : 0
-            }
-
-            # Toggle ditch lights if the ditch lights key is pressed.
-            if (KeyState == 1 & KeyPressed == Controls["Controls", array][11, string])
-            {
-                Controls["DitchLights", number] = Controls["DitchLights", number] == 0 ? 1 : 0
+                Controls["Faults", table]["Message", string] = "Emergency brake is already applied."
+                Controls["Faults", table]["EmergencyBrake", number] = 1
             }
         }
     }
