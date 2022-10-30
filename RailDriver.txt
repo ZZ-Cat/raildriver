@@ -164,7 +164,9 @@ if (clk("Debug"))
 {
     stoptimer("Debug")
     timer("Debug", 100)
-    Debugger["Speed Raw", number] = SpeedRaw
-    Debugger["Speed Filtered", number] = SpeedFiltered
-    Debugger["Speed Filter Cut-off Frequency (Hz)", number] = speedometerGetFilterCutOffFrequencyHz(Speedo)
+    Debugger["Speed", number] = SpeedFiltered
+    Debugger["Reverser", number] = playerControlsGetDirection(PlayerControls)
+    Debugger["Throttle", number] = playerControlsGetThrottle(PlayerControls)
+    Debugger["Brake", number] = playerControlsGetBrake(PlayerControls)
+    Debugger["Emergency Brake", number] = playerControlsGetEmergencyBrake(PlayerControls)
 }
