@@ -100,7 +100,7 @@ if (first() | duped())
         KeyboardControls["Decrease Engine Brake", string] = "left ctrl + A"
         KeyboardControls["Emergency Brake", string] = "space"
         KeyboardControls["Horn", string] = "H"
-        KeyboardControls["bell", string] = "left alt"
+        KeyboardControls["Bell", string] = "left alt"
         KeyboardControls["Headlights", string] = "F"
         KeyboardControls["Ditch Lights", string] = "left shift + F"
 
