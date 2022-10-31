@@ -1014,7 +1014,7 @@ function number playerControlsValid(Controls:table, Speed)
         # Velocity Mode.
         case "Velocity",
             # Brake is disabled in Velocity Mode. Any value set to the brake is invalid.
-            if (Brake > 0)
+            if (Brake != 0)
             {
                 Controls["Brake", number] = 0
                 Controls["Faults", table]["Message", string] = "Brake is disabled in Velocity Mode."
