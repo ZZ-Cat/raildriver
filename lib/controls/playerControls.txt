@@ -716,7 +716,7 @@ function table playerControlsInit(KeyboardControls:table, ThrottleMap:table, Bra
     Controls["Direction", number] = 0
     Controls["Throttle", number] = 0
     Controls["Brake", number] = 0
-    Controls["EmergencyBrake", number] = 0
+    Controls["Emergency Brake", number] = 0
     Controls["Horn", number] = 0
     Controls["Bell", number] = 0
     Controls["Headlights", number] = 0
@@ -733,7 +733,7 @@ function table playerControlsInit(KeyboardControls:table, ThrottleMap:table, Bra
     Controls["Faults", table]["Direction", number] = 0
     Controls["Faults", table]["Throttle", number] = 0
     Controls["Faults", table]["Brake", number] = 0
-    Controls["Faults", table]["EmergencyBrake", number] = 0
+    Controls["Faults", table]["Emergency Brake", number] = 0
     Controls["Faults", table]["Message", string] = ""
 
     runOnKeys(Controls["TrainDriver", entity], 1)
@@ -809,14 +809,14 @@ function void playerControlsUpdate(Controls:table)
     # Update the emergency brake.
     elseif (EmergencyBrake)
     {
-        if (Controls["EmergencyBrake", number] == 0)
+        if (Controls["Emergency Brake", number] == 0)
         {
-            Controls["EmergencyBrake", number] = 1
+            Controls["Emergency Brake", number] = 1
         }
         else
         {
             Controls["Faults", table]["Message", string] = "Emergency brake is already applied."
-            Controls["Faults", table]["EmergencyBrake", number] = 1
+            Controls["Faults", table]["Emergency Brake", number] = 1
         }
     }
 }
@@ -842,7 +842,7 @@ function number playerControlsGetBrake(Controls:table)
 # This function returns the emergency brake of the locomotive.
 function number playerControlsGetEmergencyBrake(Controls:table)
 {
-    return Controls["EmergencyBrake", number]
+    return Controls["Emergency Brake", number]
 }
 
 # This function returns the horn of the locomotive.
@@ -876,7 +876,7 @@ function number playerControlsValid(Controls:table, Speed)
     local Direction = Controls["Direction", number]
     local Throttle = Controls["Throttle", number]
     local Brake = Controls["Brake", number]
-    local EmergencyBrake = Controls["EmergencyBrake", number]
+    local EmergencyBrake = Controls["Emergency Brake", number]
 
     # Get the throttle & brake maps.
     local ThrMap = Controls["ThrottleMap", table]
