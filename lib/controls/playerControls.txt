@@ -34,42 +34,49 @@ function table encodeKeyboardControls(KeyboardControls:table)
             {
                 ControlTable["Increase Direction Modifier", string] = "lshift"
                 ControlTable["Increase Direction Key", string] = V:sub(13):trim():upper()
+                ControlTable["Increase Direction has Modifier", number] = 1
             }
 
             elseif (V:find("right shift + "))
             {
                 ControlTable["Increase Direction Modifier", string] = "rshift"
                 ControlTable["Increase Direction Key", string] = V:sub(14):trim():upper()
+                ControlTable["Increase Direction has Modifier", number] = 1
             }
 
             elseif (V:find("left ctrl + "))
             {
                 ControlTable["Increase Direction Modifier", string] = "lcontrol"
                 ControlTable["Increase Direction Key", string] = V:sub(12):trim():upper()
+                ControlTable["Increase Direction has Modifier", number] = 1
             }
 
             elseif (V:find("right ctrl + "))
             {
                 ControlTable["Increase Direction Modifier", string] = "rcontrol"
                 ControlTable["Increase Direction Key", string] = V:sub(13):trim():upper()
+                ControlTable["Increase Direction has Modifier", number] = 1
             }
 
             elseif (V:find("left alt + "))
             {
                 ControlTable["Increase Direction Modifier", string] = "lalt"
                 ControlTable["Increase Direction Key", string] = V:sub(11):trim():upper()
+                ControlTable["Increase Direction has Modifier", number] = 1
             }
 
             elseif (V:find("right alt + "))
             {
                 ControlTable["Increase Direction Modifier", string] = "ralt"
                 ControlTable["Increase Direction Key", string] = V:sub(12):trim():upper()
+                ControlTable["Increase Direction has Modifier", number] = 1
             }
 
             else
             {
                 ControlTable["Increase Direction Modifier", string] = ""
                 ControlTable["Increase Direction Key", string] = V:trim():upper()
+                ControlTable["Increase Direction has Modifier", number] = 0
             }
         }
 
@@ -79,42 +86,49 @@ function table encodeKeyboardControls(KeyboardControls:table)
             {
                 ControlTable["Decrease Direction Modifier", string] = "lshift"
                 ControlTable["Decrease Direction Key", string] = V:sub(13):trim():upper()
+                ControlTable["Decrease Direction has Modifier", number] = 1
             }
 
             elseif (V:find("right shift + "))
             {
                 ControlTable["Decrease Direction Modifier", string] = "rshift"
                 ControlTable["Decrease Direction Key", string] = V:sub(14):trim():upper()
+                ControlTable["Decrease Direction has Modifier", number] = 1
             }
 
             elseif (V:find("left ctrl + "))
             {
                 ControlTable["Decrease Direction Modifier", string] = "lcontrol"
                 ControlTable["Decrease Direction Key", string] = V:sub(12):trim():upper()
+                ControlTable["Decrease Direction has Modifier", number] = 1
             }
 
             elseif (V:find("right ctrl + "))
             {
                 ControlTable["Decrease Direction Modifier", string] = "rcontrol"
                 ControlTable["Decrease Direction Key", string] = V:sub(13):trim():upper()
+                ControlTable["Decrease Direction has Modifier", number] = 1
             }
 
             elseif (V:find("left alt + "))
             {
                 ControlTable["Decrease Direction Modifier", string] = "lalt"
                 ControlTable["Decrease Direction Key", string] = V:sub(11):trim():upper()
+                ControlTable["Decrease Direction has Modifier", number] = 1
             }
 
             elseif (V:find("right alt + "))
             {
                 ControlTable["Decrease Direction Modifier", string] = "ralt"
                 ControlTable["Decrease Direction Key", string] = V:sub(12):trim():upper()
+                ControlTable["Decrease Direction has Modifier", number] = 1
             }
 
             else
             {
                 ControlTable["Decrease Direction Modifier", string] = ""
                 ControlTable["Decrease Direction Key", string] = V:trim():upper()
+                ControlTable["Decrease Direction has Modifier", number] = 0
             }
         }
 
@@ -124,42 +138,49 @@ function table encodeKeyboardControls(KeyboardControls:table)
             {
                 ControlTable["Increase Throttle Modifier", string] = "lshift"
                 ControlTable["Increase Throttle Key", string] = V:sub(13):trim():upper()
+                ControlTable["Increase Throttle has Modifier", number] = 1
             }
 
             elseif (V:find("right shift + "))
             {
                 ControlTable["Increase Throttle Modifier", string] = "rshift"
                 ControlTable["Increase Throttle Key", string] = V:sub(14):trim():upper()
+                ControlTable["Increase Throttle has Modifier", number] = 1
             }
 
             elseif (V:find("left ctrl + "))
             {
                 ControlTable["Increase Throttle Modifier", string] = "lcontrol"
                 ControlTable["Increase Throttle Key", string] = V:sub(12):trim():upper()
+                ControlTable["Increase Throttle has Modifier", number] = 1
             }
 
             elseif (V:find("right ctrl + "))
             {
                 ControlTable["Increase Throttle Modifier", string] = "rcontrol"
                 ControlTable["Increase Throttle Key", string] = V:sub(13):trim():upper()
+                ControlTable["Increase Throttle has Modifier", number] = 1
             }
 
             elseif (V:find("left alt + "))
             {
                 ControlTable["Increase Throttle Modifier", string] = "lalt"
                 ControlTable["Increase Throttle Key", string] = V:sub(11):trim():upper()
+                ControlTable["Increase Throttle has Modifier", number] = 1
             }
 
             elseif (V:find("right alt + "))
             {
                 ControlTable["Increase Throttle Modifier", string] = "ralt"
                 ControlTable["Increase Throttle Key", string] = V:sub(12):trim():upper()
+                ControlTable["Increase Throttle has Modifier", number] = 1
             }
 
             else
             {
                 ControlTable["Increase Throttle Modifier", string] = ""
                 ControlTable["Increase Throttle Key", string] = V:trim():upper()
+                ControlTable["Increase Throttle has Modifier", number] = 0
             }
         }
 
@@ -169,42 +190,49 @@ function table encodeKeyboardControls(KeyboardControls:table)
             {
                 ControlTable["Decrease Throttle Modifier", string] = "lshift"
                 ControlTable["Decrease Throttle Key", string] = V:sub(13):trim():upper()
+                ControlTable["Decrease Throttle has Modifier", number] = 1
             }
 
             elseif (V:find("right shift + "))
             {
                 ControlTable["Decrease Throttle Modifier", string] = "rshift"
                 ControlTable["Decrease Throttle Key", string] = V:sub(14):trim():upper()
+                ControlTable["Decrease Throttle has Modifier", number] = 1
             }
 
             elseif (V:find("left ctrl + "))
             {
                 ControlTable["Decrease Throttle Modifier", string] = "lcontrol"
                 ControlTable["Decrease Throttle Key", string] = V:sub(12):trim():upper()
+                ControlTable["Decrease Throttle has Modifier", number] = 1
             }
 
             elseif (V:find("right ctrl + "))
             {
                 ControlTable["Decrease Throttle Modifier", string] = "rcontrol"
                 ControlTable["Decrease Throttle Key", string] = V:sub(13):trim():upper()
+                ControlTable["Decrease Throttle has Modifier", number] = 1
             }
 
             elseif (V:find("left alt + "))
             {
                 ControlTable["Decrease Throttle Modifier", string] = "lalt"
                 ControlTable["Decrease Throttle Key", string] = V:sub(11):trim():upper()
+                ControlTable["Decrease Throttle has Modifier", number] = 1
             }
 
             elseif (V:find("right alt + "))
             {
                 ControlTable["Decrease Throttle Modifier", string] = "ralt"
                 ControlTable["Decrease Throttle Key", string] = V:sub(12):trim():upper()
+                ControlTable["Decrease Throttle has Modifier", number] = 1
             }
 
             else
             {
                 ControlTable["Decrease Throttle Modifier", string] = ""
                 ControlTable["Decrease Throttle Key", string] = V:trim():upper()
+                ControlTable["Decrease Throttle has Modifier", number] = 0
             }
         }
 
@@ -214,42 +242,49 @@ function table encodeKeyboardControls(KeyboardControls:table)
             {
                 ControlTable["Increase Train Brake Modifier", string] = "lshift"
                 ControlTable["Increase Train Brake Key", string] = V:sub(13):trim():upper()
+                ControlTable["Increase Train Brake has Modifier", number] = 1
             }
 
             elseif (V:find("right shift + "))
             {
                 ControlTable["Increase Train Brake Modifier", string] = "rshift"
                 ControlTable["Increase Train Brake Key", string] = V:sub(14):trim():upper()
+                ControlTable["Increase Train Brake has Modifier", number] = 1
             }
 
             elseif (V:find("left ctrl + "))
             {
                 ControlTable["Increase Train Brake Modifier", string] = "lcontrol"
                 ControlTable["Increase Train Brake Key", string] = V:sub(12):trim():upper()
+                ControlTable["Increase Train Brake has Modifier", number] = 1
             }
 
             elseif (V:find("right ctrl + "))
             {
                 ControlTable["Increase Train Brake Modifier", string] = "rcontrol"
                 ControlTable["Increase Train Brake Key", string] = V:sub(13):trim():upper()
+                ControlTable["Increase Train Brake has Modifier", number] = 1
             }
 
             elseif (V:find("left alt + "))
             {
                 ControlTable["Increase Train Brake Modifier", string] = "lalt"
                 ControlTable["Increase Train Brake Key", string] = V:sub(11):trim():upper()
+                ControlTable["Increase Train Brake has Modifier", number] = 1
             }
 
             elseif (V:find("right alt + "))
             {
                 ControlTable["Increase Train Brake Modifier", string] = "ralt"
                 ControlTable["Increase Train Brake Key", string] = V:sub(12):trim():upper()
+                ControlTable["Increase Train Brake has Modifier", number] = 1
             }
 
             else
             {
                 ControlTable["Increase Train Brake Modifier", string] = ""
                 ControlTable["Increase Train Brake Key", string] = V:trim():upper()
+                ControlTable["Increase Train Brake has Modifier", number] = 0
             }
         }
 
@@ -259,42 +294,49 @@ function table encodeKeyboardControls(KeyboardControls:table)
             {
                 ControlTable["Decrease Train Brake Modifier", string] = "lshift"
                 ControlTable["Decrease Train Brake Key", string] = V:sub(13):trim():upper()
+                ControlTable["Decrease Train Brake has Modifier", number] = 1
             }
 
             elseif (V:find("right shift + "))
             {
                 ControlTable["Decrease Train Brake Modifier", string] = "rshift"
                 ControlTable["Decrease Train Brake Key", string] = V:sub(14):trim():upper()
+                ControlTable["Decrease Train Brake has Modifier", number] = 1
             }
 
             elseif (V:find("left ctrl + "))
             {
                 ControlTable["Decrease Train Brake Modifier", string] = "lcontrol"
                 ControlTable["Decrease Train Brake Key", string] = V:sub(12):trim():upper()
+                ControlTable["Decrease Train Brake has Modifier", number] = 1
             }
 
             elseif (V:find("right ctrl + "))
             {
                 ControlTable["Decrease Train Brake Modifier", string] = "rcontrol"
                 ControlTable["Decrease Train Brake Key", string] = V:sub(13):trim():upper()
+                ControlTable["Decrease Train Brake has Modifier", number] = 1
             }
 
             elseif (V:find("left alt + "))
             {
                 ControlTable["Decrease Train Brake Modifier", string] = "lalt"
                 ControlTable["Decrease Train Brake Key", string] = V:sub(11):trim():upper()
+                ControlTable["Decrease Train Brake has Modifier", number] = 1
             }
 
             elseif (V:find("right alt + "))
             {
                 ControlTable["Decrease Train Brake Modifier", string] = "ralt"
                 ControlTable["Decrease Train Brake Key", string] = V:sub(12):trim():upper()
+                ControlTable["Decrease Train Brake has Modifier", number] = 1
             }
 
             else
             {
                 ControlTable["Decrease Train Brake Modifier", string] = ""
                 ControlTable["Decrease Train Brake Key", string] = V:trim():upper()
+                ControlTable["Decrease Train Brake has Modifier", number] = 0
             }
         }
 
@@ -304,42 +346,49 @@ function table encodeKeyboardControls(KeyboardControls:table)
             {
                 ControlTable["Increase Engine Brake Modifier", string] = "lshift"
                 ControlTable["Increase Engine Brake Key", string] = V:sub(13):trim():upper()
+                ControlTable["Increase Engine Brake has Modifier", number] = 1
             }
 
             elseif (V:find("right shift + "))
             {
                 ControlTable["Increase Engine Brake Modifier", string] = "rshift"
                 ControlTable["Increase Engine Brake Key", string] = V:sub(14):trim():upper()
+                ControlTable["Increase Engine Brake has Modifier", number] = 1
             }
 
             elseif (V:find("left ctrl + "))
             {
                 ControlTable["Increase Engine Brake Modifier", string] = "lcontrol"
                 ControlTable["Increase Engine Brake Key", string] = V:sub(12):trim():upper()
+                ControlTable["Increase Engine Brake has Modifier", number] = 1
             }
 
             elseif (V:find("right ctrl + "))
             {
                 ControlTable["Increase Engine Brake Modifier", string] = "rcontrol"
                 ControlTable["Increase Engine Brake Key", string] = V:sub(13):trim():upper()
+                ControlTable["Increase Engine Brake has Modifier", number] = 1
             }
 
             elseif (V:find("left alt + "))
             {
                 ControlTable["Increase Engine Brake Modifier", string] = "lalt"
                 ControlTable["Increase Engine Brake Key", string] = V:sub(11):trim():upper()
+                ControlTable["Increase Engine Brake has Modifier", number] = 1
             }
 
             elseif (V:find("right alt + "))
             {
                 ControlTable["Increase Engine Brake Modifier", string] = "ralt"
                 ControlTable["Increase Engine Brake Key", string] = V:sub(12):trim():upper()
+                ControlTable["Increase Engine Brake has Modifier", number] = 1
             }
 
             else
             {
                 ControlTable["Increase Engine Brake Modifier", string] = ""
                 ControlTable["Increase Engine Brake Key", string] = V:trim():upper()
+                ControlTable["Increase Engine Brake has Modifier", number] = 0
             }
         }
 
@@ -349,42 +398,49 @@ function table encodeKeyboardControls(KeyboardControls:table)
             {
                 ControlTable["Decrease Engine Brake Modifier", string] = "lshift"
                 ControlTable["Decrease Engine Brake Key", string] = V:sub(13):trim():upper()
+                ControlTable["Decrease Engine Brake has Modifier", number] = 1
             }
 
             elseif (V:find("right shift + "))
             {
                 ControlTable["Decrease Engine Brake Modifier", string] = "rshift"
                 ControlTable["Decrease Engine Brake Key", string] = V:sub(14):trim():upper()
+                ControlTable["Decrease Engine Brake has Modifier", number] = 1
             }
 
             elseif (V:find("left ctrl + "))
             {
                 ControlTable["Decrease Engine Brake Modifier", string] = "lcontrol"
                 ControlTable["Decrease Engine Brake Key", string] = V:sub(12):trim():upper()
+                ControlTable["Decrease Engine Brake has Modifier", number] = 1
             }
 
             elseif (V:find("right ctrl + "))
             {
                 ControlTable["Decrease Engine Brake Modifier", string] = "rcontrol"
                 ControlTable["Decrease Engine Brake Key", string] = V:sub(13):trim():upper()
+                ControlTable["Decrease Engine Brake has Modifier", number] = 1
             }
 
             elseif (V:find("left alt + "))
             {
                 ControlTable["Decrease Engine Brake Modifier", string] = "lalt"
                 ControlTable["Decrease Engine Brake Key", string] = V:sub(11):trim():upper()
+                ControlTable["Decrease Engine Brake has Modifier", number] = 1
             }
 
             elseif (V:find("right alt + "))
             {
                 ControlTable["Decrease Engine Brake Modifier", string] = "ralt"
                 ControlTable["Decrease Engine Brake Key", string] = V:sub(12):trim():upper()
+                ControlTable["Decrease Engine Brake has Modifier", number] = 1
             }
 
             else
             {
                 ControlTable["Decrease Engine Brake Modifier", string] = ""
                 ControlTable["Decrease Engine Brake Key", string] = V:trim():upper()
+                ControlTable["Decrease Engine Brake has Modifier", number] = 0
             }
         }
 
@@ -394,42 +450,49 @@ function table encodeKeyboardControls(KeyboardControls:table)
             {
                 ControlTable["Emergency Brake Modifier", string] = "lshift"
                 ControlTable["Emergency Brake Key", string] = V:sub(13):trim():upper()
+                ControlTable["Emergency Brake has Modifier", number] = 1
             }
 
             elseif (V:find("right shift + "))
             {
                 ControlTable["Emergency Brake Modifier", string] = "rshift"
                 ControlTable["Emergency Brake Key", string] = V:sub(14):trim():upper()
+                ControlTable["Emergency Brake has Modifier", number] = 1
             }
 
             elseif (V:find("left ctrl + "))
             {
                 ControlTable["Emergency Brake Modifier", string] = "lcontrol"
                 ControlTable["Emergency Brake Key", string] = V:sub(12):trim():upper()
+                ControlTable["Emergency Brake has Modifier", number] = 1
             }
 
             elseif (V:find("right ctrl + "))
             {
                 ControlTable["Emergency Brake Modifier", string] = "rcontrol"
                 ControlTable["Emergency Brake Key", string] = V:sub(13):trim():upper()
+                ControlTable["Emergency Brake has Modifier", number] = 1
             }
 
             elseif (V:find("left alt + "))
             {
                 ControlTable["Emergency Brake Modifier", string] = "lalt"
                 ControlTable["Emergency Brake Key", string] = V:sub(11):trim():upper()
+                ControlTable["Emergency Brake has Modifier", number] = 1
             }
 
             elseif (V:find("right alt + "))
             {
                 ControlTable["Emergency Brake Modifier", string] = "ralt"
                 ControlTable["Emergency Brake Key", string] = V:sub(12):trim():upper()
+                ControlTable["Emergency Brake has Modifier", number] = 1
             }
 
             else
             {
                 ControlTable["Emergency Brake Modifier", string] = ""
                 ControlTable["Emergency Brake Key", string] = V:trim():upper()
+                ControlTable["Emergency Brake has Modifier", number] = 0
             }
         }
 
@@ -439,42 +502,49 @@ function table encodeKeyboardControls(KeyboardControls:table)
             {
                 ControlTable["Horn Modifier", string] = "lshift"
                 ControlTable["Horn Key", string] = V:sub(13):trim():upper()
+                ControlTable["Horn has Modifier", number] = 1
             }
 
             elseif (V:find("right shift + "))
             {
                 ControlTable["Horn Modifier", string] = "rshift"
                 ControlTable["Horn Key", string] = V:sub(14):trim():upper()
+                ControlTable["Horn has Modifier", number] = 1
             }
 
             elseif (V:find("left ctrl + "))
             {
                 ControlTable["Horn Modifier", string] = "lcontrol"
                 ControlTable["Horn Key", string] = V:sub(12):trim():upper()
+                ControlTable["Horn has Modifier", number] = 1
             }
 
             elseif (V:find("right ctrl + "))
             {
                 ControlTable["Horn Modifier", string] = "rcontrol"
                 ControlTable["Horn Key", string] = V:sub(13):trim():upper()
+                ControlTable["Horn has Modifier", number] = 1
             }
 
             elseif (V:find("left alt + "))
             {
                 ControlTable["Horn Modifier", string] = "lalt"
                 ControlTable["Horn Key", string] = V:sub(11):trim():upper()
+                ControlTable["Horn has Modifier", number] = 1
             }
 
             elseif (V:find("right alt + "))
             {
                 ControlTable["Horn Modifier", string] = "ralt"
                 ControlTable["Horn Key", string] = V:sub(12):trim():upper()
+                ControlTable["Horn has Modifier", number] = 1
             }
 
             else
             {
                 ControlTable["Horn Modifier", string] = ""
                 ControlTable["Horn Key", string] = V:trim():upper()
+                ControlTable["Horn has Modifier", number] = 0
             }
         }
 
@@ -484,42 +554,49 @@ function table encodeKeyboardControls(KeyboardControls:table)
             {
                 ControlTable["Bell Modifier", string] = "lshift"
                 ControlTable["Bell Key", string] = V:sub(13):trim():upper()
+                ControlTable["Bell has Modifier", number] = 1
             }
 
             elseif (V:find("right shift + "))
             {
                 ControlTable["Bell Modifier", string] = "rshift"
                 ControlTable["Bell Key", string] = V:sub(14):trim():upper()
+                ControlTable["Bell has Modifier", number] = 1
             }
 
             elseif (V:find("left ctrl + "))
             {
                 ControlTable["Bell Modifier", string] = "lcontrol"
                 ControlTable["Bell Key", string] = V:sub(12):trim():upper()
+                ControlTable["Bell has Modifier", number] = 1
             }
 
             elseif (V:find("right ctrl + "))
             {
                 ControlTable["Bell Modifier", string] = "rcontrol"
                 ControlTable["Bell Key", string] = V:sub(13):trim():upper()
+                ControlTable["Bell has Modifier", number] = 1
             }
 
             elseif (V:find("left alt + "))
             {
                 ControlTable["Bell Modifier", string] = "lalt"
                 ControlTable["Bell Key", string] = V:sub(11):trim():upper()
+                ControlTable["Bell has Modifier", number] = 1
             }
 
             elseif (V:find("right alt + "))
             {
                 ControlTable["Bell Modifier", string] = "ralt"
                 ControlTable["Bell Key", string] = V:sub(12):trim():upper()
+                ControlTable["Bell has Modifier", number] = 1
             }
 
             else
             {
                 ControlTable["Bell Modifier", string] = ""
                 ControlTable["Bell Key", string] = V:trim():upper()
+                ControlTable["Bell has Modifier", number] = 0
             }
         }
 
@@ -529,42 +606,49 @@ function table encodeKeyboardControls(KeyboardControls:table)
             {
                 ControlTable["Headlights Modifier", string] = "lshift"
                 ControlTable["Headlights Key", string] = V:sub(13):trim():upper()
+                ControlTable["Headlights has Modifier", number] = 1
             }
 
             elseif (V:find("right shift + "))
             {
                 ControlTable["Headlights Modifier", string] = "rshift"
                 ControlTable["Headlights Key", string] = V:sub(14):trim():upper()
+                ControlTable["Headlights has Modifier", number] = 1
             }
 
             elseif (V:find("left ctrl + "))
             {
                 ControlTable["Headlights Modifier", string] = "lcontrol"
                 ControlTable["Headlights Key", string] = V:sub(12):trim():upper()
+                ControlTable["Headlights has Modifier", number] = 1
             }
 
             elseif (V:find("right ctrl + "))
             {
                 ControlTable["Headlights Modifier", string] = "rcontrol"
                 ControlTable["Headlights Key", string] = V:sub(13):trim():upper()
+                ControlTable["Headlights has Modifier", number] = 1
             }
 
             elseif (V:find("left alt + "))
             {
                 ControlTable["Headlights Modifier", string] = "lalt"
                 ControlTable["Headlights Key", string] = V:sub(11):trim():upper()
+                ControlTable["Headlights has Modifier", number] = 1
             }
 
             elseif (V:find("right alt + "))
             {
                 ControlTable["Headlights Modifier", string] = "ralt"
                 ControlTable["Headlights Key", string] = V:sub(12):trim():upper()
+                ControlTable["Headlights has Modifier", number] = 1
             }
 
             else
             {
                 ControlTable["Headlights Modifier", string] = ""
                 ControlTable["Headlights Key", string] = V:trim():upper()
+                ControlTable["Headlights has Modifier", number] = 0
             }
         }
 
@@ -574,42 +658,49 @@ function table encodeKeyboardControls(KeyboardControls:table)
             {
                 ControlTable["Ditch Lights Modifier", string] = "lshift"
                 ControlTable["Ditch Lights Key", string] = V:sub(13):trim():upper()
+                ControlTable["Ditch Lights has Modifier", number] = 1
             }
 
             elseif (V:find("right shift + "))
             {
                 ControlTable["Ditch Lights Modifier", string] = "rshift"
                 ControlTable["Ditch Lights Key", string] = V:sub(14):trim():upper()
+                ControlTable["Ditch Lights has Modifier", number] = 1
             }
 
             elseif (V:find("left ctrl + "))
             {
                 ControlTable["Ditch Lights Modifier", string] = "lcontrol"
                 ControlTable["Ditch Lights Key", string] = V:sub(12):trim():upper()
+                ControlTable["Ditch Lights has Modifier", number] = 1
             }
 
             elseif (V:find("right ctrl + "))
             {
                 ControlTable["Ditch Lights Modifier", string] = "rcontrol"
                 ControlTable["Ditch Lights Key", string] = V:sub(13):trim():upper()
+                ControlTable["Ditch Lights has Modifier", number] = 1
             }
 
             elseif (V:find("left alt + "))
             {
                 ControlTable["Ditch Lights Modifier", string] = "lalt"
                 ControlTable["Ditch Lights Key", string] = V:sub(11):trim():upper()
+                ControlTable["Ditch Lights has Modifier", number] = 1
             }
 
             elseif (V:find("right alt + "))
             {
                 ControlTable["Ditch Lights Modifier", string] = "ralt"
                 ControlTable["Ditch Lights Key", string] = V:sub(12):trim():upper()
+                ControlTable["Ditch Lights has Modifier", number] = 1
             }
 
             else
             {
                 ControlTable["Ditch Lights Modifier", string] = ""
                 ControlTable["Ditch Lights Key", string] = V:trim():upper()
+                ControlTable["Ditch Lights has Modifier", number] = 0
             }
         }
     }
@@ -656,178 +747,76 @@ function void playerControlsUpdate(Controls:table)
     local KeyboardControls = Controls["Controls", table]
     local Driver = Controls["TrainDriver", entity]
 
-    # Set the locomotive's direction.
-    # Here, the direction selector is no longer clamped.
-    # This is to allow the fault reporting system to alert the player when the direction selector is out of range.
-    if (KeyboardControls["Increase Direction Modifier", string] != "" & KeyboardControls["Increase Direction Key", string] != "")
+    local LeftModifierKeyPressed = bXor(Driver:keyPressed("lshift"), bXor(Driver:keyPressed("lcontrol"), Driver:keyPressed("lalt")))
+    local RightModifierKeyPressed = bXor(Driver:keyPressed("rshift"), bXor(Driver:keyPressed("rcontrol"), Driver:keyPressed("ralt")))
+    local ModifierKeyPressed = bXor(LeftModifierKeyPressed, RightModifierKeyPressed)
+
+    # I couldn't find a better way of doing this.
+    local IncreaseDirection = Driver:keyPressed(KeyboardControls["Increase Direction Key", string]) & (KeyboardControls["Increase Direction has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Increase Direction Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
+    local DecreaseDirection = Driver:keyPressed(KeyboardControls["Decrease Direction Key", string]) & (KeyboardControls["Decrease Direction has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Decrease Direction Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
+    local IncreaseThrottle = Driver:keyPressed(KeyboardControls["Increase Throttle Key", string]) & (KeyboardControls["Increase Throttle has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Increase Throttle Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
+    local DecreaseThrottle = Driver:keyPressed(KeyboardControls["Decrease Throttle Key", string]) & (KeyboardControls["Decrease Throttle has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Decrease Throttle Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
+    local IncreaseTrainBrake = Driver:keyPressed(KeyboardControls["Increase Train Brake Key", string]) & (KeyboardControls["Increase Train Brake has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Increase Train Brake Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
+    local DecreaseTrainBrake = Driver:keyPressed(KeyboardControls["Decrease Train Brake Key", string]) & (KeyboardControls["Decrease Train Brake has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Decrease Train Brake Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
+    local IncreaseEngineBrake = Driver:keyPressed(KeyboardControls["Increase Engine Brake Key", string]) & (KeyboardControls["Increase Engine Brake has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Increase Engine Brake Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
+    local DecreaseEngineBrake = Driver:keyPressed(KeyboardControls["Decrease Engine Brake Key", string]) & (KeyboardControls["Decrease Engine Brake has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Decrease Engine Brake Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
+    local EmergencyBrake = Driver:keyPressed(KeyboardControls["Emergency Brake Key", string]) & (KeyboardControls["Emergency Brake has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Emergency Brake Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
+    local Horn = Driver:keyPressed(KeyboardControls["Horn Key", string]) & (KeyboardControls["Horn has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Horn Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
+    local Bell = Driver:keyPressed(KeyboardControls["Bell Key", string]) & (KeyboardControls["Bell has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Bell Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
+    local Headlights = Driver:keyPressed(KeyboardControls["Headlights Key", string]) & (KeyboardControls["Headlights has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Headlights Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
+    local DitchLights = Driver:keyPressed(KeyboardControls["Ditch Lights Key", string]) & (KeyboardControls["Ditch Lights has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Ditch Lights Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
+
+    # Update the direction.
+    if (IncreaseDirection & !DecreaseDirection)
     {
-        if (Driver:keyPressed(KeyboardControls["Increase Direction Modifier", string]) & Driver:keyPressed(KeyboardControls["Increase Direction Key", string]))
-        {
-            Controls["Direction", number] = Controls["Direction", number] + 1
-        }
+        Controls["Direction", number] = Controls["Direction", number] + 1
+    }
+    elseif (DecreaseDirection & !IncreaseDirection)
+    {
+        Controls["Direction", number] = Controls["Direction", number] - 1
     }
 
-    elseif (KeyboardControls["Increase Direction Key", string] != "")
+    # Update the throttle.
+    elseif (IncreaseThrottle & !DecreaseThrottle)
     {
-        if (Driver:keyPressed(KeyboardControls["Increase Direction Key", string]))
-        {
-            Controls["Direction", number] = Controls["Direction", number] + 1
-        }
+        Controls["Throttle", number] = Controls["Throttle", number] + 1
+    }
+    elseif (DecreaseThrottle & !IncreaseThrottle)
+    {
+        Controls["Throttle", number] = Controls["Throttle", number] - 1
     }
 
-    if (KeyboardControls["Decrease Direction Modifier", string] != "" & KeyboardControls["Decrease Direction Key", string] != "")
+    # Update the train brake.
+    elseif (IncreaseTrainBrake & !DecreaseTrainBrake)
     {
-        if (Driver:keyPressed(KeyboardControls["Decrease Direction Modifier", string]) & Driver:keyPressed(KeyboardControls["Decrease Direction Key", string]))
-        {
-            Controls["Direction", number] = Controls["Direction", number] - 1
-        }
+        Controls["Brake", number] = Controls["Brake", number] + 1
+    }
+    elseif (DecreaseTrainBrake & !IncreaseTrainBrake)
+    {
+        Controls["Brake", number] = Controls["Brake", number] - 1
     }
 
-    elseif (KeyboardControls["Decrease Direction Key", string] != "")
+    # Update the engine brake.
+    elseif (IncreaseEngineBrake & !DecreaseEngineBrake)
     {
-        if (Driver:keyPressed(KeyboardControls["Decrease Direction Key", string]))
-        {
-            Controls["Direction", number] = Controls["Direction", number] - 1
-        }
+        Controls["Brake", number] = Controls["Brake", number] + 1
+    }
+    elseif (DecreaseEngineBrake & !IncreaseEngineBrake)
+    {
+        Controls["Brake", number] = Controls["Brake", number] - 1
     }
 
-    # Set the locomotive's throttle.
-    # Here, the throttle selector is no longer clamped.
-    # This is to allow the fault reporting system to alert the player when the throttle selector is out of range.
-    if (KeyboardControls["Increase Throttle Modifier", string] != "" & KeyboardControls["Increase Throttle Key", string] != "")
+    # Update the emergency brake.
+    elseif (EmergencyBrake)
     {
-        if (Driver:keyPressed(KeyboardControls["Increase Throttle Modifier", string]) & Driver:keyPressed(KeyboardControls["Increase Throttle Key", string]))
+        if (Controls["EmergencyBrake", number] == 0)
         {
-            Controls["Throttle", number] = Controls["Throttle", number] + 1
+            Controls["EmergencyBrake", number] = 1
         }
-    }
-
-    elseif (KeyboardControls["Increase Throttle Key", string] != "")
-    {
-        if (Driver:keyPressed(KeyboardControls["Increase Throttle Key", string]))
+        else
         {
-            Controls["Throttle", number] = Controls["Throttle", number] + 1
-        }
-    }
-
-    if (KeyboardControls["Decrease Throttle Modifier", string] != "" & KeyboardControls["Decrease Throttle Key", string] != "")
-    {
-        if (Driver:keyPressed(KeyboardControls["Decrease Throttle Modifier", string]) & Driver:keyPressed(KeyboardControls["Decrease Throttle Key", string]))
-        {
-            Controls["Throttle", number] = Controls["Throttle", number] - 1
-        }
-    }
-
-    elseif (KeyboardControls["Decrease Throttle Key", string] != "")
-    {
-        if (Driver:keyPressed(KeyboardControls["Decrease Throttle Key", string]))
-        {
-            Controls["Throttle", number] = Controls["Throttle", number] - 1
-        }
-    }
-
-    # Set the train brake.
-    # Here, the brake selector is no longer clamped.
-    # This is to allow the fault reporting system to alert the player when the train brake selector is out of range.
-    if (KeyboardControls["Increase Train Brake Modifier", string] != "" & KeyboardControls["Increase Train Brake Key", string] != "")
-    {
-        if (Driver:keyPressed(KeyboardControls["Increase Train Brake Modifier", string]) & Driver:keyPressed(KeyboardControls["Increase Train Brake Key", string]))
-        {
-            Controls["Brake", number] = Controls["Brake", number] + 1
-        }
-    }
-
-    elseif (KeyboardControls["Increase Train Brake Key", string] != "")
-    {
-        if (Driver:keyPressed(KeyboardControls["Increase Train Brake Key", string]))
-        {
-            Controls["Brake", number] = Controls["Brake", number] + 1
-        }
-    }
-
-    if (KeyboardControls["Decrease Train Brake Modifier", string] != "" & KeyboardControls["Decrease Train Brake Key", string] != "")
-    {
-        if (Driver:keyPressed(KeyboardControls["Decrease Train Brake Modifier", string]) & Driver:keyPressed(KeyboardControls["Decrease Train Brake Key", string]))
-        {
-            Controls["Brake", number] = Controls["Brake", number] - 1
-        }
-    }
-
-    elseif (KeyboardControls["Decrease Train Brake Key", string] != "")
-    {
-        if (Driver:keyPressed(KeyboardControls["Decrease Train Brake Key", string]))
-        {
-            Controls["Brake", number] = Controls["Brake", number] - 1
-        }
-    }
-
-    # Set the engine brake.
-    # Here, the engine brake selector is no longer clamped.
-    # This is to allow the fault reporting system to alert the player when the engine brake selector is out of range.
-    if (KeyboardControls["Increase Engine Brake Modifier", string] != "" & KeyboardControls["Increase Engine Brake Key", string] != "")
-    {
-        if (Driver:keyPressed(KeyboardControls["Increase Engine Brake Modifier", string]) & Driver:keyPressed(KeyboardControls["Increase Engine Brake Key", string]))
-        {
-            Controls["Brake", number] = Controls["Brake", number] + 1
-        }
-    }
-
-    elseif (KeyboardControls["Increase Engine Brake Key", string] != "")
-    {
-        if (Driver:keyPressed(KeyboardControls["Increase Engine Brake Key", string]))
-        {
-            Controls["Brake", number] = Controls["Brake", number] + 1
-        }
-    }
-
-    if (KeyboardControls["Decrease Engine Brake Modifier", string] != "" & KeyboardControls["Decrease Engine Brake Key", string] != "")
-    {
-        if (Driver:keyPressed(KeyboardControls["Decrease Engine Brake Modifier", string]) & Driver:keyPressed(KeyboardControls["Decrease Engine Brake Key", string]))
-        {
-            Controls["Brake", number] = Controls["Brake", number] - 1
-        }
-    }
-
-    elseif (KeyboardControls["Decrease Engine Brake Key", string] != "")
-    {
-        if (Driver:keyPressed(KeyboardControls["Decrease Engine Brake Key", string]))
-        {
-            Controls["Brake", number] = Controls["Brake", number] - 1
-        }
-    }
-
-    # Set the emergency brake.
-    if (KeyboardControls["Emergency Brake Modifier", string] != "" & KeyboardControls["Emergency Brake Key", string] != "")
-    {
-        if (Driver:keyPressed(KeyboardControls["Emergency Brake Modifier", string]) & Driver:keyPressed(KeyboardControls["Emergency Brake Key", string]))
-        {
-            if (Controls["Emergency Brake", number] == 0)
-            {
-                Controls["Emergency Brake", number] = 1
-            }
-
-            else
-            {
-                Controls["Faults", table]["Message", string] = "Emergency brake is already applied."
-                Controls["Faults", table]["EmergencyBrake", number] = 1
-            }
-        }
-    }
-
-    elseif (KeyboardControls["Emergency Brake Key", string] != "")
-    {
-        if (Driver:keyPressed(KeyboardControls["Emergency Brake Key", string]))
-        {
-            if (Controls["Emergency Brake", number] == 0)
-            {
-                Controls["Emergency Brake", number] = 1
-            }
-
-            else
-            {
-                Controls["Faults", table]["Message", string] = "Emergency brake is already applied."
-                Controls["Faults", table]["EmergencyBrake", number] = 1
-            }
+            Controls["Faults", table]["Message", string] = "Emergency brake is already applied."
+            Controls["Faults", table]["EmergencyBrake", number] = 1
         }
     }
 }
