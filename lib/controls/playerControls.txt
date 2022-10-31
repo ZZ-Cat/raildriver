@@ -1141,3 +1141,20 @@ function number playerControlsClearBrakeFault(Controls:table)
         return 0
     }
 }
+
+# This function clears the emergency brake fault.
+# Returns true if the emergency brake fault was cleared.
+# False if the emergency brake fault was not previously set.
+function number playerControlsClearEmergencyBrakeFault(Controls:table)
+{
+    if (Controls["Faults", table]["Emergency Brake", number] == 1)
+    {
+        Controls["Faults", table]["Emergency Brake", number] = 0
+        return 1
+    }
+    else
+    {
+        Controls["Faults", table]["Message", string] = "Emergency Brake fault was not previously set."
+        return 0
+    }
+}
