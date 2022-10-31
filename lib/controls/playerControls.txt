@@ -720,7 +720,7 @@ function table playerControlsInit(KeyboardControls:table, ThrottleMap:table, Bra
     Controls["Horn", number] = 0
     Controls["Bell", number] = 0
     Controls["Headlights", number] = 0
-    Controls["DitchLights", number] = 0
+    Controls["Ditch Lights", number] = 0
     Controls["TrainDriver", entity] = TrainDriver
     Controls["Controls", table] = encodeKeyboardControls(KeyboardControls)
 
@@ -866,7 +866,7 @@ function number playerControlsGetHeadlights(Controls:table)
 # This function returns the ditch lights of the locomotive.
 function number playerControlsGetDitchLights(Controls:table)
 {
-    return Controls["DitchLights", number]
+    return Controls["Ditch Lights", number]
 }
 
 # This function checks whether or not the player controls are valid.
