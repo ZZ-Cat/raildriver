@@ -240,6 +240,8 @@ if (tickClk())
             Brake = PIDFOutput
         }
 
+        # Apply the throttle, brake, and reverser values to the locomotive's traction motors.
+        semControlTrucks(Trucks, Throttle:number, Brake:number, Reverser)
     }
 
     catch (Exception)
