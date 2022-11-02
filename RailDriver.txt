@@ -144,6 +144,7 @@ if (clk(speedometerGetClockId(Speedo)))
 {
     try
     {
+        speedometerClearAndRestartTimer(Speedo)
 
     # Apply a low-pass filter to the raw speed.
     SpeedFiltered = speedometerFilter(Speedo, SpeedRaw)
