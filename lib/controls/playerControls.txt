@@ -870,13 +870,13 @@ function number playerControlsGetDitchLights(Controls:table)
 }
 
 # This function returns the throttle map.
-function table playerControlsGetThrottleMap(Controls:table, ThrottleInputType:string, ThrottleIndex:number)
+function number playerControlsGetThrottleMap(Controls:table, ThrottleInputType:string, ThrottleIndex:number)
 {
     return Controls["Throttle Map", table][ThrottleInputType, array][ThrottleIndex, number]
 }
 
 # This function returns the brake map.
-function table playerControlsGetBrakeMap(Controls:table, BrakeInputType:string, BrakeIndex:number)
+function number playerControlsGetBrakeMap(Controls:table, BrakeInputType:string, BrakeIndex:number)
 {
     return Controls["Brake Map", table][BrakeInputType, array][BrakeIndex, number]
 }

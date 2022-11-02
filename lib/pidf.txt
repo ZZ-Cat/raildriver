@@ -574,7 +574,7 @@ function number pidCalculate(S:table)
 }
 
 # This function returns the current value of the Control Variable.
-function number pidGetOutput()
+function number pidGetOutput(S:table)
 {
     return S["Control Variable", number]
 }
