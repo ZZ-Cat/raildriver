@@ -192,10 +192,6 @@ if (keyClk())
     }
 }
 
-if (tickClk())
-{
-}
-
 if (clk("Debug"))
 {
     stoptimer("Debug")
