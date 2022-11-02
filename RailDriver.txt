@@ -155,6 +155,8 @@ if (clk(speedometerGetClockId(Speedo)))
         # Apply a deadband to the speed.
         Speed = speedometerDeadband(Speedo, Speed)
 
+        # Convert speed from Garry's Mod units to miles per hour.
+        SpeedMPH = round(toUnit("mph", Speed) * 4 / 3)
     }
 
     catch (Exception)
