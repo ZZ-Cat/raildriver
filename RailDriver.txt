@@ -167,8 +167,9 @@ if (clk(speedometerGetClockId(Speedo)))
 
 if (keyClk())
 {
-    # Update the player controls.
-    playerControlsUpdate(PlayerControls)
+    try
+    {
+        playerControlsUpdate(PlayerControls)
 
     try
     {
