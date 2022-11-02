@@ -103,7 +103,7 @@ function number semLockE2()
     return 0
 }
 
-function number semSmartParentE2toLocoBody()
+function number semParentToLocomotive()
 {
 
     # Parent the E2 to the locomotive body.
