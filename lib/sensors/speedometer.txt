@@ -29,6 +29,8 @@ function table speedometerInit(InputPos:entity, InputNeg:entity)
     S["Differential Speed Positive Input", entity] = InputPos
     S["Differential Speed Negative Input", entity] = InputNeg
 
+    S["Deadband", number] = 0.1
+
     S["Error Value", number] = 0
     S["Error Threshold", number] = 1.5
     S["Error Hysteresis", number] = (5 / 100) * S["Error Threshold", number]
@@ -300,6 +302,20 @@ function void speedometerSetFilterCutoffFrequency(S:table, CutoffFrequency)
 {
     speedometerFilterCoefficient(S, CutoffFrequency)
     speedometerFilterTimeConstant(S, CutoffFrequency)
+}
+
+# This function applies a deadband to the speedometer's data.
+# This is done to reduce the amount of noise that is present in the speedometer's data.
+function number speedometerDeadband(S:table, Input)
+{
+    # The deadband's output is calculated from the deadband's input.
+    local Output = 0
+    if (abs(Input) > S["Deadband", number])
+    {
+        Output = Input
+    }
+
+    return Output
 }
 
 function number speedometerDirectionIsValid(S:table)
