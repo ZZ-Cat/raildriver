@@ -187,6 +187,27 @@ if (tickClk())
 {
     try
     {
+        #[
+            TODO:
+            - Move the setpoint, throttle, and brake values up to the player controls.
+            - Move the throttle & brake feedforward values up to the player controls.
+        ]#
+        # Get the current throttle and brake values.
+        local Throttle = playerControlsGetThrottle(PlayerControls)
+        local Brake = playerControlsGetBrake(PlayerControls)
+        local Reverser = playerControlsGetReverser(PlayerControls)
+
+        # Get the current velocity setpoint.
+        local VelocitySetpoint = playerControlsGetThrottleMap(PlayerControls, "Velocity Setpoint", Throttle)
+
+        # Set the throttle and brake feedforward values.
+        pidSetFeedforward(PIDF, "Throttle", Throttle)
+        pidSetFeedforward(PIDF, "Brake", Brake)
+
+        # Set the PIDF controller's setpoint.
+        # This is the desired speed of the locomotive.
+        pidSetSetpoint(PIDF, VelocitySetpoint)
+
     }
 
     catch (Exception)
