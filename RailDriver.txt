@@ -122,11 +122,13 @@ if (first() | duped())
 
     catch (Exception)
     {
-        # If an error occurs, unlock the E2 so it can be edited again.
-        # This prevents the E2 from being permanently locked.
-        # This also prevents the E2 from being permanently parented to the locomotive.
-        semUnlockE2()
-        semSmartUnparentE2fromLocoBody()
+        # If an exception is thrown, unlock the E2.
+        # This is to prevent the E2 from being locked forever.
+        if (semE2IsLocked())
+        {
+            semUnlockE2()
+        }
+
         printColor(vec(255, 0, 0), "[RailDriver | Error]", vec(255, 255, 255), ": " + Exception)
     }
 }
