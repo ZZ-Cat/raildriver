@@ -181,3 +181,23 @@ function array semFindTrucks()
         }
     }
 }
+
+function number semValidateTrucks(Trucks:array)
+{
+    if (Trucks:count() != 2)
+    {
+        return 0
+    }
+
+    if (!Trucks[1, entity]:isValid() | !Trucks[1, entity]:isValidPhysics())
+    {
+        return 0
+    }
+
+    if (!Trucks[2, entity]:isValid() | !Trucks[2, entity]:isValidPhysics())
+    {
+        return 0
+    }
+
+    return 1
+}
