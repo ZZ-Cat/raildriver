@@ -171,14 +171,21 @@ if (keyClk())
     {
         playerControlsUpdate(PlayerControls)
 
-    try
-    {
-        # Check if the player controls are valid.
-        if (!playerControlsValid(PlayerControls, SpeedFiltered))
-        {
-            error(playerControlsGetFaultMessage(PlayerControls))
-        }
+        #[
+            Notes from ZZ Cat:
+            This has been commented out, because it keeps spamming the chat with the same message.
+            Currently, I'm not sure how to fix this.
+            If you know how to fix this, please let me know by opening either an issue or a pull request on GitHub.
+        ]#
+        #[
+            if (!playerControlsValid(PlayerControls, SpeedMPH))
+            {
+                playerControlsClearAllFaults(PlayerControls)
+                error(playerControlsGetFaultMessage(PlayerControls))
+            }
+        ]#
     }
+
     catch (Exception)
     {
         printColor(vec(255, 0, 0), "[RailDriver | Error]", vec(255, 255, 255), ": " + Exception)
