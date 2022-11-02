@@ -26,58 +26,61 @@
 
 if (first() | duped())
 {
-    #include "e2shared/RailDriver/lib/smartEntityManagement"
-    #include "e2shared/RailDriver/lib/sensors/speedometer"
-    #include "e2shared/RailDriver/lib/controls/playerControls"
-    #include "e2shared/RailDriver/lib/pidf"
-
     try
     {
-        # Initialize Smart Entity Management library.
-        if(!semInit())
-        {
-            error("Failed to initialize Smart Entity Management library.")
-        }
+        #include "e2shared/RailDriver/lib/smartEntityManagement"
+        #include "e2shared/RailDriver/lib/sensors/speedometer"
+        #include "e2shared/RailDriver/lib/controls/playerControls"
+        #include "e2shared/RailDriver/lib/pidf"
 
-        # Lock E2 so it can't be edited by other players in multiplayer mode.
-        # This prevents players from accidentally breaking the E2.
-        if (!semLockE2())
+        # Initialize Smart Entity Management.
+        if (semInit())
         {
-            error("Failed to lock E2.")
-        }
+            #[
+                Lock the E2, so that it can't be deleted or edited by anyone
+                except you.
 
-        # Parent E2 to the locomotive so it moves with the locomotive.
-        if (!semSmartParentE2toLocoBody())
-        {
-            error("Could not find a valid locomotive body to parent to.")
-        }
+                This is not a security measure, as the E2 can still be
+                deleted or edited by you. It is only a convenience measure,
+                to prevent other users from accidentally or maliciously
+                deleting or editing the E2, which would cause RailDriver to
+                stop working.
 
-        # Find all the trucks on the locomotive.
-        Trucks = semFindTrucks()
-        if (Trucks:count() < 2)
-        {
-            error("Could not find any trucks on the locomotive.")
-        }
+                You can still update the E2 by using the "Update" button in
+                the Remote Upload menu of the Expression 2 Tool Gun.
+            ]#
+            semLockE2()
+            assert(semE2IsLocked(), "Failed to lock E2.")
 
-        # Check that the trucks are valid physics objects.
-        for (I = 1, Trucks:count())
-        {
-            # Use an alternative version, to prevent false positives.
-            if (!Trucks[I, entity]:isValid() | !Trucks[I, entity]:isValidPhysics())
+            if (!semParentToLocomotive())
             {
-                error("Truck " + I + " is not a valid physics object.")
+                error("Failed to parent E2 to locomotive.")
+            }
+
+            Trucks = semFindTrucks()
+            if (!semValidateTrucks(Trucks))
+            {
+                error("Locomotive trucks are not valid physics objects.")
             }
         }
 
-        # Initialize, configure and start the speedometer.
-        Speedo = speedometerInit(Trucks[1, entity], Trucks[2, entity])
-        if (!Speedo)
+        else
         {
-            error("Failed to initialize speedometer.")
+            error("RailDriver: Failed to initialize Smart Entity Management.")
         }
 
-        speedometerSetFilterCutoffFrequency(Speedo, 10) 
-        speedometerStart(Speedo)
+        # Initialize Speedometer.
+        Speedo = speedometerInit(Trucks[1, entity], Trucks[2, entity])
+        if (Speedo:count() == 19)
+        {
+            speedometerSetFilterCutoffFrequency(Speedo, 1)
+            speedometerStart(Speedo)
+        }
+
+        else
+        {
+            error("RailDriver: Failed to initialize Speedometer.")
+        }
 
         # Setup throttle and brake maps.
         ThrottleMap["Throttle Input Type", string] = "Velocity"
@@ -107,15 +110,16 @@ if (first() | duped())
         # Set the driver to the player who spawned the E2.
         TrainDriver = owner()
 
-        # Initialize and configure the player controls with keyboard controls, throttle and brake maps, and the driver.
+        # Initialize Player Controls.
         PlayerControls = playerControlsInit(KeyboardControls, ThrottleMap, BrakeMap, TrainDriver)
-        if (!PlayerControls)
+        if (PlayerControls:count() == 0)
         {
-            error("Failed to initialize player controls.")
+            error("Failed to initialize Player Controls.")
         }
-        timer("Debug", 100)
 
+        timer("Debug", 100)
     }
+
     catch (Exception)
     {
         # If an error occurs, unlock the E2 so it can be edited again.
