@@ -440,6 +440,12 @@ function number pidSetItermRelax(S:table, Iterm, ItermErrorRate, ProcessVariable
     return ItermErrorRate
 }
 
+# This function sets the process variable, which is the input to the PIDF controller.
+function void pidSetProcessVariable(S:table, Value)
+{
+    S["Process Variable", number] = Value
+}
+
 function number pidCalculate(S:table)
 {
     # PID Controller can have several operating modes.
