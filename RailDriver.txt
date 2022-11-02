@@ -146,9 +146,10 @@ if (clk(speedometerGetClockId(Speedo)))
     {
         speedometerClearAndRestartTimer(Speedo)
 
-    # Apply a low-pass filter to the raw speed.
-    SpeedFiltered = speedometerFilter(Speedo, SpeedRaw)
+        local SpeedRaw = 0
 
+        # Calculate the speed of the locomotive.
+        SpeedRaw = speedometerGetSpeed(Speedo, 1)
     }
 
     catch (Exception)
