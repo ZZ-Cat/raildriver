@@ -304,6 +304,13 @@ function void speedometerSetFilterCutoffFrequency(S:table, CutoffFrequency)
     speedometerFilterTimeConstant(S, CutoffFrequency)
 }
 
+# This function sets the low-pass filter's cutoff frequency in hertz.
+function void speedometerSetFilterCutoffFrequencyHz(S:table, CutoffFrequency)
+{
+    speedometerFilterCoefficient(S, CutoffFrequency * 1000)
+    speedometerFilterTimeConstant(S, CutoffFrequency * 1000)
+}
+
 # This function applies a deadband to the speedometer's data.
 # This is done to reduce the amount of noise that is present in the speedometer's data.
 function number speedometerDeadband(S:table, Input)
