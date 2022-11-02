@@ -1158,3 +1158,23 @@ function number playerControlsClearEmergencyBrakeFault(Controls:table)
         return 0
     }
 }
+
+# This function clears all faults.
+# Returns true if all faults were cleared.
+# False if no faults were found.
+function number playerControlsClearAllFaults(Controls:table)
+{
+    if (Controls["Faults", table]["Direction", number] == 1 | Controls["Faults", table]["Throttle", number] == 1 | Controls["Faults", table]["Brake", number] == 1 | Controls["Faults", table]["Emergency Brake", number] == 1)
+    {
+        Controls["Faults", table]["Direction", number] = 0
+        Controls["Faults", table]["Throttle", number] = 0
+        Controls["Faults", table]["Brake", number] = 0
+        Controls["Faults", table]["Emergency Brake", number] = 0
+        return 1
+    }
+    else
+    {
+        Controls["Faults", table]["Message", string] = "No faults found."
+        return 0
+    }
+}
