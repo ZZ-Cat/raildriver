@@ -20,6 +20,7 @@
 @model models/beer/wiremod/gate_e2_nano.mdl
 @persist Trucks:array Speedo:table
 @persist [PlayerControls ThrottleMap BrakeMap]:table TrainDriver:entity
+@persist PIDF:table
 @persist Speed SpeedMPH
 @outputs Debugger:table
 @strict
@@ -115,6 +116,18 @@ if (first() | duped())
         if (PlayerControls:count() == 0)
         {
             error("Failed to initialize Player Controls.")
+        }
+
+        # Initialize the PIDF controller.
+        PIDF = pidCreateInstance()
+        if (PIDF:count() == 55)
+        {
+            runOnTick(1)
+        }
+
+        else 
+        {
+            error("Failed to initialize PIDF controller.")
         }
 
         timer("Debug", 100)
