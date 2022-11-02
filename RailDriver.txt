@@ -152,6 +152,9 @@ if (clk(speedometerGetClockId(Speedo)))
         SpeedRaw = speedometerGetSpeed(Speedo, 1)
         Speed = speedometerFilter(Speedo, SpeedRaw)
 
+        # Apply a deadband to the speed.
+        Speed = speedometerDeadband(Speedo, Speed)
+
     }
 
     catch (Exception)
