@@ -208,6 +208,9 @@ if (tickClk())
         # This is the desired speed of the locomotive.
         pidSetSetpoint(PIDF, VelocitySetpoint)
 
+        # Calculate the PIDF controller's output.
+        pidCalculate(PIDF) # <--- This is where the magick happens. =^/,..,^=
+
     }
 
     catch (Exception)
