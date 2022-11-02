@@ -311,6 +311,12 @@ function void speedometerSetFilterCutoffFrequencyHz(S:table, CutoffFrequency)
     speedometerFilterTimeConstant(S, CutoffFrequency * 1000)
 }
 
+# This function sets the low-pass filter's time constant in milliseconds.
+function void speedometerSetFilterTimeConstantMs(S:table, TimeConstant)
+{
+    S["Filter Time Constant", number] = TimeConstant
+}
+
 # This function applies a deadband to the speedometer's data.
 # This is done to reduce the amount of noise that is present in the speedometer's data.
 function number speedometerDeadband(S:table, Input)
