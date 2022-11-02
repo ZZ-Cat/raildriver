@@ -150,6 +150,8 @@ if (clk(speedometerGetClockId(Speedo)))
 
         # Calculate the speed of the locomotive.
         SpeedRaw = speedometerGetSpeed(Speedo, 1)
+        Speed = speedometerFilter(Speedo, SpeedRaw)
+
     }
 
     catch (Exception)
