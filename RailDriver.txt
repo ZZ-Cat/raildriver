@@ -211,6 +211,35 @@ if (tickClk())
         # Calculate the PIDF controller's output.
         pidCalculate(PIDF) # <--- This is where the magick happens. =^/,..,^=
 
+        # Get the PIDF controller's output.
+        # This is the throttle and brake values that will be applied to the locomotive.
+        local PIDFOutput = pidGetOutput(PIDF)
+
+        # Set the throttle and brake values based on the PIDF controller's output and the current reverser position.
+        if (Reverser == 1)
+        {
+            Throttle = PIDFOutput
+            Brake = 0
+        }
+
+        else if (Reverser == -1)
+        {
+            Throttle = 0
+            Brake = PIDFOutput
+        }
+
+        else
+        {
+            Throttle = 0
+            Brake = 0
+        }
+
+        else if (Reverser == 1)
+        {
+            Throttle = 0
+            Brake = PIDFOutput
+        }
+
     }
 
     catch (Exception)
