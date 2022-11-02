@@ -142,12 +142,18 @@ if (first() | duped())
 
 if (clk(speedometerGetClockId(Speedo)))
 {
-    speedometerClearAndRestartTimer(Speedo)
-    SpeedRaw = speedometerGetSpeed(Speedo, 1)
+    try
+    {
 
     # Apply a low-pass filter to the raw speed.
     SpeedFiltered = speedometerFilter(Speedo, SpeedRaw)
 
+    }
+
+    catch (Exception)
+    {
+        printColor(vec(255, 0, 0), "[RailDriver | Error]", vec(255, 255, 255), ": " + Exception)
+    }
 }
 
 if (keyClk())
