@@ -566,3 +566,9 @@ function number pidCalculate(S:table)
     # Return true when the control loop is running.
     return 1
 }
+
+# This function returns the current value of the Control Variable.
+function number pidGetOutput()
+{
+    return S["Control Variable", number]
+}
