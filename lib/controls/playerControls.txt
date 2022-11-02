@@ -869,6 +869,12 @@ function number playerControlsGetDitchLights(Controls:table)
     return Controls["Ditch Lights", number]
 }
 
+# This function returns the throttle map.
+function table playerControlsGetThrottleMap(Controls:table, ThrottleInputType:string, ThrottleIndex:number)
+{
+    return Controls["Throttle Map", table][ThrottleInputType, array][ThrottleIndex, number]
+}
+
 # This function checks whether or not the player controls are valid.
 function number playerControlsValid(Controls:table, Speed)
 {
