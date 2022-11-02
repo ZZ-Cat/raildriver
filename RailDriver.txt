@@ -129,6 +129,13 @@ if (first() | duped())
             semUnlockE2()
         }
 
+        #[
+            Notes from ZZ Cat:
+            I tried to unparent the E2 & re-weld it to the locomotive, but it didn't work.
+            I'm not sure why, but I'm not going to spend any more time on it.
+            If you know how to fix this, please let me know by opening either an issue or a pull request on GitHub.
+        ]#
+
         printColor(vec(255, 0, 0), "[RailDriver | Error]", vec(255, 255, 255), ": " + Exception)
     }
 }
