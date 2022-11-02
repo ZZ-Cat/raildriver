@@ -19,6 +19,8 @@
 @name RailDriver
 @model models/beer/wiremod/gate_e2_nano.mdl
 @persist Trucks:array Speedo:table
+@persist [PlayerControls ThrottleMap BrakeMap]:table TrainDriver:entity
+@persist Speed SpeedMPH
 @outputs Debugger:table
 @strict
 
