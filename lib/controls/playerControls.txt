@@ -875,6 +875,12 @@ function table playerControlsGetThrottleMap(Controls:table, ThrottleInputType:st
     return Controls["Throttle Map", table][ThrottleInputType, array][ThrottleIndex, number]
 }
 
+# This function returns the brake map.
+function table playerControlsGetBrakeMap(Controls:table, BrakeInputType:string, BrakeIndex:number)
+{
+    return Controls["Brake Map", table][BrakeInputType, array][BrakeIndex, number]
+}
+
 # This function checks whether or not the player controls are valid.
 function number playerControlsValid(Controls:table, Speed)
 {
