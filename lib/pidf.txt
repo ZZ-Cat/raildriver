@@ -440,7 +440,7 @@ function number pidSetItermRelax(S:table, Iterm, ItermErrorRate, ProcessVariable
     return ItermErrorRate
 }
 
-function number pidUpdate(S:table)
+function number pidCalculate(S:table)
 {
     # PID Controller can have several operating modes.
     # These modes can include, but aren't limited to:
