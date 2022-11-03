@@ -331,6 +331,12 @@ function number speedometerDeadband(S:table, Input)
     return Output
 }
 
+# This function sets the deadband's size.
+function void speedometerSetDeadband(S:table, Deadband)
+{
+    S["Deadband", number] = Deadband
+}
+
 function number speedometerDirectionIsValid(S:table)
 {
     return S["SPEEDOMETER FAULT: Speed Direction Incorrect", number] == 0 ? 1 : 0
