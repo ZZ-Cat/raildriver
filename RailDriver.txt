@@ -186,7 +186,7 @@ if (clk(speedometerGetClockId(Speedo)))
         local SpeedRaw = 0
 
         # Calculate the speed of the locomotive.
-        SpeedRaw = speedometerGetSpeed(Speedo, 1)
+        SpeedRaw = speedometerGetSpeed(Speedo, playerControlsGetDirection(PlayerControls))
         Speed = speedometerFilter(Speedo, SpeedRaw)
 
         # Apply a deadband to the speed.
