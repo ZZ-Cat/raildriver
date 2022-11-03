@@ -136,7 +136,7 @@ function number pidSetItermLimits(S:table, Min, Max)
     }
 }
 
-function number pidSetControlVariableLimits(S:table, Floor, Ceiling)
+function number pidSetOutputLimits(S:table, Floor, Ceiling)
 {
     if (Floor > Ceiling)
     {
