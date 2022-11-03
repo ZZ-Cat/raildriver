@@ -725,8 +725,8 @@ function table playerControlsInit(KeyboardControls:table, ThrottleMap:table, Bra
     Controls["Controls", table] = encodeKeyboardControls(KeyboardControls)
 
     # 'table:toArray()' is bugged, so I am directly using the throttle and brake maps.
-    Controls["ThrottleMap", table] = ThrottleMap
-    Controls["BrakeMap", table] = BrakeMap
+    Controls["Throttle Map", table] = ThrottleMap
+    Controls["Brake Map", table] = BrakeMap
 
     # Fault Reporting for the player controls.
     Controls["Faults", table] = table()
