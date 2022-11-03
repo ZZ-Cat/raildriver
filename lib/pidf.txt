@@ -29,7 +29,7 @@ function table pidCreateInstance()
     # Default properties:
     S["Sample Time", number] = ticksToMillis(1)
     S["Range", number] = 75000
-    S["Scale", number] = 100
+    S["Scale", number] = 1
     S["Proportional", number] = 0
     S["Integral", number] = 0
     S["Derivative", number] = 0
