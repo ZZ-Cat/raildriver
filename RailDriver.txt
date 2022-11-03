@@ -265,6 +265,34 @@ if (tickClk())
             # Apply the throttle, brake, and reverser values to the locomotive's traction motors.
             semControlTrucks(Trucks, Throttle, Brake, Reverser)
         ]#
+
+        # Apply the PIDF Controller's output directly to the locomotive's traction motors.
+        if (!semDirectControlTrucks(Trucks, PIDFOutput, Reverser))
+        {
+            #[ 
+                Notes from ZZ Cat:
+                When 'semDirectControlTrucks()' returns false, the control loop is disabled.
+                The E2 is also unlocked, so you can edit or remove it.
+                This is to prevent the E2 from being locked forever.
+
+                Through testing, I found a few things:
+                - If the trucks are removed from the locomotive, 'semDirectControlTrucks()' will return false.
+                  & the speedometer will show an "Invalid entity!" error.
+                - If the entire locomotive is removed from the world, 'semDirectControlTrucks()' will return false.
+                  & the error below will be printed.
+            ]#
+
+            # If the E2 is locked, unlock it.
+            # This is to prevent the E2 from being locked forever.
+            runOnTick(0)
+            if (semE2IsLocked())
+            {
+                semUnlockE2()
+            }
+
+            # Print an error message.
+            error("Failed to apply PIDF controller's output to locomotive's traction motors.")
+        }
     }
 
     catch (Exception)
