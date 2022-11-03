@@ -320,7 +320,6 @@ if (keyClk())
                 error(playerControlsGetFaultMessage(PlayerControls))
             }
         ]#
-        playerControlsValid(PlayerControls, SpeedMPH)
     }
 
     catch (Exception)
