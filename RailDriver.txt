@@ -241,27 +241,30 @@ if (tickClk())
         # This is the throttle and brake values that will be applied to the locomotive.
         local PIDFOutput = pidGetOutput(PIDF)
 
-        # Set the throttle and brake values based on the PIDF controller's output and the current reverser position.
-        if (Reverser == 1)
-        {
-            Throttle = PIDFOutput
-            Brake = 0
-        }
+        #[ Bypass all of this for now. ]#
+        #[
+            # Set the throttle and brake values based on the PIDF controller's output and the current reverser position.
+            if (Reverser == 1)
+            {
+                Throttle = PIDFOutput
+                Brake = 0
+            }
 
-        elseif (Reverser == -1)
-        {
-            Throttle = 0
-            Brake = PIDFOutput
-        }
+            elseif (Reverser == -1)
+            {
+                Throttle = 0
+                Brake = PIDFOutput
+            }
 
-        else
-        {
-            Throttle = 0
-            Brake = 0
-        }
+            else
+            {
+                Throttle = 0
+                Brake = 0
+            }
 
-        # Apply the throttle, brake, and reverser values to the locomotive's traction motors.
-        semControlTrucks(Trucks, Throttle, Brake, Reverser)
+            # Apply the throttle, brake, and reverser values to the locomotive's traction motors.
+            semControlTrucks(Trucks, Throttle, Brake, Reverser)
+        ]#
     }
 
     catch (Exception)
