@@ -819,6 +819,15 @@ function void playerControlsUpdate(Controls:table)
             Controls["Faults", table]["Emergency Brake", number] = 1
         }
     }
+
+        # Clamp the direction.
+        Controls["Direction", number] = clamp(Controls["Direction", number], -1, 1)
+
+        # Clamp the throttle.
+        Controls["Throttle", number] = clamp(Controls["Throttle", number], 1, Controls["Throttle Map", table]["Velocity Setpoint", array]:count())
+
+        # Clamp the brake.
+        Controls["Brake", number] = clamp(Controls["Brake", number], 1, Controls["Brake Map", table]["Velocity Setpoint", array]:count())
 }
 
 # This function returns the direction of the locomotive.
