@@ -27,6 +27,9 @@
 
 if (first() | duped())
 {
+    local SpeedometerFilterCutoffFrequency = 1
+    local SpeedometerDeadband = 0.1
+
     try
     {
         #include "e2shared/RailDriver/lib/smartEntityManagement"
@@ -74,7 +77,8 @@ if (first() | duped())
         Speedo = speedometerInit(Trucks[1, entity], Trucks[2, entity])
         if (Speedo:count() == 19)
         {
-            speedometerSetFilterCutoffFrequency(Speedo, 1)
+            speedometerSetFilterCutoffFrequency(Speedo, SpeedometerFilterCutoffFrequency)
+            speedometerSetDeadband(Speedo, SpeedometerDeadband * 17.6)
             speedometerStart(Speedo)
         }
 
