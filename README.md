@@ -35,7 +35,7 @@ I have decided to publish RailDriver stupidly early on in the piece.
 I am a bit more clued up on how to properly use GitHub & all its wonderful features, along with using a new IDE: Visual Studio Code. I absolutely adore VS Code, because it has helped streamline 95% of my workflow & I have done all I can to have it work for me... & it delivers the goods... _in spades!!!_
 Okay, I digress. Where was I? Oh yea. Now, I remember. This is what you're here for:
 
-- [ ] PIDF controller.
+- [x] PIDF controller.
   - This has pretty much been my Control Theory playground for the last three years & I have a much older version of this working already.
   - This will be a standard PID controller, where I pull the Feedforward terms in from external sources such as how much of an incline your locomotive is on.
   This will help out, when you're climbing or descending hills.
@@ -45,7 +45,7 @@ Okay, I digress. Where was I? Oh yea. Now, I remember. This is what you're here 
   - I will also seperate out the I Term Limit.
   Currently, its limit is the same as the PIDF Controller's output to the trucks.
   By making it seperate, this gives you more adjustment over how sensitive you want the control loop to be.
-- [ ] Simplified Primary Control Interface.
+- [x] Simplified Primary Control Interface.
   - If you're new to the world of GMTB, this will be your best friend.
   - Here, I will have RailDriver automatically select your line speeds based on what map you are running your locomotive on.
   EG for gm_sunsetgulch your linespeeds will be 5, 15, 20, 30, 40 & 60 miles per hour.
