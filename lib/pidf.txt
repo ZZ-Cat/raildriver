@@ -268,7 +268,7 @@ function number pidSetCoefficients(S:table, Gains:string, Value)
     }
 }
 
-function number pidSetCoefficients(S:table, PtermGain, ItermGain, DtermGain)
+function number pidSetPIDcoefficients(S:table, PtermGain, ItermGain, DtermGain)
 {
     if (pidSetCoefficients(S, "proportional", PtermGain) == 0)
     {
@@ -288,7 +288,7 @@ function number pidSetCoefficients(S:table, PtermGain, ItermGain, DtermGain)
     return 1
 }
 
-function number pidSetCoefficients(S:table, FFaccel, FFyawRate, FFpitchAngle, FFthr, FFbrk)
+function number pidSetFFcoefficients(S:table, FFaccel, FFyawRate, FFpitchAngle, FFthr, FFbrk)
 {
     if (pidSetCoefficients(S, "acceleration feedforward", FFaccel) == 0)
     {
