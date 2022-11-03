@@ -578,3 +578,39 @@ function number pidGetOutput(S:table)
 {
     return S["Control Variable", number]
 }
+
+# This function returns the current value of the P-Term.
+function number pidGetPterm(S:table)
+{
+    return S["P-Term", number]
+}
+
+# This function returns the current value of the I-Term.
+function number pidGetIterm(S:table)
+{
+    return S["I-Term", number]
+}
+
+# This function returns the current value of the D-Term.
+function number pidGetDterm(S:table)
+{
+    return S["D-Term", number]
+}
+
+# This function returns the current value of the Feedforward Sum.
+function number pidGetFFsum(S:table)
+{
+    return S["FF Sum", number]
+}
+
+# This function returns the current value of the Set Point.
+function number pidGetSetPoint(S:table)
+{
+    return S["Set Point", number]
+}
+
+# This function returns the current value of the Process Variable.
+function number pidGetProcessVariable(S:table)
+{
+    return S["Process Variable", number]
+}
