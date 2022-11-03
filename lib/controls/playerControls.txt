@@ -725,8 +725,8 @@ function table playerControlsInit(KeyboardControls:table, ThrottleMap:table, Bra
     Controls["Controls", table] = encodeKeyboardControls(KeyboardControls)
 
     # 'table:toArray()' is bugged, so I am directly using the throttle and brake maps.
-    Controls["ThrottleMap", table] = ThrottleMap
-    Controls["BrakeMap", table] = BrakeMap
+    Controls["Throttle Map", table] = ThrottleMap
+    Controls["Brake Map", table] = BrakeMap
 
     # Fault Reporting for the player controls.
     Controls["Faults", table] = table()
@@ -819,6 +819,15 @@ function void playerControlsUpdate(Controls:table)
             Controls["Faults", table]["Emergency Brake", number] = 1
         }
     }
+
+        # Clamp the direction.
+        Controls["Direction", number] = clamp(Controls["Direction", number], -1, 1)
+
+        # Clamp the throttle.
+        Controls["Throttle", number] = clamp(Controls["Throttle", number], 1, Controls["Throttle Map", table]["Velocity Setpoint", array]:count())
+
+        # Clamp the brake.
+        Controls["Brake", number] = clamp(Controls["Brake", number], 1, Controls["Brake Map", table]["Velocity Setpoint", array]:count())
 }
 
 # This function returns the direction of the locomotive.
@@ -867,6 +876,18 @@ function number playerControlsGetHeadlights(Controls:table)
 function number playerControlsGetDitchLights(Controls:table)
 {
     return Controls["Ditch Lights", number]
+}
+
+# This function returns the throttle map.
+function number playerControlsGetThrottleMap(Controls:table, ThrottleInputType:string, ThrottleIndex:number)
+{
+    return Controls["Throttle Map", table][ThrottleInputType, array][ThrottleIndex, number]
+}
+
+# This function returns the brake map.
+function number playerControlsGetBrakeMap(Controls:table, BrakeInputType:string, BrakeIndex:number)
+{
+    return Controls["Brake Map", table][BrakeInputType, array][BrakeIndex, number]
 }
 
 # This function checks whether or not the player controls are valid.

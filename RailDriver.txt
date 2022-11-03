@@ -20,12 +20,27 @@
 @model models/beer/wiremod/gate_e2_nano.mdl
 @persist Trucks:array Speedo:table
 @persist [PlayerControls ThrottleMap BrakeMap]:table TrainDriver:entity
+@persist PIDF:table
 @persist Speed SpeedMPH
 @outputs Debugger:table
 @strict
 
 if (first() | duped())
 {
+    local PIDCoefficientKp = 1020
+    local PIDCoefficientKi = 850
+    local PIDCoefficientKd = 10
+
+    local PIDItermDecayRate = 0.5
+    local PIDItermDecayThreshold = 3.0 * 17.6
+    local PIDItermDecayHysteresis = 1
+
+    local PIDItermLimit = 75000
+    local PIDOutputLimit = 75000
+
+    local SpeedometerFilterCutoffFrequency = 1
+    local SpeedometerDeadband = 0.1
+
     try
     {
         #include "e2shared/RailDriver/lib/smartEntityManagement"
@@ -73,7 +88,8 @@ if (first() | duped())
         Speedo = speedometerInit(Trucks[1, entity], Trucks[2, entity])
         if (Speedo:count() == 19)
         {
-            speedometerSetFilterCutoffFrequency(Speedo, 1)
+            speedometerSetFilterCutoffFrequency(Speedo, SpeedometerFilterCutoffFrequency)
+            speedometerSetDeadband(Speedo, SpeedometerDeadband * 17.6)
             speedometerStart(Speedo)
         }
 
@@ -88,6 +104,7 @@ if (first() | duped())
         ThrottleMap["Acceleration Setpoint", array] = array(0, 0.5, 1, 1.5, 2, 2.5, 3)
         ThrottleMap["Torque Setpoint", array] = array(0, 1000, 2000, 3000, 4000, 5000, 6000)
         BrakeMap["Brake Input Type", string] = "Velocity"
+        BrakeMap["Velocity Setpoint", array] = array(0, 0, 0, 0, 0, 0, 0)
         BrakeMap["Deceleration Setpoint", array] = array(0, -0.5, -1, -1.5, -2, -2.5, -3)
         BrakeMap["Torque Setpoint", array] = array(0, -1000, -2000, -3000, -4000, -5000, -6000)
 
@@ -117,6 +134,26 @@ if (first() | duped())
             error("Failed to initialize Player Controls.")
         }
 
+        # Initialize the PIDF controller.
+        PIDF = pidCreateInstance()
+        if (PIDF:count() == 55)
+        {
+            # Set the initial PIDF Controller's parameters.
+            pidSetPIDcoefficients(PIDF, PIDCoefficientKp, PIDCoefficientKi, PIDCoefficientKd)
+            pidSetFFcoefficients(PIDF, 0, 0, 0, 0, 0)
+            pidSetItermDecay(PIDF, PIDItermDecayRate, PIDItermDecayThreshold, PIDItermDecayHysteresis)
+            pidSetItermLimits(PIDF, -PIDItermLimit, PIDItermLimit)
+            pidSetOutputLimits(PIDF, -PIDOutputLimit, PIDOutputLimit)
+            pidSetProportionalMode(PIDF, "Proportional on Measurement")
+            pidSetMode(PIDF, "Automatic")
+            runOnTick(1)
+        }
+
+        else 
+        {
+            error("Failed to initialize PIDF controller.")
+        }
+
         timer("Debug", 100)
     }
 
@@ -136,7 +173,7 @@ if (first() | duped())
             If you know how to fix this, please let me know by opening either an issue or a pull request on GitHub.
         ]#
 
-        printColor(vec(255, 0, 0), "[RailDriver | Error]", vec(255, 255, 255), ": " + Exception)
+        printColor(vec(255, 0, 0), "[RailDriver | Init | Error]", vec(255, 255, 255), ": " + Exception)
     }
 }
 
@@ -149,11 +186,15 @@ if (clk(speedometerGetClockId(Speedo)))
         local SpeedRaw = 0
 
         # Calculate the speed of the locomotive.
-        SpeedRaw = speedometerGetSpeed(Speedo, 1)
+        SpeedRaw = speedometerGetSpeed(Speedo, playerControlsGetDirection(PlayerControls))
         Speed = speedometerFilter(Speedo, SpeedRaw)
 
         # Apply a deadband to the speed.
         Speed = speedometerDeadband(Speedo, Speed)
+
+        # Update the PIDF controller's process variable.
+        # This is the measured speed of the locomotive.
+        pidSetProcessVariable(PIDF, Speed)
 
         # Convert speed from Garry's Mod units to miles per hour.
         SpeedMPH = round(toUnit("mph", Speed) * 4 / 3)
@@ -161,7 +202,102 @@ if (clk(speedometerGetClockId(Speedo)))
 
     catch (Exception)
     {
-        printColor(vec(255, 0, 0), "[RailDriver | Error]", vec(255, 255, 255), ": " + Exception)
+        printColor(vec(255, 0, 0), "[RailDriver | Speedo | Error]", vec(255, 255, 255), ": " + Exception)
+    }
+}
+
+if (tickClk())
+{
+    try
+    {
+        #[
+            TODO:
+            - Move the setpoint, throttle, and brake values up to the player controls.
+            - Move the throttle & brake feedforward values up to the player controls.
+        ]#
+        # Get the current throttle and brake values.
+        local Throttle = playerControlsGetThrottle(PlayerControls)
+        local Brake = playerControlsGetBrake(PlayerControls)
+        local Reverser = playerControlsGetDirection(PlayerControls)
+
+        # Get the current velocity setpoint.
+        local VelocitySetpoint = playerControlsGetThrottleMap(PlayerControls, "Velocity Setpoint", Throttle)
+
+        # Convert the velocity setpoint from miles per hour to Garry's Mod units.
+        local VelocitySetpointGM = VelocitySetpoint * 17.6
+
+        # Set the throttle and brake feedforward values.
+        pidSetFeedforward(PIDF, "Throttle", VelocitySetpointGM)
+        #pidSetFeedforward(PIDF, "Brake", Brake)
+
+        # Set the PIDF controller's setpoint.
+        # This is the desired speed of the locomotive.
+        pidSetSetPoint(PIDF, VelocitySetpointGM)
+
+        # Calculate the PIDF controller's output.
+        pidCalculate(PIDF) # <--- This is where the magick happens. =^/,..,^=
+
+        # Get the PIDF controller's output.
+        # This is the throttle and brake values that will be applied to the locomotive.
+        local PIDFOutput = pidGetOutput(PIDF)
+
+        #[ Bypass all of this for now. ]#
+        #[
+            # Set the throttle and brake values based on the PIDF controller's output and the current reverser position.
+            if (Reverser == 1)
+            {
+                Throttle = PIDFOutput
+                Brake = 0
+            }
+
+            elseif (Reverser == -1)
+            {
+                Throttle = 0
+                Brake = PIDFOutput
+            }
+
+            else
+            {
+                Throttle = 0
+                Brake = 0
+            }
+
+            # Apply the throttle, brake, and reverser values to the locomotive's traction motors.
+            semControlTrucks(Trucks, Throttle, Brake, Reverser)
+        ]#
+
+        # Apply the PIDF Controller's output directly to the locomotive's traction motors.
+        if (!semDirectControlTrucks(Trucks, PIDFOutput, Reverser))
+        {
+            #[ 
+                Notes from ZZ Cat:
+                When 'semDirectControlTrucks()' returns false, the control loop is disabled.
+                The E2 is also unlocked, so you can edit or remove it.
+                This is to prevent the E2 from being locked forever.
+
+                Through testing, I found a few things:
+                - If the trucks are removed from the locomotive, 'semDirectControlTrucks()' will return false.
+                  & the speedometer will show an "Invalid entity!" error.
+                - If the entire locomotive is removed from the world, 'semDirectControlTrucks()' will return false.
+                  & the error below will be printed.
+            ]#
+
+            # If the E2 is locked, unlock it.
+            # This is to prevent the E2 from being locked forever.
+            runOnTick(0)
+            if (semE2IsLocked())
+            {
+                semUnlockE2()
+            }
+
+            # Print an error message.
+            error("Failed to apply PIDF controller's output to locomotive's traction motors.")
+        }
+    }
+
+    catch (Exception)
+    {
+        printColor(vec(255, 0, 0), "[RailDriver | PID | Error]", vec(255, 255, 255), ": " + Exception)
     }
 }
 
@@ -188,7 +324,7 @@ if (keyClk())
 
     catch (Exception)
     {
-        printColor(vec(255, 0, 0), "[RailDriver | Error]", vec(255, 255, 255), ": " + Exception)
+        printColor(vec(255, 0, 0), "[RailDriver | PlyCtrls | Error]", vec(255, 255, 255), ": " + Exception)
     }
 }
 
@@ -197,6 +333,24 @@ if (clk("Debug"))
     stoptimer("Debug")
     timer("Debug", 100)
 
+    # Locomotive's speed.
     Debugger["Speed (Source)", number] = Speed
     Debugger["Speed (mph)", number] = SpeedMPH
+
+    # Player controls.
+    #Debugger["Throttle", number] = playerControlsGetThrottle(PlayerControls)
+    #Debugger["Brake", number] = playerControlsGetBrake(PlayerControls)
+    #Debugger["Reverser", number] = playerControlsGetDirection(PlayerControls)
+
+    # PIDF controller.
+    Debugger["PIDF Setpoint", number] = pidGetSetPoint(PIDF) / 17.6
+
+    #Debugger["PIDF Feedforward", number] = pidGetFFsum(PIDF)
+    #Debugger["PIDF Process Variable", number] = pidGetProcessVariable(PIDF) / 17.6
+
+    Debugger["PIDF P-Term", number] = pidGetPterm(PIDF)
+    Debugger["PIDF I-Term", number] = pidGetIterm(PIDF)
+    Debugger["PIDF D-Term", number] = pidGetDterm(PIDF)
+
+    Debugger["PIDF Output", number] = pidGetOutput(PIDF)
 }

@@ -29,11 +29,11 @@ function table pidCreateInstance()
     # Default properties:
     S["Sample Time", number] = ticksToMillis(1)
     S["Range", number] = 75000
-    S["Scale", number] = 100
-    S["Proportional", number] = 1012
-    S["Integral", number] = 850
-    S["Derivative", number] = 10
-    S["Feed Forward", number] = 14
+    S["Scale", number] = 1
+    S["Proportional", number] = 0
+    S["Integral", number] = 0
+    S["Derivative", number] = 0
+    S["Feed Forward", number] = 0
     S["Proportional Mode", number] = 0
     S["Direction", number] = 1
     S["Mode", number] = 1
@@ -136,7 +136,7 @@ function number pidSetItermLimits(S:table, Min, Max)
     }
 }
 
-function number pidSetControlVariableLimits(S:table, Floor, Ceiling)
+function number pidSetOutputLimits(S:table, Floor, Ceiling)
 {
     if (Floor > Ceiling)
     {
@@ -153,8 +153,8 @@ function number pidSetControlVariableLimits(S:table, Floor, Ceiling)
             return 0
         }
 
-        S["Control Variable", number] = clamp(S["Control Variable", number], Floor, Ceiling)
-        # S["CV Sum", number] = clamp(S["CV Sum", number], Floor, Ceiling)
+        S["CV Sum", number] = clamp(S["CV Sum", number], Floor, Ceiling)
+        S["Control Variable", number] = S["CV Sum", number]
         return 1
     }
 }
@@ -268,7 +268,7 @@ function number pidSetCoefficients(S:table, Gains:string, Value)
     }
 }
 
-function number pidSetCoefficients(S:table, PtermGain, ItermGain, DtermGain)
+function number pidSetPIDcoefficients(S:table, PtermGain, ItermGain, DtermGain)
 {
     if (pidSetCoefficients(S, "proportional", PtermGain) == 0)
     {
@@ -288,7 +288,7 @@ function number pidSetCoefficients(S:table, PtermGain, ItermGain, DtermGain)
     return 1
 }
 
-function number pidSetCoefficients(S:table, FFaccel, FFyawRate, FFpitchAngle, FFthr, FFbrk)
+function number pidSetFFcoefficients(S:table, FFaccel, FFyawRate, FFpitchAngle, FFthr, FFbrk)
 {
     if (pidSetCoefficients(S, "acceleration feedforward", FFaccel) == 0)
     {
@@ -440,7 +440,19 @@ function number pidSetItermRelax(S:table, Iterm, ItermErrorRate, ProcessVariable
     return ItermErrorRate
 }
 
-function number pidUpdate(S:table)
+# This function sets the process variable, which is the input to the PIDF controller.
+function void pidSetProcessVariable(S:table, Value)
+{
+    S["Process Variable", number] = Value
+}
+
+# This function sets the set point, which is the desired output of the PIDF controller.
+function void pidSetSetPoint(S:table, Value)
+{
+    S["Set Point", number] = Value
+}
+
+function number pidCalculate(S:table)
 {
     # PID Controller can have several operating modes.
     # These modes can include, but aren't limited to:
@@ -559,4 +571,46 @@ function number pidUpdate(S:table)
 
     # Return true when the control loop is running.
     return 1
+}
+
+# This function returns the current value of the Control Variable.
+function number pidGetOutput(S:table)
+{
+    return S["Control Variable", number]
+}
+
+# This function returns the current value of the P-Term.
+function number pidGetPterm(S:table)
+{
+    return S["P-Term", number]
+}
+
+# This function returns the current value of the I-Term.
+function number pidGetIterm(S:table)
+{
+    return S["I-Term", number]
+}
+
+# This function returns the current value of the D-Term.
+function number pidGetDterm(S:table)
+{
+    return S["D-Term", number]
+}
+
+# This function returns the current value of the Feedforward Sum.
+function number pidGetFFsum(S:table)
+{
+    return S["FF Sum", number]
+}
+
+# This function returns the current value of the Set Point.
+function number pidGetSetPoint(S:table)
+{
+    return S["Set Point", number]
+}
+
+# This function returns the current value of the Process Variable.
+function number pidGetProcessVariable(S:table)
+{
+    return S["Process Variable", number]
 }

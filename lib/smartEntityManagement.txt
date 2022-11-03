@@ -201,3 +201,60 @@ function number semValidateTrucks(Trucks:array)
 
     return 1
 }
+
+# This function is used to directly control the locomotive trucks' traction motors.
+# Currently, it is used by RailDriver to temporarily bypass the 'semControlTrucks()' function below this one.
+function number semDirectControlTrucks(Trucks:array, PIDFOutput:number, Reverser:number)
+{
+    if (!semValidateTrucks(Trucks))
+    {
+        return 0
+    }
+
+    # Calculate the traction motor output.
+    local MotorOutput = PIDFOutput * Reverser
+
+    # Apply the traction motor output to the trucks.
+    Trucks[1, entity]:applyForce(Trucks[1, entity]:toWorldAxis(vec(0, -MotorOutput, 0)))
+    Trucks[2, entity]:applyForce(Trucks[2, entity]:toWorldAxis(vec(0, MotorOutput, 0)))
+    #Trucks[1, entity]:applyForceCenter(Trucks[1, entity]:getForward() * MotorOutput)
+    #Trucks[2, entity]:applyForceCenter(Trucks[2, entity]:getForward() * MotorOutput)
+    return 1
+}
+
+# This function is used to control the locomotive trucks' traction motors.
+# It is called by the main E2 script.
+function number semControlTrucks(Trucks:array, Throttle:number, Brake:number, Reverser:number)
+{
+    # Validate the trucks.
+    if (!semValidateTrucks(Trucks))
+    {
+        return 0
+    }
+
+    # Calculate the traction motor power.
+    local Power = Throttle - Brake
+
+    # Calculate the traction motor torque.
+    local Torque = 0
+    if (Reverser == 1)
+    {
+        Torque = Power * 1000
+    }
+
+    elseif (Reverser == -1)
+    {
+        Torque = Power * -1000
+    }
+
+    else
+    {
+        Torque = 0
+    }
+
+    # Apply the traction motor torque to the trucks.
+    local Force = Torque * 0.5
+    Trucks[1, entity]:applyForce(Trucks[1, entity]:toWorldAxis(vec(0, -Force, 0)))
+    Trucks[2, entity]:applyForce(Trucks[2, entity]:toWorldAxis(vec(0, Force, 0)))
+    return 1
+}
