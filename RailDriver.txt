@@ -228,7 +228,7 @@ if (tickClk())
 
         # Set the throttle and brake feedforward values.
         pidSetFeedforward(PIDF, "Throttle", VelocitySetpointGM)
-        pidSetFeedforward(PIDF, "Brake", Brake)
+        #pidSetFeedforward(PIDF, "Brake", Brake)
 
         # Set the PIDF controller's setpoint.
         # This is the desired speed of the locomotive.
