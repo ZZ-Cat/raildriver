@@ -153,8 +153,8 @@ function number pidSetOutputLimits(S:table, Floor, Ceiling)
             return 0
         }
 
-        S["Control Variable", number] = clamp(S["Control Variable", number], Floor, Ceiling)
-        # S["CV Sum", number] = clamp(S["CV Sum", number], Floor, Ceiling)
+        S["CV Sum", number] = clamp(S["CV Sum", number], Floor, Ceiling)
+        S["Control Variable", number] = S["CV Sum", number]
         return 1
     }
 }
