@@ -223,13 +223,16 @@ if (tickClk())
         # Get the current velocity setpoint.
         local VelocitySetpoint = playerControlsGetThrottleMap(PlayerControls, "Velocity Setpoint", Throttle)
 
+        # Convert the velocity setpoint from miles per hour to Garry's Mod units.
+        local VelocitySetpointGM = VelocitySetpoint * 17.6
+
         # Set the throttle and brake feedforward values.
-        pidSetFeedforward(PIDF, "Throttle", Throttle)
+        pidSetFeedforward(PIDF, "Throttle", VelocitySetpointGM)
         pidSetFeedforward(PIDF, "Brake", Brake)
 
         # Set the PIDF controller's setpoint.
         # This is the desired speed of the locomotive.
-        pidSetSetPoint(PIDF, VelocitySetpoint)
+        pidSetSetPoint(PIDF, VelocitySetpointGM)
 
         # Calculate the PIDF controller's output.
         pidCalculate(PIDF) # <--- This is where the magick happens. =^/,..,^=
