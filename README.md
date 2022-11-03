@@ -45,7 +45,7 @@ Okay, I digress. Where was I? Oh yea. Now, I remember. This is what you're here 
   - I will also seperate out the I Term Limit.
   Currently, its limit is the same as the PIDF Controller's output to the trucks.
   By making it seperate, this gives you more adjustment over how sensitive you want the control loop to be.
-- [ ] Simplified Primary Control Interface.
+- [x] Simplified Primary Control Interface.
   - If you're new to the world of GMTB, this will be your best friend.
   - Here, I will have RailDriver automatically select your line speeds based on what map you are running your locomotive on.
   EG for gm_sunsetgulch your linespeeds will be 5, 15, 20, 30, 40 & 60 miles per hour.
