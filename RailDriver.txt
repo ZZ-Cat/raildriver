@@ -333,6 +333,24 @@ if (clk("Debug"))
     stoptimer("Debug")
     timer("Debug", 100)
 
+    # Locomotive's speed.
     Debugger["Speed (Source)", number] = Speed
     Debugger["Speed (mph)", number] = SpeedMPH
+
+    # Player controls.
+    #Debugger["Throttle", number] = playerControlsGetThrottle(PlayerControls)
+    #Debugger["Brake", number] = playerControlsGetBrake(PlayerControls)
+    #Debugger["Reverser", number] = playerControlsGetDirection(PlayerControls)
+
+    # PIDF controller.
+    Debugger["PIDF Setpoint", number] = pidGetSetPoint(PIDF) / 17.6
+
+    #Debugger["PIDF Feedforward", number] = pidGetFFsum(PIDF)
+    #Debugger["PIDF Process Variable", number] = pidGetProcessVariable(PIDF) / 17.6
+
+    Debugger["PIDF P-Term", number] = pidGetPterm(PIDF)
+    Debugger["PIDF I-Term", number] = pidGetIterm(PIDF)
+    Debugger["PIDF D-Term", number] = pidGetDterm(PIDF)
+
+    Debugger["PIDF Output", number] = pidGetOutput(PIDF)
 }
