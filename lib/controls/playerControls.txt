@@ -776,7 +776,6 @@ function number playerControlsUpdate(Controls:table)
                 Controls["Emergency Brake", number] = 1
                 Controls["Flags", table]["Emergency Brake is Updated", number] = 1
                 Controls["Flags", table]["Player Controls Updated", number] = 1
-                Controls["Flags", table]["Emergency Brake is Released", number] = 0
             }
         }
     }

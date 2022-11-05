@@ -214,30 +214,6 @@ if (tickClk())
 {
     try
     {
-        #[
-            TODO:
-            - Move the setpoint, throttle, and brake values up to the player controls.
-            - Move the throttle & brake feedforward values up to the player controls.
-        ]#
-        # Get the current throttle and brake values.
-        local Throttle = playerControlsGetThrottle(PlayerControls)
-        local Brake = playerControlsGetBrake(PlayerControls)
-        local Reverser = playerControlsGetDirection(PlayerControls)
-
-        # Get the current velocity setpoint.
-        local VelocitySetpoint = playerControlsGetThrottleMap(PlayerControls, "Velocity Setpoint", Throttle)
-
-        # Convert the velocity setpoint from miles per hour to Garry's Mod units.
-        local VelocitySetpointGM = VelocitySetpoint * 17.6
-
-        # Set the throttle and brake feedforward values.
-        pidSetFeedforward(PIDF, "Throttle", VelocitySetpointGM)
-        #pidSetFeedforward(PIDF, "Brake", Brake)
-
-        # Set the PIDF controller's setpoint.
-        # This is the desired speed of the locomotive.
-        pidSetSetPoint(PIDF, VelocitySetpointGM)
-
         # Calculate the PIDF controller's output.
         pidCalculate(PIDF) # <--- This is where the magick happens. =^/,..,^=
 
@@ -271,7 +247,7 @@ if (tickClk())
         ]#
 
         # Apply the PIDF Controller's output directly to the locomotive's traction motors.
-        if (!semDirectControlTrucks(Trucks, PIDFOutput, Reverser))
+        if (!semDirectControlTrucks(Trucks, PIDFOutput, Direction))
         {
             #[ 
                 Notes from ZZ Cat:
