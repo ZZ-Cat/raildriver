@@ -19,6 +19,7 @@
 @name RailDriver
 @model models/beer/wiremod/gate_e2_nano.mdl
 @persist Trucks:array Speedo:table
+@persist [Direction Throttle Brake EmergencyBrake]:number
 @persist [PlayerControls ThrottleMap BrakeMap]:table TrainDriver:entity
 @persist PIDF:table
 @persist Speed SpeedMPH
@@ -131,6 +132,11 @@ if (first() | duped())
         {
             error("Failed to initialize Player Controls.")
         }
+
+        Direction = 0
+        Throttle = 1
+        Brake = 1
+        EmergencyBrake = 0
 
         # Initialize the PIDF controller.
         PIDF = pidCreateInstance()
@@ -303,21 +309,52 @@ if (keyClk())
 {
     try
     {
-        playerControlsUpdate(PlayerControls)
-
-        #[
-            Notes from ZZ Cat:
-            This has been commented out, because it keeps spamming the chat with the same message.
-            Currently, I'm not sure how to fix this.
-            If you know how to fix this, please let me know by opening either an issue or a pull request on GitHub.
-        ]#
-        #[
-            if (!playerControlsValid(PlayerControls, SpeedMPH))
+        if (playerControlsUpdate(PlayerControls))
+        {
+            if (!playerControlsValid(PlayerControls, Speed))
             {
-                playerControlsClearAllFaults(PlayerControls)
                 error(playerControlsGetFaultMessage(PlayerControls))
             }
-        ]#
+
+            if (playerControlsDirectionIsUpdated(PlayerControls))
+            {
+                Direction = playerControlsGetDirection(PlayerControls)
+            }
+
+            if (playerControlsThrottleIsUpdated(PlayerControls))
+            {
+                # Get the current throttle value.
+                Throttle = playerControlsGetThrottle(PlayerControls)
+
+                # Get the current velocity setpoint & convert it from miles per hour to Garry's Mod units.
+                local VelocitySetpoint = playerControlsGetThrottleMap(PlayerControls, "Velocity Setpoint", Throttle)
+                local VelocitySetpointGM = VelocitySetpoint * 17.6
+
+                # Set the PIDF controller's setpoint.
+                pidSetFeedforward(PIDF, "Throttle", VelocitySetpointGM)
+                pidSetSetPoint(PIDF, VelocitySetpointGM)
+            }
+
+            if (playerControlsBrakeIsUpdated(PlayerControls))
+            {
+                Brake = playerControlsGetBrake(PlayerControls)
+
+                # Brake currently is not used.
+                # So, I'm gonna let it silently do nothing. =^/.~=
+            }
+
+            if (playerControlsEmergencyBrakeIsUpdated(PlayerControls))
+            {
+                EmergencyBrake = playerControlsGetEmergencyBrake(PlayerControls)
+
+                # If the Emergency Brake is pressed, set the controller's setpoint to 0.
+                if (EmergencyBrake)
+                {
+                    pidSetFeedforward(PIDF, "Throttle", 0)
+                    pidSetSetPoint(PIDF, 0)
+                }
+            }
+        }
     }
 
     catch (Exception)
