@@ -610,8 +610,8 @@ function table playerControlsInit(KeyboardControls:table, ThrottleMap:table, Bra
 {
     local Controls = table()
     Controls["Direction", number] = 0
-    Controls["Throttle", number] = 0
-    Controls["Brake", number] = 0
+    Controls["Throttle", number] = 1
+    Controls["Brake", number] = 1
     Controls["Emergency Brake", number] = 0
     Controls["Horn", number] = 0
     Controls["Bell", number] = 0
@@ -821,6 +821,30 @@ function number playerControlsEmergencyBrakeIsUpdated(Controls:table)
 function number playerControlsEmergencyBrakeIsActive(Controls:table)
 {
     return Controls["Flags", table]["Emergency Brake is Released", number] != 1 ? 1 : 0
+}
+
+# This function clears the Direction is Updated flag.
+function void playerControlsClearDirectionIsUpdated(Controls:table)
+{
+    Controls["Flags", table]["Direction is Updated", number] = 0
+}
+
+# This function clears the Throttle is Updated flag.
+function void playerControlsClearThrottleIsUpdated(Controls:table)
+{
+    Controls["Flags", table]["Throttle is Updated", number] = 0
+}
+
+# This function clears the Brake is Updated flag.
+function void playerControlsClearBrakeIsUpdated(Controls:table)
+{
+    Controls["Flags", table]["Brake is Updated", number] = 0
+}
+
+# This function clears the Emergency Brake is Updated flag.
+function void playerControlsClearEmergencyBrakeIsUpdated(Controls:table)
+{
+    Controls["Flags", table]["Emergency Brake is Updated", number] = 0
 }
 
 # This function returns the direction of the locomotive.

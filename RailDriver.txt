@@ -319,6 +319,9 @@ if (keyClk())
             if (playerControlsDirectionIsUpdated(PlayerControls))
             {
                 Direction = playerControlsGetDirection(PlayerControls)
+
+                # Clear the Direction is Updated flag.
+                playerControlsClearDirectionIsUpdated(PlayerControls)
             }
 
             if (playerControlsThrottleIsUpdated(PlayerControls))
@@ -333,6 +336,9 @@ if (keyClk())
                 # Set the PIDF controller's setpoint.
                 pidSetFeedforward(PIDF, "Throttle", VelocitySetpointGM)
                 pidSetSetPoint(PIDF, VelocitySetpointGM)
+
+                # Clear the Throttle is Updated flag.
+                playerControlsClearThrottleIsUpdated(PlayerControls)
             }
 
             if (playerControlsBrakeIsUpdated(PlayerControls))
@@ -341,6 +347,9 @@ if (keyClk())
 
                 # Brake currently is not used.
                 # So, I'm gonna let it silently do nothing. =^/.~=
+
+                # Clear the Brake is Updated flag.
+                playerControlsClearBrakeIsUpdated(PlayerControls)
             }
 
             if (playerControlsEmergencyBrakeIsUpdated(PlayerControls))
@@ -353,6 +362,9 @@ if (keyClk())
                     pidSetFeedforward(PIDF, "Throttle", 0)
                     pidSetSetPoint(PIDF, 0)
                 }
+
+                # Clear the Emergency Brake is Updated flag.
+                playerControlsClearEmergencyBrakeIsUpdated(PlayerControls)
             }
         }
     }
