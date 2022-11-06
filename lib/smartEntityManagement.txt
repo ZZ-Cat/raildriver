@@ -226,14 +226,14 @@ function number semDirectControlTrucks(Trucks:array, PIDFOutput:number, Reverser
 
 # This function is used to control the locomotive trucks' brakes.
 # Currently, it is used by RailDriver to temporarily bypass the 'semControlTrucks()' function below this one.
-function void semDirectControlBrakes(Trucks:array, BrakePercentage:number, Direction:number, Speed:number)
+function void semDirectControlBrakes(Trucks:array, BrakePercentage:number, Speed:number)
 {
     # Apply the brake.
     # This is done by applying a force to the locomotive's trucks.
     # The force is applied in the opposite direction of the locomotive's current velocity.
     # The force is proportional to the locomotive's current velocity.
     # The force is proportional to the brake percentage.
-    local F = (Speed * Direction) * (BrakePercentage / 100) * SemBrakeForceCoefficient * -1
+    local F = Speed * (BrakePercentage / 100) * SemBrakeForceCoefficient * -1
     Trucks[1, entity]:applyForce(Trucks[1, entity]:toWorldAxis(vec(0, -F, 0)))
     Trucks[2, entity]:applyForce(Trucks[2, entity]:toWorldAxis(vec(0, F, 0)))
 }

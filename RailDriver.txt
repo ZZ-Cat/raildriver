@@ -23,7 +23,7 @@
 @persist [PlayerControls ThrottleMap BrakeMap]:table TrainDriver:entity
 @persist PIDF:table
 @persist EmBrakeState EmBrakeThisSpeed EmBrakeLastSpeed EmBrakeObserverTickInterval
-@persist Speed SpeedMPH
+@persist Speed SpeedAbs SpeedMPH
 @outputs Debugger:table
 @strict
 
@@ -197,12 +197,14 @@ if (clk(speedometerGetClockId(Speedo)))
         # Apply a deadband to the speed.
         Speed = speedometerDeadband(Speedo, Speed)
 
+        SpeedAbs = abs(Speed)
+
         # Update the PIDF controller's process variable.
         # This is the measured speed of the locomotive.
-        pidSetProcessVariable(PIDF, abs(Speed))
+        pidSetProcessVariable(PIDF, SpeedAbs)
 
         # Convert speed from Garry's Mod units to miles per hour.
-        SpeedMPH = round(toUnit("mph", abs(Speed)) * 4 / 3)
+        SpeedMPH = round(toUnit("mph", SpeedAbs) * 4 / 3)
     }
 
     catch (Exception)
@@ -377,8 +379,8 @@ if (clk("Emergency Brake"))
         if (EmBrakeState == 1)
         {
             # Get the current speed of the locomotive.
-            EmBrakeThisSpeed = Speed
-            EmBrakeLastSpeed = Speed
+            EmBrakeThisSpeed = SpeedAbs
+            EmBrakeLastSpeed = SpeedAbs
 
             # Reset the Throttle & Brake values.
             playerControlsResetThrottle(PlayerControls)
@@ -401,7 +403,7 @@ if (clk("Emergency Brake"))
         elseif (EmBrakeState == 2)
         {
             # Get the current speed of the locomotive.
-            EmBrakeThisSpeed = Speed
+            EmBrakeThisSpeed = SpeedAbs
 
             # If the locomotive's speed is not decreasing, set the Emergency Brake state to 3.
             if (EmBrakeThisSpeed >= EmBrakeLastSpeed)
@@ -430,7 +432,7 @@ if (clk("Emergency Brake"))
         elseif (EmBrakeState == 3)
         {
             # Get the current speed of the locomotive.
-            EmBrakeThisSpeed = Speed
+            EmBrakeThisSpeed = SpeedAbs
 
             # If the locomotive is stopped, set the Emergency Brake state to 4.
             if (EmBrakeThisSpeed == 0)
@@ -456,7 +458,7 @@ if (clk("Emergency Brake"))
             semDirectControlTrucks(Trucks, 0, Direction)
 
             # Set the locomotive's brakes to 100%.
-            semDirectControlBrakes(Trucks, 100, Direction, Speed)
+            semDirectControlBrakes(Trucks, 100, Speed)
 
             # Restart the Emergency Brake timer.
             timer("Emergency Brake", EmBrakeObserverTickInterval)
@@ -477,7 +479,7 @@ if (clk("Emergency Brake"))
         elseif (EmBrakeState == 4)
         {
             # Get the current speed of the locomotive.
-            EmBrakeThisSpeed = Speed
+            EmBrakeThisSpeed = SpeedAbs
 
             # If the locomotive is stopped, set the Emergency Brake state to 0.
             if (EmBrakeThisSpeed == 0)
@@ -504,7 +506,7 @@ if (clk("Emergency Brake"))
                 semDirectControlTrucks(Trucks, 0, Direction)
 
                 # Set the locomotive's brakes to 0.
-                semDirectControlBrakes(Trucks, 0, Direction, Speed)
+                semDirectControlBrakes(Trucks, 0, Speed)
 
                 # Re-enable the PIDF controller.
                 pidSetMode(PIDF, "Automatic")
