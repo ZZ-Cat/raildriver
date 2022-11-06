@@ -452,6 +452,12 @@ function void pidSetSetPoint(S:table, Value)
     S["Set Point", number] = Value
 }
 
+# This function sets the control variable, which is the output of the PIDF controller.
+function void pidSetOutput(S:table, Value)
+{
+    S["Control Variable", number] = Value
+}
+
 function number pidCalculate(S:table)
 {
     # PID Controller can have several operating modes.
