@@ -846,6 +846,18 @@ function void playerControlsClearEmergencyBrakeIsUpdated(Controls:table)
     Controls["Flags", table]["Emergency Brake is Updated", number] = 0
 }
 
+# This function clears the Emergency Brake is Released flag.
+function void playerControlsClearEmergencyBrakeIsActive(Controls:table)
+{
+    Controls["Flags", table]["Emergency Brake is Released", number] = 1
+}
+
+# This function resets the Throttle.
+function void playerControlsResetThrottle(Controls:table)
+{
+    Controls["Throttle", number] = 1
+}
+
 # This function returns the direction of the locomotive.
 function number playerControlsGetDirection(Controls:table)
 {

@@ -20,6 +20,7 @@
 
 @name RailDriver/lib/smartEntityManagement
 @persist SemE2Locked [SemE2IsWeldedTo SemE2IsParentedTo SemE2]:entity
+@persist SemBrakeForceCoefficient
 
 function number semInit()
 {
@@ -31,6 +32,7 @@ function number semInit()
     SemE2 = entity()
     SemE2IsWeldedTo = SemE2:isWeldedTo()
     SemE2IsParentedTo = SemE2:parent()
+    SemBrakeForceCoefficient = 1000
     return 1
 }
 
@@ -222,6 +224,20 @@ function number semDirectControlTrucks(Trucks:array, PIDFOutput:number, Reverser
     return 1
 }
 
+# This function is used to control the locomotive trucks' brakes.
+# Currently, it is used by RailDriver to temporarily bypass the 'semControlTrucks()' function below this one.
+function void semDirectControlBrakes(Trucks:array, BrakePercentage:number, Direction:number, Speed:number)
+{
+    # Apply the brake.
+    # This is done by applying a force to the locomotive's trucks.
+    # The force is applied in the opposite direction of the locomotive's current velocity.
+    # The force is proportional to the locomotive's current velocity.
+    # The force is proportional to the brake percentage.
+    local F = (Speed * Direction) * (BrakePercentage / 100) * SemBrakeForceCoefficient * -1
+    Trucks[1, entity]:applyForce(Trucks[1, entity]:toWorldAxis(vec(0, -F, 0)))
+    Trucks[2, entity]:applyForce(Trucks[2, entity]:toWorldAxis(vec(0, F, 0)))
+}
+
 # This function is used to control the locomotive trucks' traction motors.
 # It is called by the main E2 script.
 function number semControlTrucks(Trucks:array, Throttle:number, Brake:number, Reverser:number)
@@ -257,4 +273,17 @@ function number semControlTrucks(Trucks:array, Throttle:number, Brake:number, Re
     Trucks[1, entity]:applyForce(Trucks[1, entity]:toWorldAxis(vec(0, -Force, 0)))
     Trucks[2, entity]:applyForce(Trucks[2, entity]:toWorldAxis(vec(0, Force, 0)))
     return 1
+}
+
+# This function freezes the entire train.
+function void semFreezeTrain()
+{
+    local E = entity()
+    local P = E:parent()
+    local CE = P:getConnectedEntities(array("axis", "rope", "AdvBallsocket"))
+
+    for (I = 1, CE:count())
+    {
+        CE[I, entity]:propFreeze(1)
+    }
 }
