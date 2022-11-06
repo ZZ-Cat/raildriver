@@ -202,7 +202,7 @@ function number speedometerGetSpeed(S:table, Direction)
         }
     }
 
-    return abs(Output)
+    return Output
 }
 
 # This function applies a low-pass filter to the speedometer's data.

@@ -198,10 +198,10 @@ if (clk(speedometerGetClockId(Speedo)))
 
         # Update the PIDF controller's process variable.
         # This is the measured speed of the locomotive.
-        pidSetProcessVariable(PIDF, Speed)
+        pidSetProcessVariable(PIDF, abs(Speed))
 
         # Convert speed from Garry's Mod units to miles per hour.
-        SpeedMPH = round(toUnit("mph", Speed) * 4 / 3)
+        SpeedMPH = round(toUnit("mph", abs(Speed)) * 4 / 3)
     }
 
     catch (Exception)
