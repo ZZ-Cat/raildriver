@@ -376,6 +376,8 @@ if (clk("Emergency Brake"))
         #    This is a safety measure to prevent the locomotive from derailing &/or causing a collision.
         if (EmBrakeState == 1)
         {
+            #[ STOP THE TRAIN!!! ]#
+
             # Get the current speed of the locomotive.
             EmBrakeThisSpeed = SpeedAbs
             EmBrakeLastSpeed = SpeedAbs
@@ -394,12 +396,14 @@ if (clk("Emergency Brake"))
             timer("Emergency Brake", EmBrakeObserverTickInterval)
         }
 
-        # Emergency Brake state 2 - Stop the locomotive.
+        # Emergency Brake state 2.
         # This state is used to monitor the locomotive's speed to ensure that the locomotive is stopping.
         # If the locomotive's speed is not decreasing, the Emergency Brake state is set to 3.
         # If the locomotive is stopped, the Emergency Brake state is set to 4.
         elseif (EmBrakeState == 2)
         {
+            #[ I HOPE IT STOPS! ]#
+
             # Get the current speed of the locomotive.
             EmBrakeThisSpeed = SpeedAbs
 
@@ -422,13 +426,15 @@ if (clk("Emergency Brake"))
             timer("Emergency Brake", EmBrakeObserverTickInterval)
         }
 
-        # Emergency Brake state 3 - I wasn't asking!
+        # Emergency Brake state 3.
         # This state disables the PIDF controller, sets the locomotive's traction motors to 0, &
         # uses the locomotive's brakes to stop the locomotive.
         # If the locomotive is stopped, the Emergency Brake state is set to 4.
         # If the locomotive's speed still is not decreasing, tougher measures are taken.
         elseif (EmBrakeState == 3)
         {
+            #[ I WASN'T ASKING!!! ]#
+
             # Get the current speed of the locomotive.
             EmBrakeThisSpeed = SpeedAbs
 
@@ -476,6 +482,8 @@ if (clk("Emergency Brake"))
         # Here, I am using the EmBrakeState to determine what the next action should be.
         elseif (EmBrakeState == 4)
         {
+            #[ YOU SHOULD HAVE LISTENED TO ME!!! ]#
+
             # Get the current speed of the locomotive.
             EmBrakeThisSpeed = SpeedAbs
 
@@ -515,7 +523,7 @@ if (clk("Emergency Brake"))
             timer("Emergency Brake", EmBrakeObserverTickInterval)
         }
 
-        # Emergency Brake state 5 - You should have listened to me!
+        # Emergency Brake state 5.
         # This state freezes the entire train, to prevent derailments &/or collisions.
         # This is the last resort to stop the locomotive & it should never be reached.
         # Otherwise, a non-recoverable fault is tripped.
@@ -523,6 +531,8 @@ if (clk("Emergency Brake"))
         # Also, your train will need to be manually unfrozen too.
         elseif (EmBrakeState == 5)
         {
+            #[ YA CAN'T RUNAWAY ON ME, IF YOU'RE FROZEN!!! ]#
+
             # Freeze the entire train.
             semFreezeTrain()
             semDirectControlBrakes(Trucks, 0)
