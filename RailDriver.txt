@@ -88,7 +88,7 @@ if (first() | duped())
 
         # Initialize Speedometer.
         Speedo = speedometerInit(Trucks[1, entity], Trucks[2, entity])
-        if (Speedo:count() == 19)
+        if (Speedo:count() == 8)
         {
             speedometerSetFilterCutoffFrequency(Speedo, SpeedometerFilterCutoffFrequency)
             speedometerSetDeadband(Speedo, SpeedometerDeadband * 17.6)
@@ -188,14 +188,12 @@ if (clk(speedometerGetClockId(Speedo)))
     {
         speedometerClearAndRestartTimer(Speedo)
 
-        local SpeedRaw = 0
-
         # Calculate the speed of the locomotive.
-        SpeedRaw = speedometerGetSpeed(Speedo, Direction)
-        Speed = speedometerFilter(Speedo, SpeedRaw)
+        local SpeedRaw = 0
+        SpeedRaw = speedometerGetSpeed(Speedo)
 
-        # Apply a deadband to the speed.
-        Speed = speedometerDeadband(Speedo, Speed)
+        # Apply a deadband & low-pass filter to the speed.
+        Speed = speedometerDeadband(Speedo, speedometerFilter(Speedo, SpeedRaw))
 
         SpeedAbs = abs(Speed)
 
