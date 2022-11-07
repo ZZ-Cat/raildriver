@@ -456,7 +456,7 @@ if (clk("Emergency Brake"))
             semDirectControlTrucks(Trucks, 0, Direction)
 
             # Set the locomotive's brakes to 100%.
-            semDirectControlBrakes(Trucks, 100, Speed)
+            semDirectControlBrakes(Trucks, 2)
 
             # Restart the Emergency Brake timer.
             timer("Emergency Brake", EmBrakeObserverTickInterval)
@@ -504,7 +504,7 @@ if (clk("Emergency Brake"))
                 semDirectControlTrucks(Trucks, 0, Direction)
 
                 # Set the locomotive's brakes to 0.
-                semDirectControlBrakes(Trucks, 0, Speed)
+                semDirectControlBrakes(Trucks, 0)
 
                 # Re-enable the PIDF controller.
                 pidSetMode(PIDF, "Automatic")
@@ -525,6 +525,7 @@ if (clk("Emergency Brake"))
         {
             # Freeze the entire train.
             semFreezeTrain()
+            semDirectControlBrakes(Trucks, 0)
 
             # Disable RailDriver.
             stopAllTimers()
@@ -583,7 +584,7 @@ if (clk("Emergency Brake"))
                 semDirectControlTrucks(Trucks, 0, Direction)
 
                 # Set the locomotive's brakes to 100%.
-                semDirectControlBrakes(Trucks, 100, Speed)
+                semDirectControlBrakes(Trucks, 2)
             }
 
             # If the locomotive is stopped, do the following:
@@ -603,7 +604,7 @@ if (clk("Emergency Brake"))
                 semDirectControlTrucks(Trucks, 0, Direction)
 
                 # Set the locomotive's brakes to 0.
-                semDirectControlBrakes(Trucks, 0, Speed)
+                semDirectControlBrakes(Trucks, 0)
             }
 
             # Set the last speed to the current speed.

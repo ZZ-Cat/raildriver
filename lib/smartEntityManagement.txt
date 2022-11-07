@@ -32,7 +32,6 @@ function number semInit()
     SemE2 = entity()
     SemE2IsWeldedTo = SemE2:isWeldedTo()
     SemE2IsParentedTo = SemE2:parent()
-    SemBrakeForceCoefficient = 1000
     return 1
 }
 
@@ -226,16 +225,102 @@ function number semDirectControlTrucks(Trucks:array, PIDFOutput:number, Reverser
 
 # This function is used to control the locomotive trucks' brakes.
 # Currently, it is used by RailDriver to temporarily bypass the 'semControlTrucks()' function below this one.
-function void semDirectControlBrakes(Trucks:array, BrakePercentage:number, Speed:number)
+function number semDirectControlBrakes(Trucks:array, BrakeLevel:number)
 {
-    # Apply the brake.
-    # This is done by applying a force to the locomotive's trucks.
-    # The force is applied in the opposite direction of the locomotive's current velocity.
-    # The force is proportional to the locomotive's current velocity.
-    # The force is proportional to the brake percentage.
-    local F = Speed * (BrakePercentage / 100) * SemBrakeForceCoefficient * -1
-    Trucks[1, entity]:applyForce(Trucks[1, entity]:toWorldAxis(vec(0, -F, 0)))
-    Trucks[2, entity]:applyForce(Trucks[2, entity]:toWorldAxis(vec(0, F, 0)))
+    if (!semValidateTrucks(Trucks) | BrakeLevel < 0 | BrakeLevel > 2)
+    {
+        return 0
+    }
+
+    # Find all of the trucks in the entire train.
+    # This is necessary because the brakes are applied to the entire train, not just the locomotive.
+    # This is done by finding all connected entities in the train.
+    # Anything matching the model paths in the following list will be considered a truck.
+    # This list is not exhaustive, but it will cover most cases.
+    # If you have a custom truck model, you will need to add it to this list.
+    # - "models/gsgtrainprops/parts/trucks/barber_s2_28in_phx.mdl"
+    # - "models/gsgtrainprops/parts/trucks/barber_s2hd_36in_phx.mdl"
+    # - "models/magtrains/locobogey3.mdl"
+    # - "models/magtrains/trucks/barber_s2_phx.mdl"
+    # - "models/magtrains/trucks/barber_s2_rsg.mdl"
+    # - "models/magtrainslocos/trucks/blomberg_b_phx.mdl"
+    # - "models/magtrainslocos/trucks/blomberg_b_rsg.mdl"
+    # - "models/magtrainslocos/trucks/blomberg_m_phx.mdl"
+    # - "models/magtrainslocos/trucks/blomberg_m_rsg.mdl"
+    local Train = Trucks[1, entity]:getConnectedEntities(array("AdvBallsocket", "axis", "rope"))
+    local TrainTrucks = array()
+    if (Train:count() > 0)
+    {
+        for (I = 1, Train:count())
+        {
+            local T = Train[I, entity]
+            if (T:isValid() & T:isValidPhysics())
+            {
+                local M = T:model()
+                switch (M)
+                {
+                    case "models/gsgtrainprops/parts/trucks/barber_s2_28in_phx.mdl",
+                    case "models/gsgtrainprops/parts/trucks/barber_s2hd_36in_phx.mdl",
+                    case "models/magtrains/locobogey3.mdl",
+                    case "models/magtrains/trucks/barber_s2_phx.mdl",
+                    case "models/magtrains/trucks/barber_s2_rsg.mdl",
+                    case "models/magtrainslocos/trucks/blomberg_b_phx.mdl",
+                    case "models/magtrainslocos/trucks/blomberg_b_rsg.mdl",
+                    case "models/magtrainslocos/trucks/blomberg_m_phx.mdl",
+                    case "models/magtrainslocos/trucks/blomberg_m_rsg.mdl",
+                        TrainTrucks:pushEntity(T)
+                    break
+                }
+            }
+
+            else
+            {
+                continue
+            }
+        }
+    }
+
+    # If there are no trucks found, then return an error.
+    else
+    {
+        return 0
+    }
+
+    switch (BrakeLevel)
+    {
+
+        # Brakes are released.
+        case 0,
+            # Set the trucks' physics material to 'friction_00'.
+            for (I = 1, TrainTrucks:count())
+            {
+                TrainTrucks[I, entity]:propPhysicalMaterial("friction_00")
+            }
+        break
+
+        # Brakes are applied.
+        case 1,
+            # Set the trucks' physics material to 'phx_tire_normal'.
+            for (I = 1, TrainTrucks:count())
+            {
+                TrainTrucks[I, entity]:propPhysicalMaterial("phx_tire_normal")
+            }
+        break
+
+        # Emergency brakes are applied.
+        case 2,
+            # Set the trucks' physics material to 'slipperyslime'.
+            for (I = 1, TrainTrucks:count())
+            {
+                TrainTrucks[I, entity]:propPhysicalMaterial("slipperyslime")
+            }
+        break
+    }
+
+
+    # Return true.
+    return 1
+
 }
 
 # This function is used to control the locomotive trucks' traction motors.
