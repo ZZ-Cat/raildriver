@@ -236,211 +236,107 @@ function table encodeKeyboardControls(KeyboardControls:table)
             }
         }
 
-        if (K == "Increase Train Brake")
+        if (K == "Increase Brake")
         {
             if (V:find("left shift + "))
             {
-                ControlTable["Increase Train Brake Modifier", string] = "lshift"
-                ControlTable["Increase Train Brake Key", string] = V:sub(13):trim():upper()
-                ControlTable["Increase Train Brake has Modifier", number] = 1
+                ControlTable["Increase Brake Modifier", string] = "lshift"
+                ControlTable["Increase Brake Key", string] = V:sub(13):trim():upper()
+                ControlTable["Increase Brake has Modifier", number] = 1
             }
 
             elseif (V:find("right shift + "))
             {
-                ControlTable["Increase Train Brake Modifier", string] = "rshift"
-                ControlTable["Increase Train Brake Key", string] = V:sub(14):trim():upper()
-                ControlTable["Increase Train Brake has Modifier", number] = 1
+                ControlTable["Increase Brake Modifier", string] = "rshift"
+                ControlTable["Increase Brake Key", string] = V:sub(14):trim():upper()
+                ControlTable["Increase Brake has Modifier", number] = 1
             }
 
             elseif (V:find("left ctrl + "))
             {
-                ControlTable["Increase Train Brake Modifier", string] = "lcontrol"
-                ControlTable["Increase Train Brake Key", string] = V:sub(12):trim():upper()
-                ControlTable["Increase Train Brake has Modifier", number] = 1
+                ControlTable["Increase Brake Modifier", string] = "lcontrol"
+                ControlTable["Increase Brake Key", string] = V:sub(12):trim():upper()
+                ControlTable["Increase Brake has Modifier", number] = 1
             }
 
             elseif (V:find("right ctrl + "))
             {
-                ControlTable["Increase Train Brake Modifier", string] = "rcontrol"
-                ControlTable["Increase Train Brake Key", string] = V:sub(13):trim():upper()
-                ControlTable["Increase Train Brake has Modifier", number] = 1
+                ControlTable["Increase Brake Modifier", string] = "rcontrol"
+                ControlTable["Increase Brake Key", string] = V:sub(13):trim():upper()
+                ControlTable["Increase Brake has Modifier", number] = 1
             }
 
             elseif (V:find("left alt + "))
             {
-                ControlTable["Increase Train Brake Modifier", string] = "lalt"
-                ControlTable["Increase Train Brake Key", string] = V:sub(11):trim():upper()
-                ControlTable["Increase Train Brake has Modifier", number] = 1
+                ControlTable["Increase Brake Modifier", string] = "lalt"
+                ControlTable["Increase Brake Key", string] = V:sub(11):trim():upper()
+                ControlTable["Increase Brake has Modifier", number] = 1
             }
 
             elseif (V:find("right alt + "))
             {
-                ControlTable["Increase Train Brake Modifier", string] = "ralt"
-                ControlTable["Increase Train Brake Key", string] = V:sub(12):trim():upper()
-                ControlTable["Increase Train Brake has Modifier", number] = 1
+                ControlTable["Increase Brake Modifier", string] = "ralt"
+                ControlTable["Increase Brake Key", string] = V:sub(12):trim():upper()
+                ControlTable["Increase Brake has Modifier", number] = 1
             }
 
             else
             {
-                ControlTable["Increase Train Brake Modifier", string] = ""
-                ControlTable["Increase Train Brake Key", string] = V:trim():upper()
-                ControlTable["Increase Train Brake has Modifier", number] = 0
+                ControlTable["Increase Brake Modifier", string] = ""
+                ControlTable["Increase Brake Key", string] = V:trim():upper()
+                ControlTable["Increase Brake has Modifier", number] = 0
             }
         }
 
-        if (K == "Decrease Train Brake")
+        if (K == "Decrease Brake")
         {
             if (V:find("left shift + "))
             {
-                ControlTable["Decrease Train Brake Modifier", string] = "lshift"
-                ControlTable["Decrease Train Brake Key", string] = V:sub(13):trim():upper()
-                ControlTable["Decrease Train Brake has Modifier", number] = 1
+                ControlTable["Decrease Brake Modifier", string] = "lshift"
+                ControlTable["Decrease Brake Key", string] = V:sub(13):trim():upper()
+                ControlTable["Decrease Brake has Modifier", number] = 1
             }
 
             elseif (V:find("right shift + "))
             {
-                ControlTable["Decrease Train Brake Modifier", string] = "rshift"
-                ControlTable["Decrease Train Brake Key", string] = V:sub(14):trim():upper()
-                ControlTable["Decrease Train Brake has Modifier", number] = 1
+                ControlTable["Decrease Brake Modifier", string] = "rshift"
+                ControlTable["Decrease Brake Key", string] = V:sub(14):trim():upper()
+                ControlTable["Decrease Brake has Modifier", number] = 1
             }
 
             elseif (V:find("left ctrl + "))
             {
-                ControlTable["Decrease Train Brake Modifier", string] = "lcontrol"
-                ControlTable["Decrease Train Brake Key", string] = V:sub(12):trim():upper()
-                ControlTable["Decrease Train Brake has Modifier", number] = 1
+                ControlTable["Decrease Brake Modifier", string] = "lcontrol"
+                ControlTable["Decrease Brake Key", string] = V:sub(12):trim():upper()
+                ControlTable["Decrease Brake has Modifier", number] = 1
             }
 
             elseif (V:find("right ctrl + "))
             {
-                ControlTable["Decrease Train Brake Modifier", string] = "rcontrol"
-                ControlTable["Decrease Train Brake Key", string] = V:sub(13):trim():upper()
-                ControlTable["Decrease Train Brake has Modifier", number] = 1
+                ControlTable["Decrease Brake Modifier", string] = "rcontrol"
+                ControlTable["Decrease Brake Key", string] = V:sub(13):trim():upper()
+                ControlTable["Decrease Brake has Modifier", number] = 1
             }
 
             elseif (V:find("left alt + "))
             {
-                ControlTable["Decrease Train Brake Modifier", string] = "lalt"
-                ControlTable["Decrease Train Brake Key", string] = V:sub(11):trim():upper()
-                ControlTable["Decrease Train Brake has Modifier", number] = 1
+                ControlTable["Decrease Brake Modifier", string] = "lalt"
+                ControlTable["Decrease Brake Key", string] = V:sub(11):trim():upper()
+                ControlTable["Decrease Brake has Modifier", number] = 1
             }
 
             elseif (V:find("right alt + "))
             {
-                ControlTable["Decrease Train Brake Modifier", string] = "ralt"
-                ControlTable["Decrease Train Brake Key", string] = V:sub(12):trim():upper()
-                ControlTable["Decrease Train Brake has Modifier", number] = 1
+                ControlTable["Decrease Brake Modifier", string] = "ralt"
+                ControlTable["Decrease Brake Key", string] = V:sub(12):trim():upper()
+                ControlTable["Decrease Brake has Modifier", number] = 1
             }
 
             else
             {
-                ControlTable["Decrease Train Brake Modifier", string] = ""
-                ControlTable["Decrease Train Brake Key", string] = V:trim():upper()
-                ControlTable["Decrease Train Brake has Modifier", number] = 0
-            }
-        }
-
-        if (K == "Increase Engine Brake")
-        {
-            if (V:find("left shift + "))
-            {
-                ControlTable["Increase Engine Brake Modifier", string] = "lshift"
-                ControlTable["Increase Engine Brake Key", string] = V:sub(13):trim():upper()
-                ControlTable["Increase Engine Brake has Modifier", number] = 1
-            }
-
-            elseif (V:find("right shift + "))
-            {
-                ControlTable["Increase Engine Brake Modifier", string] = "rshift"
-                ControlTable["Increase Engine Brake Key", string] = V:sub(14):trim():upper()
-                ControlTable["Increase Engine Brake has Modifier", number] = 1
-            }
-
-            elseif (V:find("left ctrl + "))
-            {
-                ControlTable["Increase Engine Brake Modifier", string] = "lcontrol"
-                ControlTable["Increase Engine Brake Key", string] = V:sub(12):trim():upper()
-                ControlTable["Increase Engine Brake has Modifier", number] = 1
-            }
-
-            elseif (V:find("right ctrl + "))
-            {
-                ControlTable["Increase Engine Brake Modifier", string] = "rcontrol"
-                ControlTable["Increase Engine Brake Key", string] = V:sub(13):trim():upper()
-                ControlTable["Increase Engine Brake has Modifier", number] = 1
-            }
-
-            elseif (V:find("left alt + "))
-            {
-                ControlTable["Increase Engine Brake Modifier", string] = "lalt"
-                ControlTable["Increase Engine Brake Key", string] = V:sub(11):trim():upper()
-                ControlTable["Increase Engine Brake has Modifier", number] = 1
-            }
-
-            elseif (V:find("right alt + "))
-            {
-                ControlTable["Increase Engine Brake Modifier", string] = "ralt"
-                ControlTable["Increase Engine Brake Key", string] = V:sub(12):trim():upper()
-                ControlTable["Increase Engine Brake has Modifier", number] = 1
-            }
-
-            else
-            {
-                ControlTable["Increase Engine Brake Modifier", string] = ""
-                ControlTable["Increase Engine Brake Key", string] = V:trim():upper()
-                ControlTable["Increase Engine Brake has Modifier", number] = 0
-            }
-        }
-
-        if (K == "Decrease Engine Brake")
-        {
-            if (V:find("left shift + "))
-            {
-                ControlTable["Decrease Engine Brake Modifier", string] = "lshift"
-                ControlTable["Decrease Engine Brake Key", string] = V:sub(13):trim():upper()
-                ControlTable["Decrease Engine Brake has Modifier", number] = 1
-            }
-
-            elseif (V:find("right shift + "))
-            {
-                ControlTable["Decrease Engine Brake Modifier", string] = "rshift"
-                ControlTable["Decrease Engine Brake Key", string] = V:sub(14):trim():upper()
-                ControlTable["Decrease Engine Brake has Modifier", number] = 1
-            }
-
-            elseif (V:find("left ctrl + "))
-            {
-                ControlTable["Decrease Engine Brake Modifier", string] = "lcontrol"
-                ControlTable["Decrease Engine Brake Key", string] = V:sub(12):trim():upper()
-                ControlTable["Decrease Engine Brake has Modifier", number] = 1
-            }
-
-            elseif (V:find("right ctrl + "))
-            {
-                ControlTable["Decrease Engine Brake Modifier", string] = "rcontrol"
-                ControlTable["Decrease Engine Brake Key", string] = V:sub(13):trim():upper()
-                ControlTable["Decrease Engine Brake has Modifier", number] = 1
-            }
-
-            elseif (V:find("left alt + "))
-            {
-                ControlTable["Decrease Engine Brake Modifier", string] = "lalt"
-                ControlTable["Decrease Engine Brake Key", string] = V:sub(11):trim():upper()
-                ControlTable["Decrease Engine Brake has Modifier", number] = 1
-            }
-
-            elseif (V:find("right alt + "))
-            {
-                ControlTable["Decrease Engine Brake Modifier", string] = "ralt"
-                ControlTable["Decrease Engine Brake Key", string] = V:sub(12):trim():upper()
-                ControlTable["Decrease Engine Brake has Modifier", number] = 1
-            }
-
-            else
-            {
-                ControlTable["Decrease Engine Brake Modifier", string] = ""
-                ControlTable["Decrease Engine Brake Key", string] = V:trim():upper()
-                ControlTable["Decrease Engine Brake has Modifier", number] = 0
+                ControlTable["Decrease Brake Modifier", string] = ""
+                ControlTable["Decrease Brake Key", string] = V:trim():upper()
+                ControlTable["Decrease Brake has Modifier", number] = 0
             }
         }
 
@@ -714,8 +610,8 @@ function table playerControlsInit(KeyboardControls:table, ThrottleMap:table, Bra
 {
     local Controls = table()
     Controls["Direction", number] = 0
-    Controls["Throttle", number] = 0
-    Controls["Brake", number] = 0
+    Controls["Throttle", number] = 1
+    Controls["Brake", number] = 1
     Controls["Emergency Brake", number] = 0
     Controls["Horn", number] = 0
     Controls["Bell", number] = 0
@@ -728,13 +624,41 @@ function table playerControlsInit(KeyboardControls:table, ThrottleMap:table, Bra
     Controls["Throttle Map", table] = ThrottleMap
     Controls["Brake Map", table] = BrakeMap
 
+    # Last known valid direction, throttle, and brake values.
+    Controls["Last Valid Direction", number] = 0
+    Controls["Last Valid Throttle", number] = 0
+    Controls["Last Valid Brake", number] = 0
+    Controls["Last Valid Emergency Brake", number] = 0
+    Controls["Last Valid Horn", number] = 0
+    Controls["Last Valid Bell", number] = 0
+    Controls["Last Valid Headlights", number] = 0
+    Controls["Last Valid Ditch Lights", number] = 0
+
     # Fault Reporting for the player controls.
     Controls["Faults", table] = table()
     Controls["Faults", table]["Direction", number] = 0
     Controls["Faults", table]["Throttle", number] = 0
     Controls["Faults", table]["Brake", number] = 0
     Controls["Faults", table]["Emergency Brake", number] = 0
+    Controls["Faults", table]["Horn", number] = 0
+    Controls["Faults", table]["Bell", number] = 0
+    Controls["Faults", table]["Headlights", number] = 0
+    Controls["Faults", table]["Ditch Lights", number] = 0
+    Controls["Faults", table]["Player Controls", number] = 0
     Controls["Faults", table]["Message", string] = ""
+
+    # Flags for the player controls.
+    Controls["Flags", table] = table()
+    Controls["Flags", table]["Direction is Updated", number] = 0
+    Controls["Flags", table]["Throttle is Updated", number] = 0
+    Controls["Flags", table]["Brake is Updated", number] = 0
+    Controls["Flags", table]["Emergency Brake is Updated", number] = 0
+    Controls["Flags", table]["Emergency Brake is Released", number] = 1
+    Controls["Flags", table]["Horn is Updated", number] = 0
+    Controls["Flags", table]["Bell is Updated", number] = 0
+    Controls["Flags", table]["Headlights is Updated", number] = 0
+    Controls["Flags", table]["Ditch Lights is Updated", number] = 0
+    Controls["Flags", table]["Player Controls Updated", number] = 0
 
     runOnKeys(Controls["TrainDriver", entity], 1)
     return Controls
@@ -742,7 +666,7 @@ function table playerControlsInit(KeyboardControls:table, ThrottleMap:table, Bra
 
 # This function updates the player controls.
 # This function should be called every key clock tick.
-function void playerControlsUpdate(Controls:table)
+function number playerControlsUpdate(Controls:table)
 {
     local KeyboardControls = Controls["Controls", table]
     local Driver = Controls["TrainDriver", entity]
@@ -756,10 +680,8 @@ function void playerControlsUpdate(Controls:table)
     local DecreaseDirection = Driver:keyPressed(KeyboardControls["Decrease Direction Key", string]) & (KeyboardControls["Decrease Direction has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Decrease Direction Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
     local IncreaseThrottle = Driver:keyPressed(KeyboardControls["Increase Throttle Key", string]) & (KeyboardControls["Increase Throttle has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Increase Throttle Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
     local DecreaseThrottle = Driver:keyPressed(KeyboardControls["Decrease Throttle Key", string]) & (KeyboardControls["Decrease Throttle has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Decrease Throttle Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
-    local IncreaseTrainBrake = Driver:keyPressed(KeyboardControls["Increase Train Brake Key", string]) & (KeyboardControls["Increase Train Brake has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Increase Train Brake Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
-    local DecreaseTrainBrake = Driver:keyPressed(KeyboardControls["Decrease Train Brake Key", string]) & (KeyboardControls["Decrease Train Brake has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Decrease Train Brake Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
-    local IncreaseEngineBrake = Driver:keyPressed(KeyboardControls["Increase Engine Brake Key", string]) & (KeyboardControls["Increase Engine Brake has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Increase Engine Brake Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
-    local DecreaseEngineBrake = Driver:keyPressed(KeyboardControls["Decrease Engine Brake Key", string]) & (KeyboardControls["Decrease Engine Brake has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Decrease Engine Brake Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
+    local IncreaseBrake = Driver:keyPressed(KeyboardControls["Increase Brake Key", string]) & (KeyboardControls["Increase Brake has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Increase Brake Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
+    local DecreaseBrake = Driver:keyPressed(KeyboardControls["Decrease Brake Key", string]) & (KeyboardControls["Decrease Brake has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Decrease Brake Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
     local EmergencyBrake = Driver:keyPressed(KeyboardControls["Emergency Brake Key", string]) & (KeyboardControls["Emergency Brake has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Emergency Brake Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
     local Horn = Driver:keyPressed(KeyboardControls["Horn Key", string]) & (KeyboardControls["Horn has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Horn Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
     local Bell = Driver:keyPressed(KeyboardControls["Bell Key", string]) & (KeyboardControls["Bell has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Bell Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
@@ -769,65 +691,171 @@ function void playerControlsUpdate(Controls:table)
     # Update the direction.
     if (IncreaseDirection & !DecreaseDirection)
     {
-        Controls["Direction", number] = Controls["Direction", number] + 1
+        if (Controls["Flags", table]["Player Controls Updated", number] == 0)
+        {
+            if (Controls["Flags", table]["Direction is Updated", number] == 0)
+            {
+                Controls["Direction", number] = Controls["Direction", number] + 1
+                Controls["Flags", table]["Direction is Updated", number] = 1
+                Controls["Flags", table]["Player Controls Updated", number] = 1
+            }
+        }
     }
     elseif (DecreaseDirection & !IncreaseDirection)
     {
-        Controls["Direction", number] = Controls["Direction", number] - 1
+        if (Controls["Flags", table]["Player Controls Updated", number] == 0)
+        {
+            if (Controls["Flags", table]["Direction is Updated", number] == 0)
+            {
+                Controls["Direction", number] = Controls["Direction", number] - 1
+                Controls["Flags", table]["Direction is Updated", number] = 1
+                Controls["Flags", table]["Player Controls Updated", number] = 1
+            }
+        }
     }
 
     # Update the throttle.
     elseif (IncreaseThrottle & !DecreaseThrottle)
     {
-        Controls["Throttle", number] = Controls["Throttle", number] + 1
+        if (Controls["Flags", table]["Player Controls Updated", number] == 0)
+        {
+            if (Controls["Flags", table]["Throttle is Updated", number] == 0)
+            {
+                Controls["Throttle", number] = Controls["Throttle", number] + 1
+                Controls["Flags", table]["Throttle is Updated", number] = 1
+                Controls["Flags", table]["Player Controls Updated", number] = 1
+            }
+        }
     }
     elseif (DecreaseThrottle & !IncreaseThrottle)
     {
-        Controls["Throttle", number] = Controls["Throttle", number] - 1
+        if (Controls["Flags", table]["Player Controls Updated", number] == 0)
+        {
+            if (Controls["Flags", table]["Throttle is Updated", number] == 0)
+            {
+                Controls["Throttle", number] = Controls["Throttle", number] - 1
+                Controls["Flags", table]["Throttle is Updated", number] = 1
+                Controls["Flags", table]["Player Controls Updated", number] = 1
+            }
+        }
     }
 
-    # Update the train brake.
-    elseif (IncreaseTrainBrake & !DecreaseTrainBrake)
+    # Update the brake.
+    elseif (IncreaseBrake & !DecreaseBrake)
     {
-        Controls["Brake", number] = Controls["Brake", number] + 1
+        if (Controls["Flags", table]["Player Controls Updated", number] == 0)
+        {
+            if (Controls["Flags", table]["Brake is Updated", number] == 0)
+            {
+                Controls["Brake", number] = Controls["Brake", number] + 1
+                Controls["Flags", table]["Brake is Updated", number] = 1
+                Controls["Flags", table]["Player Controls Updated", number] = 1
+            }
+        }
     }
-    elseif (DecreaseTrainBrake & !IncreaseTrainBrake)
+    elseif (DecreaseBrake & !IncreaseBrake)
     {
-        Controls["Brake", number] = Controls["Brake", number] - 1
-    }
-
-    # Update the engine brake.
-    elseif (IncreaseEngineBrake & !DecreaseEngineBrake)
-    {
-        Controls["Brake", number] = Controls["Brake", number] + 1
-    }
-    elseif (DecreaseEngineBrake & !IncreaseEngineBrake)
-    {
-        Controls["Brake", number] = Controls["Brake", number] - 1
+        if (Controls["Flags", table]["Player Controls Updated", number] == 0)
+        {
+            if (Controls["Flags", table]["Brake is Updated", number] == 0)
+            {
+                Controls["Brake", number] = Controls["Brake", number] - 1
+                Controls["Flags", table]["Brake is Updated", number] = 1
+                Controls["Flags", table]["Player Controls Updated", number] = 1
+            }
+        }
     }
 
     # Update the emergency brake.
     elseif (EmergencyBrake)
     {
-        if (Controls["Emergency Brake", number] == 0)
+        if (Controls["Flags", table]["Player Controls Updated", number] == 0)
         {
-            Controls["Emergency Brake", number] = 1
-        }
-        else
-        {
-            Controls["Faults", table]["Message", string] = "Emergency brake is already applied."
-            Controls["Faults", table]["Emergency Brake", number] = 1
+            if (Controls["Flags", table]["Emergency Brake is Updated", number] == 0)
+            {
+                Controls["Emergency Brake", number] = 1
+                Controls["Flags", table]["Emergency Brake is Updated", number] = 1
+                Controls["Flags", table]["Player Controls Updated", number] = 1
+            }
         }
     }
 
-        # Clamp the direction.
-        Controls["Direction", number] = clamp(Controls["Direction", number], -1, 1)
+    # Clamp the direction.
+    Controls["Direction", number] = clamp(Controls["Direction", number], -1, 1)
 
-        # Clamp the throttle.
-        Controls["Throttle", number] = clamp(Controls["Throttle", number], 1, Controls["Throttle Map", table]["Velocity Setpoint", array]:count())
+    # Clamp the throttle.
+    Controls["Throttle", number] = clamp(Controls["Throttle", number], 1, Controls["Throttle Map", table]["Velocity Setpoint", array]:count())
 
-        # Clamp the brake.
-        Controls["Brake", number] = clamp(Controls["Brake", number], 1, Controls["Brake Map", table]["Velocity Setpoint", array]:count())
+    # Clamp the brake.
+    Controls["Brake", number] = clamp(Controls["Brake", number], 1, Controls["Brake Map", table]["Velocity Setpoint", array]:count())
+
+    return Controls["Flags", table]["Player Controls Updated", number]
+}
+
+# This function returns true if the direction has been updated.
+function number playerControlsDirectionIsUpdated(Controls:table)
+{
+    return Controls["Flags", table]["Direction is Updated", number] == 1 ? 1 : 0
+}
+
+# This function returns true if the throttle has been updated.
+function number playerControlsThrottleIsUpdated(Controls:table)
+{
+    return Controls["Flags", table]["Throttle is Updated", number] == 1 ? 1 : 0
+}
+
+# This function returns true if the brake is updated.
+function number playerControlsBrakeIsUpdated(Controls:table)
+{
+    return Controls["Flags", table]["Brake is Updated", number] == 1 ? 1 : 0
+}
+
+# This function returns true if the emergency brake is updated.
+function number playerControlsEmergencyBrakeIsUpdated(Controls:table)
+{
+    return Controls["Flags", table]["Emergency Brake is Updated", number] == 1 ? 1 : 0
+}
+
+# This function returns true if the Emergency Brake is active.
+function number playerControlsEmergencyBrakeIsActive(Controls:table)
+{
+    return Controls["Flags", table]["Emergency Brake is Released", number] != 1 ? 1 : 0
+}
+
+# This function clears the Direction is Updated flag.
+function void playerControlsClearDirectionIsUpdated(Controls:table)
+{
+    Controls["Flags", table]["Direction is Updated", number] = 0
+}
+
+# This function clears the Throttle is Updated flag.
+function void playerControlsClearThrottleIsUpdated(Controls:table)
+{
+    Controls["Flags", table]["Throttle is Updated", number] = 0
+}
+
+# This function clears the Brake is Updated flag.
+function void playerControlsClearBrakeIsUpdated(Controls:table)
+{
+    Controls["Flags", table]["Brake is Updated", number] = 0
+}
+
+# This function clears the Emergency Brake is Updated flag.
+function void playerControlsClearEmergencyBrakeIsUpdated(Controls:table)
+{
+    Controls["Flags", table]["Emergency Brake is Updated", number] = 0
+}
+
+# This function clears the Emergency Brake is Released flag.
+function void playerControlsClearEmergencyBrakeIsActive(Controls:table)
+{
+    Controls["Flags", table]["Emergency Brake is Released", number] = 1
+}
+
+# This function resets the Throttle.
+function void playerControlsResetThrottle(Controls:table)
+{
+    Controls["Throttle", number] = 1
 }
 
 # This function returns the direction of the locomotive.
@@ -893,182 +921,671 @@ function number playerControlsGetBrakeMap(Controls:table, BrakeInputType:string,
 # This function checks whether or not the player controls are valid.
 function number playerControlsValid(Controls:table, Speed)
 {
-    # Get the direction, throttle, brake, and emergency brake.
-    local Direction = Controls["Direction", number]
-    local Throttle = Controls["Throttle", number]
-    local Brake = Controls["Brake", number]
-    local EmergencyBrake = Controls["Emergency Brake", number]
 
-    # Get the throttle & brake maps.
-    local ThrMap = Controls["ThrottleMap", table]
-    local BrkMap = Controls["BrakeMap", table]
-
-    # Get the throttle & brake input types.
-    local ThrInputType = ThrMap["Throttle Input Type", string]
-    local BrkInputType = BrkMap["Brake Input Type", string]
-
-    # Direction cannot be set higher than 1 or lower than -1.
-    if (Direction > 1)
+    # Player Controls Updated flag should already be set to 1.
+    # If it is not, then the player controls are invalid.
+    if (Controls["Flags", table]["Player Controls Updated", number] != 1)
     {
-        Controls["Direction", number] = 1
-        Controls["Faults", table]["Message", string] = "Direction is already set to forward."
-        Controls["Faults", table]["Direction", number] = 1
+        # Clear any flags that may have been set.
+        Controls["Flags", table]["Direction is Updated", number] = 0
+        Controls["Flags", table]["Throttle is Updated", number] = 0
+        Controls["Flags", table]["Brake is Updated", number] = 0
+        Controls["Flags", table]["Emergency Brake is Updated", number] = 0
+        Controls["Flags", table]["Horn is Updated", number] = 0
+        Controls["Flags", table]["Bell is Updated", number] = 0
+        Controls["Flags", table]["Headlights is Updated", number] = 0
+        Controls["Flags", table]["Ditch Lights is Updated", number] = 0
+        Controls["Flags", table]["Player Controls Updated", number] = 0
+
+        # Set Player Controls Fault.
+        Controls["Faults", table]["Player Controls", number] = 1
+        Controls["Faults", table]["Message", string] = "Player Controls are invalid."
+
+        # Return false.
         return 0
     }
 
-    elseif (Direction < -1)
+    # Direction Fault.
+    if (Controls["Faults", table]["Direction", number] != 0)
     {
-        Controls["Direction", number] = -1
-        Controls["Faults", table]["Message", string] = "Direction is already set to reverse."
-        Controls["Faults", table]["Direction", number] = 1
-        return 0
+        # Check if the Direction has been updated.
+        if (Controls["Flags", table]["Direction is Updated", number] == 1)
+        {
+            # Direction Fault Reset.
+            # Certain conditions must be met before the fault can be reset.
+            # These conditions are:
+            # 1. The Emergency Brake must be released.
+            # 2. The Throttle must be set to Idle.
+            # 3. The locomotive must be stopped.
+            # 4. The Direction must be set to Neutral.
+            # If these conditions are met, then the Direction Fault can be reset.
+            # If any of these conditions are not met, then the Direction Fault cannot be reset.
+            # A Fault Message will be displayed to the player, indicating which Faults are preventing the Direction Fault from being reset.
+            # Check if the Emergency Brake is released.
+            if (Controls["Flags", table]["Emergency Brake is Released", number] == 1)
+            {
+                # Check if the Throttle is set to Idle.
+                if (Controls["Throttle", number] == 1)
+                {
+                    # Check if the locomotive is stopped.
+                    if (Speed == 0)
+                    {
+                        # Check if the Direction is set to Neutral.
+                        if (Controls["Direction", number] == 0)
+                        {
+                            # Reset the Direction Fault.
+                            Controls["Faults", table]["Direction", number] = 0
+                            Controls["Faults", table]["Message", string] = ""
+                        }
+                        else
+                        {
+                            # Set the Direction Fault.
+                            Controls["Faults", table]["Direction", number] = 1
+                            Controls["Faults", table]["Message", string] = "Direction Fault: Direction must be set to Neutral."
+                        }
+                    }
+                    else
+                    {
+                        # Set the Direction Fault.
+                        Controls["Faults", table]["Direction", number] = 1
+                        Controls["Faults", table]["Message", string] = "Direction Fault: Locomotive must be stopped."
+                    }
+                }
+                else
+                {
+                    # Set the Direction Fault.
+                    Controls["Faults", table]["Direction", number] = 1
+                    Controls["Faults", table]["Message", string] = "Direction Fault: Throttle must be set to Idle."
+                }
+            }
+            else
+            {
+                # Set the Direction Fault.
+                Controls["Faults", table]["Direction", number] = 1
+                Controls["Faults", table]["Message", string] = "Direction Fault: Emergency Brake must be released."
+            }
+
+            # Clear the Direction is Updated flag.
+            # Clear the Player Controls Updated flag.
+            # Return false.
+            Controls["Flags", table]["Direction is Updated", number] = 0
+            Controls["Flags", table]["Player Controls Updated", number] = 0
+            return 0
+        }
+
+        # Any other Player Controls that were updated will indicate to the player that the Direction Fault needs to be reset.
+        # If the Direction Fault is not reset, then the player will not be able to control the locomotive.
+        elseif (Controls["Flags", table]["Throttle is Updated", number] == 1)
+        {
+            # Set the Throttle to the last valid value.
+            Controls["Throttle", number] = Controls["Last Valid Throttle", number]
+
+            # Set the Direction Fault.
+            Controls["Faults", table]["Direction", number] = 1
+            Controls["Faults", table]["Message", string] = "Direction Fault: Direction must be reset."
+
+            # Clear the Throttle is Updated flag.
+            # Clear the Player Controls Updated flag.
+            # Return false.
+            Controls["Flags", table]["Throttle is Updated", number] = 0
+            Controls["Flags", table]["Player Controls Updated", number] = 0
+            return 0
+        }
+        elseif (Controls["Flags", table]["Brake is Updated", number] == 1)
+        {
+            # Set the Brake to the last valid value.
+            Controls["Brake", number] = Controls["Last Valid Brake", number]
+
+            # Set the Direction Fault.
+            Controls["Faults", table]["Direction", number] = 1
+            Controls["Faults", table]["Message", string] = "Direction Fault: Direction must be reset."
+
+            # Clear the Brake is Updated flag.
+            # Clear the Player Controls Updated flag.
+            # Return false.
+            Controls["Flags", table]["Brake is Updated", number] = 0
+            Controls["Flags", table]["Player Controls Updated", number] = 0
+            return 0
+        }
+        elseif (Controls["Flags", table]["Emergency Brake is Updated", number] == 1)
+        {
+            # Set the Emergency Brake to the last valid value.
+            Controls["Emergency Brake", number] = Controls["Last Valid Emergency Brake", number]
+
+            # Set the Direction Fault.
+            Controls["Faults", table]["Direction", number] = 1
+            Controls["Faults", table]["Message", string] = "Direction Fault: Direction must be reset."
+
+            # Clear the Emergency Brake is Updated flag.
+            # Clear the Player Controls Updated flag.
+            # Return false.
+            Controls["Flags", table]["Emergency Brake is Updated", number] = 0
+            Controls["Flags", table]["Player Controls Updated", number] = 0
+            return 0
+        }
+        elseif (Controls["Flags", table]["Horn is Updated", number] == 1)
+        {   
+            # Set the Horn to the last valid value.
+            Controls["Horn", number] = Controls["Last Valid Horn", number]
+
+            # Set the Direction Fault.
+            Controls["Faults", table]["Direction", number] = 1
+            Controls["Faults", table]["Message", string] = "Direction Fault: Direction must be reset."
+
+            # Clear the Horn is Updated flag.
+            # Clear the Player Controls Updated flag.
+            # Return false.
+            Controls["Flags", table]["Horn is Updated", number] = 0
+            Controls["Flags", table]["Player Controls Updated", number] = 0
+            return 0
+        }
+        elseif (Controls["Flags", table]["Bell is Updated", number] == 1)
+        {
+            # Set the Bell to the last valid value.
+            Controls["Bell", number] = Controls["Last Valid Bell", number]
+
+            # Set the Direction Fault.
+            Controls["Faults", table]["Direction", number] = 1
+            Controls["Faults", table]["Message", string] = "Direction Fault: Direction must be reset."
+
+            # Clear the Bell is Updated flag.
+            # Clear the Player Controls Updated flag.
+            # Return false.
+            Controls["Flags", table]["Bell is Updated", number] = 0
+            Controls["Flags", table]["Player Controls Updated", number] = 0
+            return 0
+        }
+        elseif (Controls["Flags", table]["Headlights is Updated", number] == 1)
+        {
+            # Set the Headlights to the last valid value.
+            Controls["Headlights", number] = Controls["Last Valid Headlights", number]
+
+            # Set the Direction Fault.
+            Controls["Faults", table]["Direction", number] = 1
+            Controls["Faults", table]["Message", string] = "Direction Fault: Direction must be reset."
+
+            # Clear the Headlights is Updated flag.
+            # Clear the Player Controls Updated flag.
+            # Return false.
+            Controls["Flags", table]["Headlights is Updated", number] = 0
+            Controls["Flags", table]["Player Controls Updated", number] = 0
+            return 0
+        }
+        elseif (Controls["Flags", table]["Ditch Lights is Updated", number] == 1)
+        {
+            # Set the Ditch Lights to the last valid value.
+            Controls["Ditch Lights", number] = Controls["Last Valid Ditch Lights", number]
+
+            # Set the Direction Fault.
+            Controls["Faults", table]["Direction", number] = 1
+            Controls["Faults", table]["Message", string] = "Direction Fault: Direction must be reset."
+
+            # Clear the Ditch Lights is Updated flag.
+            # Clear the Player Controls Updated flag.
+            # Return false.
+            Controls["Flags", table]["Ditch Lights is Updated", number] = 0
+            Controls["Flags", table]["Player Controls Updated", number] = 0
+            return 0
+        }
     }
 
-    # Direction must remain set to forward when the locomotive is moving forward,
-    # and direction must remain set to reverse when the locomotive is moving in reverse.
-    if (Direction != 1 & Speed > 0)
+    # Throttle Fault.
+    elseif (Controls["Faults", table]["Throttle", number] != 0)
     {
-        Controls["Direction", number] = 1
-        Controls["Faults", table]["Message", string] = "Cannot set direction whilst the locomotive is moving."
-        Controls["Faults", table]["Direction", number] = 1
-        return 0
+        # Check if the Throttle is updated.
+        if (Controls["Flags", table]["Throttle is Updated", number] == 1)
+        {
+            # Throttle Fault Reset.
+            # If the Throttle Fault has been set, certain conditions must be met before the Throttle Fault can be reset.
+            # These conditions are:
+            #  1. The Emergency Brake must be released.
+            #  2. The locomotive must be stopped.
+            #  3. The Direction must be set to the same direction as what was last valid.
+            #  4. The Throttle must be set to Idle.
+            # If any of these conditions are not met, then the Throttle Fault cannot be reset.
+            # A Fault Message will be displayed to the player, indicating which Faults are preventing the Throttle Fault from being reset.
+            # Check if the Emergency Brake is released.
+            if (Controls["Flags", table]["Emergency Brake is Released", number] == 1)
+            {
+                # Check if the locomotive is stopped.
+                if (Controls["Speed", number] == 0)
+                {
+                    # Check if the Direction is set to the same direction as what was last valid.
+                    if (Controls["Direction", number] == Controls["Last Valid Direction", number])
+                    {
+                        # Check if the Throttle is set to Idle.
+                        if (Controls["Throttle", number] == 1)
+                        {
+                            # Clear the Throttle Fault.
+                            Controls["Faults", table]["Throttle", number] = 0
+                            Controls["Faults", table]["Message", string] = ""
+                        }
+                        else
+                        {
+                            # Set the Throttle Fault.
+                            Controls["Faults", table]["Throttle", number] = 1
+                            Controls["Faults", table]["Message", string] = "Throttle Fault: Throttle must be set to Idle."
+                        }
+                    }
+                    else
+                    {
+                        # Get the name of the last valid Direction.
+                        # Valid names are Forward, Neutral, and Reverse.
+                        # Forward is 1, Neutral is 0, and Reverse is -1.
+                        local LastValidDirectionName = ""
+                        if (Controls["Last Valid Direction", number] == 1)
+                        {
+                            LastValidDirectionName = "Forward"
+                        }
+                        elseif (Controls["Last Valid Direction", number] == 0)
+                        {
+                            LastValidDirectionName = "Neutral"
+                        }
+                        elseif (Controls["Last Valid Direction", number] == -1)
+                        {
+                            LastValidDirectionName = "Reverse"
+                        }
+                        
+                        # Set the Throttle Fault.
+                        Controls["Faults", table]["Throttle", number] = 1
+                        Controls["Faults", table]["Message", string] = "Throttle Fault: Direction must be set to " + LastValidDirectionName + "."
+                    }
+                }
+                else
+                {
+                    # Set the Throttle Fault.
+                    Controls["Faults", table]["Throttle", number] = 1
+                    Controls["Faults", table]["Message", string] = "Throttle Fault: Locomotive must be stopped."
+                }
+            }
+            else
+            {
+                # Set the Throttle Fault.
+                Controls["Faults", table]["Throttle", number] = 1
+                Controls["Faults", table]["Message", string] = "Throttle Fault: Emergency Brake must be released."
+            }
+
+            # Clear the Throttle is Updated flag.
+            # Clear the Player Controls Updated flag.
+            # Return false.
+            Controls["Flags", table]["Throttle is Updated", number] = 0
+            Controls["Flags", table]["Player Controls Updated", number] = 0
+            return 0
+        }
+
+        # Any other Player Controls that were updated will indicate to the player that the Throttle Fault needs to be reset.
+        # If the Throttle Fault is not reset, then the player will not be able to control the locomotive.
+        elseif (Controls["Flags", table]["Direction is Updated", number] == 1)
+        {
+            # Set the Direction to the last valid value.
+            Controls["Direction", number] = Controls["Last Valid Direction", number]
+
+            # Set the Throttle Fault.
+            Controls["Faults", table]["Throttle", number] = 1
+            Controls["Faults", table]["Message", string] = "Throttle Fault: Throttle must be reset."
+
+            # Clear the Direction is Updated flag.
+            # Clear the Player Controls Updated flag.
+            # Return false.
+            Controls["Flags", table]["Direction is Updated", number] = 0
+            Controls["Flags", table]["Player Controls Updated", number] = 0
+            return 0
+        }
+        elseif (Controls["Flags", table]["Brake is Updated", number] == 1)
+        {
+            # Set the Brake to the last valid value.
+            Controls["Brake", number] = Controls["Last Valid Brake", number]
+
+            # Set the Throttle Fault.
+            Controls["Faults", table]["Throttle", number] = 1
+            Controls["Faults", table]["Message", string] = "Throttle Fault: Throttle must be reset."
+
+            # Clear the Brake is Updated flag.
+            # Clear the Player Controls Updated flag.
+            # Return false.
+            Controls["Flags", table]["Brake is Updated", number] = 0
+            Controls["Flags", table]["Player Controls Updated", number] = 0
+            return 0
+        }
+        elseif (Controls["Flags", table]["Emergency Brake is Updated", number] == 1)
+        {
+            # Set the Emergency Brake to the last valid value.
+            Controls["Emergency Brake", number] = Controls["Last Valid Emergency Brake", number]
+
+            # Set the Throttle Fault.
+            Controls["Faults", table]["Throttle", number] = 1
+            Controls["Faults", table]["Message", string] = "Throttle Fault: Throttle must be reset."
+
+            # Clear the Emergency Brake is Updated flag.
+            # Clear the Player Controls Updated flag.
+            # Return false.
+            Controls["Flags", table]["Emergency Brake is Updated", number] = 0
+            Controls["Flags", table]["Player Controls Updated", number] = 0
+            return 0
+        }
+        elseif (Controls["Flags", table]["Horn is Updated", number] == 1)
+        {
+            # Set the Horn to the last valid value.
+            Controls["Horn", number] = Controls["Last Valid Horn", number]
+
+            # Set the Throttle Fault.
+            Controls["Faults", table]["Throttle", number] = 1
+            Controls["Faults", table]["Message", string] = "Throttle Fault: Throttle must be reset."
+
+            # Clear the Horn is Updated flag.
+            # Clear the Player Controls Updated flag.
+            # Return false.
+            Controls["Flags", table]["Horn is Updated", number] = 0
+            Controls["Flags", table]["Player Controls Updated", number] = 0
+            return 0
+        }
+        elseif (Controls["Flags", table]["Bell is Updated", number] == 1)
+        {
+            # Set the Bell to the last valid value.
+            Controls["Bell", number] = Controls["Last Valid Bell", number]
+
+            # Set the Throttle Fault.
+            Controls["Faults", table]["Throttle", number] = 1
+            Controls["Faults", table]["Message", string] = "Throttle Fault: Throttle must be reset."
+
+            # Clear the Bell is Updated flag.
+            # Clear the Player Controls Updated flag.
+            # Return false.
+            Controls["Flags", table]["Bell is Updated", number] = 0
+            Controls["Flags", table]["Player Controls Updated", number] = 0
+            return 0
+        }
+        elseif (Controls["Flags", table]["Headlights is Updated", number] == 1)
+        {
+            # Set the Headlights to the last valid value.
+            Controls["Headlights", number] = Controls["Last Valid Headlights", number]
+
+            # Set the Throttle Fault.
+            Controls["Faults", table]["Throttle", number] = 1
+            Controls["Faults", table]["Message", string] = "Throttle Fault: Throttle must be reset."
+
+            # Clear the Headlights is Updated flag.
+            # Clear the Player Controls Updated flag.
+            # Return false.
+            Controls["Flags", table]["Headlights is Updated", number] = 0
+            Controls["Flags", table]["Player Controls Updated", number] = 0
+            return 0
+        }
+        elseif(Controls["Flags", table]["Ditch Lights is Updated", number] == 1)
+        {
+            # Set the Ditch Lights to the last valid value.
+            Controls["Ditch Lights", number] = Controls["Last Valid Ditch Lights", number]
+
+            # Set the Throttle Fault.
+            Controls["Faults", table]["Throttle", number] = 1
+            Controls["Faults", table]["Message", string] = "Throttle Fault: Throttle must be reset."
+
+            # Clear the Ditch Lights is Updated flag.
+            # Clear the Player Controls Updated flag.
+            # Return false.
+            Controls["Flags", table]["Ditch Lights is Updated", number] = 0
+            Controls["Flags", table]["Player Controls Updated", number] = 0
+            return 0
+        }
     }
 
-    elseif (Direction != -1 & Speed > 0)
+    # Brake Fault.
+    elseif (Controls["Faults", table]["Brake", number] != 0)
     {
-        Controls["Direction", number] = -1
-        Controls["Faults", table]["Message", string] = "Cannot set direction whilst the locomotive is moving."
-        Controls["Faults", table]["Direction", number] = 1
-        return 0
+        # Check if the Brake has been updated.
+        if (Controls["Flags", table]["Brake is Updated", number] == 1)
+        {
+            # Brake Fault Reset.
+            #[
+                Notes from ZZ Cat:
+                I need to write code that will reset the Brake Fault.
+                The implementation of this code is a little more complex than the other Faults,
+                because the Brake Fault is dependent on what Mode the locomotive is in.
+
+                On top of that, the locomotive must be stopped before the Brake Fault can be reset.
+                Also, right now, I can't think of anything that could potentially trigger a Brake Fault beyond
+                trying to apply the Brake when the locomotive is in a mode that doesn't support manual braking,
+                such as Velocity Mode.
+
+                In either Acceleration Mode or Torque Mode, I can't see any way that the Brake Fault could be
+                triggered without the locomotive being in a state where it is already stopped, or the
+                locomotive is in a situation where it is desirable to have the Brake applied while the Throttle
+                is also set to anything other than Idle.
+
+                Maybe if the player has the brake applied & the Throttle is set to anything other than Idle?
+                That doesn't make sense to me, because I can think of four scenarios where this would be desired,
+                right off the bat. Such as in a situation where the locomotive is on a hill, & the player is
+                using the brake to prevent the locomotive from rolling backwards as it accelerates up the hill
+                from a stop. 
+                The second scenario is where the locomotive is descending a hill, & the player is using the brake
+                to help regulate the locomotive's speed as it descends the hill.
+                The third scenario would be in a yard, where the locomotive is set up to couple to a train,
+                & the player is using both the throttle & brake together to help regulate the locomotive's speed
+                as it approaches the train.
+                The fourth scenario would be when the locomotive is approaching a station, & the player is using
+                both the throttle & brake together to help regulate the locomotive's speed as it approaches the
+                station. This one in particular is a very common scenario (I have even done this myself), & it
+                is useful for helping to prevent the locomotive from overshooting & undershooting the station.
+
+                I can also think of a situation where the player can use the Brake to slow down the locomotive
+                when it is in Velocity Mode, but I don't think that's a good idea.
+                In Velocity Mode, the control loop has total control over the locomotive's speed.
+                All the player is doing is setting the locomotive's target speed with the Throttle.
+                The control loop is then responsible for regulating the locomotive's speed to match the target speed.
+                If the player is trying to slow down the locomotive or bring it to a complete stop, they should
+                always be using the Throttle to do so. The Brake should only be used to bring the locomotive to a stop
+                when it is in Acceleration Mode or Torque Mode.
+                Otherwise, the player is going to be constantly fighting the control loop.
+                The player is better off just letting the control loop do its job, like it was designed to do.
+
+                I think the only way that the Brake Fault could be triggered is if the player is trying to apply
+                the Brake when the locomotive is in Velocity Mode.
+                Apart from that, I can't think of any other way that the Brake Fault could be triggered.
+                
+                Realistically, I don't think the Brake Fault will ever be triggered.
+                So, I'm not going to worry about implementing code to reset the Brake Fault & (by extension) I'm
+                not going to worry about writing code for the entire Brake Fault system.
+                This goes without saying for the Emergency Brake Fault as well.
+
+                I'm going to leave this code here, in case I change my mind in the future.
+                Also, I may revisit this code if it turns out that I'm wrong about the Brake Fault never being
+                triggered, or someone else requests that I implement the Brake Fault system.
+
+                If you are reading this, & you want me to implement the Brake Fault system, please let me know.
+                You are welcome to submit an issue on RailDriver's GitHub page, or you can contact me on Discord.
+                My Discord is ZZ Cat#0174.
+            ]#
+        }
     }
 
-    # Throttle is invalid when the locomotive's direction is neutral.
-    if (Throttle != 0 & Direction == 0)
+    # Emergency Brake Fault.
+    elseif (Controls["Faults", table]["Emergency Brake", number] != 0)
     {
-        Controls["Throttle", number] = 0
-        Controls["Faults", table]["Message", string] = "Throttle is invalid when the locomotive's direction is neutral."
-        Controls["Faults", table]["Throttle", number] = 1
-        return 0
+        # Check if the Emergency Brake has been updated.
+        if (Controls["Flags", table]["Emergency Brake is Updated", number] == 1)
+        {
+            # Emergency Brake Fault Reset.
+        }
     }
 
-    # Throttle is invalid when its value is higher than or less than the size of the throttle maps for each throttle input type.
-    switch(ThrInputType)
+    else
     {
-        # Velocity Mode.
-        case "Velocity",
-            # Throttle cannot be set higher than the maximum size of the Throttle Map.
-            if (Throttle > ThrMap["Velocity Setpoint", array]:count())
+        # Check if the Direction has been updated.
+        if (Controls["Flags", table]["Direction is Updated", number] == 1)
+        {
+            # Emergency Brake Interlock.
+            # The Emergency Brake must be released before the Direction can be changed.
+            # Any attempt to change the Direction while the Emergency Brake is active will result in a Direction Fault.
+            # This is to prevent the locomotive from moving in the wrong direction, which could cause a Rollback Runaway.
+            if (Controls["Flags", table]["Emergency Brake is Released", number] == 0)
             {
-                Controls["Throttle", number] = ThrMap["Velocity Setpoint", array]:count()
-                Controls["Faults", table]["Message", string] = "Throttle is already set to maximum."
-                Controls["Faults", table]["Throttle", number] = 1
+                Controls["Direction", number] = Controls["Last Valid Direction", number]
+                Controls["Flags", table]["Direction is Updated", number] = 0
+                Controls["Flags", table]["Player Controls Updated", number] = 0
+                Controls["Faults", table]["Direction", number] = 1
+                Controls["Faults", table]["Message", string] = "Direction cannot be changed while the Emergency Brake is active."
                 return 0
             }
 
-            # Throttle cannot be set lower than 0.
-            elseif (Throttle < 0)
+            # Speed Fault Interlock.
+            # The Direction cannot be changed, if the locomotive is already moving.
+            # Any attempt to change the Direction whilst the locomotive is moving will result in a Direction Fault.
+            if (Speed > 0)
             {
-                Controls["Throttle", number] = 0
-                Controls["Faults", table]["Message", string] = "Throttle is already set to minimum."
-                Controls["Faults", table]["Throttle", number] = 1
-                return 0
-            }
-        break
-
-        # Acceleration Mode.
-        case "Acceleration",
-            # Throttle cannot be set higher than the maximum size of the Throttle Map.
-            if (Throttle > ThrMap["Acceleration Setpoint", array]:count())
-            {
-                Controls["Throttle", number] = ThrMap["Acceleration Setpoint", array]:count()
-                Controls["Faults", table]["Message", string] = "Throttle is already set to maximum."
-                Controls["Faults", table]["Throttle", number] = 1
+                Controls["Direction", number] = Controls["Last Valid Direction", number]
+                Controls["Flags", table]["Direction is Updated", number] = 0
+                Controls["Flags", table]["Player Controls Updated", number] = 0
+                Controls["Faults", table]["Direction", number] = 1
+                Controls["Faults", table]["Message", string] = "Direction cannot be changed while the locomotive is moving."
                 return 0
             }
 
-            # Throttle cannot be set lower than 0.
-            elseif (Throttle < 0)
+            # Throttle Interlock.
+            # The Throttle must be set to Idle, before the Direction can be changed.
+            # Any attempt to change the Direction whilst the Throttle is not set to 0 will result in a Direction Fault.
+            if (Controls["Throttle", number] != 1)
             {
-                Controls["Throttle", number] = 0
-                Controls["Faults", table]["Message", string] = "Throttle is already set to minimum."
-                Controls["Faults", table]["Throttle", number] = 1
-                return 0
-            }
-        break
-
-        # Torque Mode.
-        case "Torque",
-            # Throttle cannot be set higher than the maximum size of the Throttle Map.
-            if (Throttle > ThrMap["Torque Setpoint", array]:count())
-            {
-                Controls["Throttle", number] = ThrMap["Torque Setpoint", array]:count()
-                Controls["Faults", table]["Message", string] = "Throttle is already set to maximum."
-                Controls["Faults", table]["Throttle", number] = 1
+                Controls["Direction", number] = Controls["Last Valid Direction", number]
+                Controls["Flags", table]["Direction is Updated", number] = 0
+                Controls["Flags", table]["Player Controls Updated", number] = 0
+                Controls["Faults", table]["Direction", number] = 1
+                Controls["Faults", table]["Message", string] = "Direction cannot be changed while the Throttle is not set to Idle."
                 return 0
             }
 
-            # Throttle cannot be set lower than 0.
-            elseif (Throttle < 0)
+            # Range Checks are now obsolete, because the Direction is already clamped to 1 or -1.
+
+            # Direction is valid.
+            # Set the Last Valid Direction to the current Direction.
+            # Leave the Direction is Updated flag set to 1.
+            # Clear the Player Controls Updated flag.
+            # Return true.
+            Controls["Last Valid Direction", number] = Controls["Direction", number]
+            Controls["Flags", table]["Player Controls Updated", number] = 0
+            return 1
+        }
+
+        # Check if the Throttle has been updated.
+        elseif (Controls["Flags", table]["Throttle is Updated", number] == 1)
+        {
+            # Emergency Brake Interlock.
+            # The Emergency Brake must be released before the Throttle can be changed.
+            # Any attempt to change the Throttle while the Emergency Brake is active will result in a Throttle Fault.
+            # This is to prevent the Throttle from fighting the Emergency Brake.
+            if (Controls["Flags", table]["Emergency Brake is Released", number] == 0)
             {
-                Controls["Throttle", number] = 0
-                Controls["Faults", table]["Message", string] = "Throttle is already set to minimum."
+                Controls["Throttle", number] = Controls["Last Valid Throttle", number]
+                Controls["Flags", table]["Throttle is Updated", number] = 0
+                Controls["Flags", table]["Player Controls Updated", number] = 0
                 Controls["Faults", table]["Throttle", number] = 1
+                Controls["Faults", table]["Message", string] = "Throttle cannot be changed while the Emergency Brake is active."
                 return 0
             }
-        break
+
+            # Direction Interlock.
+            # The Direction must be set to either Forward or Reverse, before the Throttle can be changed.
+            # Any attempt to change the Throttle whilst the Direction is set to Neutral will result in a Throttle Fault.
+            if (Controls["Direction", number] == 0)
+            {
+                Controls["Throttle", number] = Controls["Last Valid Throttle", number]
+                Controls["Flags", table]["Throttle is Updated", number] = 0
+                Controls["Flags", table]["Player Controls Updated", number] = 0
+                Controls["Faults", table]["Throttle", number] = 1
+                Controls["Faults", table]["Message", string] = "Throttle cannot be changed while the Direction is set to Neutral."
+                return 0
+            }
+
+            # No need for a Brake Interlock.
+            # The Brake is not used in Velocity Mode.
+            # In Acceleration Mode & Torque Mode, the Brake is allowed to be used at the same time as the Throttle.
+            # See my notes above as to why I will not trigger a Throttle Fault if the player attempts to use the Brake
+            # when the locomotive is in Velocity Mode.
+
+            # Range Checks are also obsolete, because the Throttle is already clamped to the range specified for each mode.
+
+            # Throttle is valid.
+            # Set the Last Valid Throttle to the current Throttle.
+            # Leave the Throttle is Updated flag set to 1.
+            # Clear the Player Controls Updated flag.
+            # Return true.
+            Controls["Last Valid Throttle", number] = Controls["Throttle", number]
+            Controls["Flags", table]["Player Controls Updated", number] = 0
+            return 1
+        }
+
+        # Check if the Brake has been updated.
+        elseif (Controls["Flags", table]["Brake is Updated", number] == 1)
+        {
+            #[
+                Notes from ZZ Cat:
+                The Brake is not used in Velocity Mode.
+                Currently, I will not trigger a Brake Fault if the player attempts to use the Brake
+                when the locomotive is in Velocity Mode.
+
+                For now, I have decided to have the Brake get silently ignored in Velocity Mode.
+                Simply put, if the player attempts to use the Brake, nothing will happen.
+                This also means that this function will return a false positive.
+                But, the Brake won't actually be set to anything, so it won't cause any problems.
+
+                Also, my usual Brake Interlocks are not needed in Velocity Mode... for now, at least.
+
+                See my notes in the Brake Fault code above for more information.
+            ]#
+
+            # Set the Brake to 1.
+            # Clear the Brake is Updated flag.
+            # Clear the Player Controls Updated flag.
+            # Clear the Brake Fault.
+            # Return true.
+            Controls["Brake", number] = 1
+            Controls["Flags", table]["Brake is Updated", number] = 0
+            Controls["Flags", table]["Player Controls Updated", number] = 0
+            Controls["Faults", table]["Brake", number] = 0
+            return 1
+        }
+
+        # Check if the Emergency Brake has been updated.
+        elseif (Controls["Flags", table]["Emergency Brake is Updated", number] == 1)
+        {
+            # The Emergency Brake does not need to interlock with itself.
+            # Though, the Emergency Brake does need to verify whether-or-not it is released.
+            # This does not need to trigger an Emergency Brake Fault, even though the
+            # Emergency Brake is used in all three modes.
+            # There are no other additional interlocks, because the Emergency Brake needs to be
+            # able to override all other controls in order to stop the locomotive.
+            # If the Emergency Brake is released, then it needs to be applied.
+            # If the Emergency Brake is already applied, this is invalid. But, it won't trigger a fault.
+            # It will simply indicate to the player that the Emergency Brake is already applied.
+            if (Controls["Flags", table]["Emergency Brake is Released", number] == 1)
+            {
+                # Emergency Brake is released.
+                # Set the Emergency Brake to 1.
+                # Set the Emergency Brake is Released flag to 0.
+                # Leave the Emergency Brake is Updated flag set to 1.
+                # Clear the Player Controls Updated flag.
+                # Clear the Emergency Brake Fault.
+                # Return true.
+                Controls["Emergency Brake", number] = 1
+                Controls["Flags", table]["Emergency Brake is Released", number] = 0
+                Controls["Flags", table]["Player Controls Updated", number] = 0
+                Controls["Faults", table]["Emergency Brake", number] = 0
+                return 1
+            }
+            else
+            {
+                # Emergency Brake is already applied.
+                # Clear the Emergency Brake is Updated flag.
+                # Clear the Player Controls Updated flag.
+                # Clear the Emergency Brake Fault.
+                # Return false.
+                Controls["Flags", table]["Emergency Brake is Updated", number] = 0
+                Controls["Flags", table]["Player Controls Updated", number] = 0
+                Controls["Faults", table]["Emergency Brake", number] = 0
+                Controls["Faults", table]["Message", string] = "Emergency Brake is already applied."
+                return 0
+            }
+        }
     }
-
-    # Brake is invalid when its value is higher than or less than the size of the brake maps for each brake input type.
-    switch(BrkInputType)
-    {
-        # Velocity Mode.
-        case "Velocity",
-            # Brake is disabled in Velocity Mode. Any value set to the brake is invalid.
-            if (Brake != 0)
-            {
-                Controls["Brake", number] = 0
-                Controls["Faults", table]["Message", string] = "Brake is disabled in Velocity Mode."
-                Controls["Faults", table]["Brake", number] = 1
-                return 0
-            }
-        break
-
-        # Acceleration Mode.
-        case "Acceleration",
-            # Brake cannot be set higher than the maximum size of the Brake Map.
-            if (Brake > BrkMap["Acceleration Setpoint", array]:count())
-            {
-                Controls["Brake", number] = BrkMap["Deceleration Setpoint", array]:count()
-                Controls["Faults", table]["Message", string] = "Brake is already set to maximum."
-                Controls["Faults", table]["Brake", number] = 1
-                return 0
-            }
-
-            # Brake cannot be set lower than 0.
-            elseif (Brake < 0)
-            {
-                Controls["Brake", number] = 0
-                Controls["Faults", table]["Message", string] = "Brake is already set to minimum."
-                Controls["Faults", table]["Brake", number] = 1
-                return 0
-            }
-        break
-
-        # Torque Mode.
-        case "Torque",
-            # Brake cannot be set higher than the maximum size of the Brake Map.
-            if (Brake > BrkMap["Torque Setpoint", array]:count())
-            {
-                Controls["Brake", number] = BrkMap["Torque Setpoint", array]:count()
-                Controls["Faults", table]["Message", string] = "Brake is already set to maximum."
-                Controls["Faults", table]["Brake", number] = 1
-                return 0
-            }
-        break
-    }
-
-    # Return 1 if all checks have passed.
-    return 1
 }
 
 # This function returns the fault message.
@@ -1093,6 +1610,42 @@ function number playerControlsGetThrottleFault(Controls:table)
 function number playerControlsGetBrakeFault(Controls:table)
 {
     return Controls["Faults", table]["Brake", number]
+}
+
+# This function returns the emergency brake fault.
+function number playerControlsGetEmergencyBrakeFault(Controls:table)
+{
+    return Controls["Faults", table]["Emergency Brake", number]
+}
+
+# This function returns the horn fault.
+function number playerControlsGetHornFault(Controls:table)
+{
+    return Controls["Faults", table]["Horn", number]
+}
+
+# This function returns the bell fault.
+function number playerControlsGetBellFault(Controls:table)
+{
+    return Controls["Faults", table]["Bell", number]
+}
+
+# This function returns the headlights fault.
+function number playerControlsGetHeadlightsFault(Controls:table)
+{
+    return Controls["Faults", table]["Headlights", number]
+}
+
+# This function returns the ditch lights fault.
+function number playerControlsGetDitchLightsFault(Controls:table)
+{
+    return Controls["Faults", table]["Ditch Lights", number]
+}
+
+# THis function returns the player controls fault.
+function number playerControlsGetFault(Controls:table)
+{
+    return Controls["Faults", table]["Player Controls", number]
 }
 
 # This function clears the fault message.

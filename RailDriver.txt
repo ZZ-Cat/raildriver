@@ -19,9 +19,11 @@
 @name RailDriver
 @model models/beer/wiremod/gate_e2_nano.mdl
 @persist Trucks:array Speedo:table
+@persist [Direction Throttle Brake EmergencyBrake]:number
 @persist [PlayerControls ThrottleMap BrakeMap]:table TrainDriver:entity
 @persist PIDF:table
-@persist Speed SpeedMPH
+@persist EmBrakeState EmBrakeThisSpeed EmBrakeLastSpeed EmBrakeObserverTickInterval
+@persist Speed SpeedAbs SpeedMPH
 @outputs Debugger:table
 @strict
 
@@ -86,7 +88,7 @@ if (first() | duped())
 
         # Initialize Speedometer.
         Speedo = speedometerInit(Trucks[1, entity], Trucks[2, entity])
-        if (Speedo:count() == 19)
+        if (Speedo:count() == 8)
         {
             speedometerSetFilterCutoffFrequency(Speedo, SpeedometerFilterCutoffFrequency)
             speedometerSetDeadband(Speedo, SpeedometerDeadband * 17.6)
@@ -114,10 +116,8 @@ if (first() | duped())
         KeyboardControls["Decrease Reverser", string] = "S"
         KeyboardControls["Increase Throttle", string] = "D"
         KeyboardControls["Decrease Throttle", string] = "A"
-        KeyboardControls["Increase Train Brake", string] = "left shift + D"
-        KeyboardControls["Decrease Train Brake", string] = "left shift + A"
-        KeyboardControls["Increase Engine Brake", string] = "left ctrl + D"
-        KeyboardControls["Decrease Engine Brake", string] = "left ctrl + A"
+        KeyboardControls["Increase Brake", string] = "left ctrl + D"
+        KeyboardControls["Decrease Brake", string] = "left ctrl + A"
         KeyboardControls["Emergency Brake", string] = "space"
         KeyboardControls["Horn", string] = "H"
         KeyboardControls["Bell", string] = "left alt"
@@ -133,6 +133,11 @@ if (first() | duped())
         {
             error("Failed to initialize Player Controls.")
         }
+
+        Direction = 0
+        Throttle = 1
+        Brake = 1
+        EmergencyBrake = 0
 
         # Initialize the PIDF controller.
         PIDF = pidCreateInstance()
@@ -183,21 +188,21 @@ if (clk(speedometerGetClockId(Speedo)))
     {
         speedometerClearAndRestartTimer(Speedo)
 
-        local SpeedRaw = 0
-
         # Calculate the speed of the locomotive.
-        SpeedRaw = speedometerGetSpeed(Speedo, playerControlsGetDirection(PlayerControls))
-        Speed = speedometerFilter(Speedo, SpeedRaw)
+        local SpeedRaw = 0
+        SpeedRaw = speedometerGetSpeed(Speedo)
 
-        # Apply a deadband to the speed.
-        Speed = speedometerDeadband(Speedo, Speed)
+        # Apply a deadband & low-pass filter to the speed.
+        Speed = speedometerDeadband(Speedo, speedometerFilter(Speedo, SpeedRaw))
+
+        SpeedAbs = abs(Speed)
 
         # Update the PIDF controller's process variable.
         # This is the measured speed of the locomotive.
-        pidSetProcessVariable(PIDF, Speed)
+        pidSetProcessVariable(PIDF, SpeedAbs)
 
         # Convert speed from Garry's Mod units to miles per hour.
-        SpeedMPH = round(toUnit("mph", Speed) * 4 / 3)
+        SpeedMPH = round(toUnit("mph", SpeedAbs) * 4 / 3)
     }
 
     catch (Exception)
@@ -210,30 +215,6 @@ if (tickClk())
 {
     try
     {
-        #[
-            TODO:
-            - Move the setpoint, throttle, and brake values up to the player controls.
-            - Move the throttle & brake feedforward values up to the player controls.
-        ]#
-        # Get the current throttle and brake values.
-        local Throttle = playerControlsGetThrottle(PlayerControls)
-        local Brake = playerControlsGetBrake(PlayerControls)
-        local Reverser = playerControlsGetDirection(PlayerControls)
-
-        # Get the current velocity setpoint.
-        local VelocitySetpoint = playerControlsGetThrottleMap(PlayerControls, "Velocity Setpoint", Throttle)
-
-        # Convert the velocity setpoint from miles per hour to Garry's Mod units.
-        local VelocitySetpointGM = VelocitySetpoint * 17.6
-
-        # Set the throttle and brake feedforward values.
-        pidSetFeedforward(PIDF, "Throttle", VelocitySetpointGM)
-        #pidSetFeedforward(PIDF, "Brake", Brake)
-
-        # Set the PIDF controller's setpoint.
-        # This is the desired speed of the locomotive.
-        pidSetSetPoint(PIDF, VelocitySetpointGM)
-
         # Calculate the PIDF controller's output.
         pidCalculate(PIDF) # <--- This is where the magick happens. =^/,..,^=
 
@@ -267,7 +248,7 @@ if (tickClk())
         ]#
 
         # Apply the PIDF Controller's output directly to the locomotive's traction motors.
-        if (!semDirectControlTrucks(Trucks, PIDFOutput, Reverser))
+        if (!semDirectControlTrucks(Trucks, PIDFOutput, Direction))
         {
             #[ 
                 Notes from ZZ Cat:
@@ -305,26 +286,348 @@ if (keyClk())
 {
     try
     {
-        playerControlsUpdate(PlayerControls)
-
-        #[
-            Notes from ZZ Cat:
-            This has been commented out, because it keeps spamming the chat with the same message.
-            Currently, I'm not sure how to fix this.
-            If you know how to fix this, please let me know by opening either an issue or a pull request on GitHub.
-        ]#
-        #[
-            if (!playerControlsValid(PlayerControls, SpeedMPH))
+        if (playerControlsUpdate(PlayerControls))
+        {
+            if (!playerControlsValid(PlayerControls, Speed))
             {
-                playerControlsClearAllFaults(PlayerControls)
                 error(playerControlsGetFaultMessage(PlayerControls))
             }
-        ]#
+
+            if (playerControlsDirectionIsUpdated(PlayerControls))
+            {
+                Direction = playerControlsGetDirection(PlayerControls)
+
+                # Clear the Direction is Updated flag.
+                playerControlsClearDirectionIsUpdated(PlayerControls)
+            }
+
+            if (playerControlsThrottleIsUpdated(PlayerControls))
+            {
+                # Get the current throttle value.
+                Throttle = playerControlsGetThrottle(PlayerControls)
+
+                # Get the current velocity setpoint & convert it from miles per hour to Garry's Mod units.
+                local VelocitySetpoint = playerControlsGetThrottleMap(PlayerControls, "Velocity Setpoint", Throttle)
+                local VelocitySetpointGM = VelocitySetpoint * 17.6
+
+                # Set the PIDF controller's setpoint.
+                pidSetFeedforward(PIDF, "Throttle", VelocitySetpointGM)
+                pidSetSetPoint(PIDF, VelocitySetpointGM)
+
+                # Clear the Throttle is Updated flag.
+                playerControlsClearThrottleIsUpdated(PlayerControls)
+            }
+
+            if (playerControlsBrakeIsUpdated(PlayerControls))
+            {
+                Brake = playerControlsGetBrake(PlayerControls)
+
+                # Brake currently is not used.
+                # So, I'm gonna let it silently do nothing. =^/.~=
+
+                # Clear the Brake is Updated flag.
+                playerControlsClearBrakeIsUpdated(PlayerControls)
+            }
+
+            if (playerControlsEmergencyBrakeIsUpdated(PlayerControls))
+            {
+                EmergencyBrake = playerControlsGetEmergencyBrake(PlayerControls)
+
+                # If the Emergency Brake is pressed, set the controller's setpoint to 0.
+                if (EmergencyBrake)
+                {
+                    # Initialize the Emergency Brake Observer.
+                    # The Emergency Brake's Observer Interval is 2 Hz.
+                    EmBrakeState = 1
+                    EmBrakeObserverTickInterval = 1000 / 2
+                    timer("Emergency Brake", tickInterval())
+                }
+
+                # Clear the Emergency Brake is Updated flag.
+                playerControlsClearEmergencyBrakeIsUpdated(PlayerControls)
+            }
+        }
     }
 
     catch (Exception)
     {
         printColor(vec(255, 0, 0), "[RailDriver | PlyCtrls | Error]", vec(255, 255, 255), ": " + Exception)
+    }
+}
+
+if (clk("Emergency Brake"))
+{
+    stoptimer("Emergency Brake")
+
+    try
+    {
+        # Emergency Brake State Machine.
+        # This state machine is an observer that will monitor the locomotive's speed
+        # while the Emergency Brake is active.
+        # If the locomotive's speed is not decreasing, tougher measures will be taken.
+        # When the locomotive is stopped, the Emergency Brake will be released.
+        # There are 5 states:
+        # 1. The Emergency Brake is activated.
+        # 2. The locomotive's speed is decreasing... or is it?
+        # 3. The locomotive's speed is not decreasing. Apply the brakes to force the locomotive to stop.
+        # 4. The locomotive should be stopped by now. Release the Emergency Brake.
+        # 5. The locomotive still isn't stopped? Okay, freeze the entire train & shut RailDriver down.
+        #    This is the last resort. Somehow, the locomotive is still moving.
+        #    This is a safety measure to prevent the locomotive from derailing &/or causing a collision.
+        if (EmBrakeState == 1)
+        {
+            #[ STOP THE TRAIN!!! ]#
+
+            # Get the current speed of the locomotive.
+            EmBrakeThisSpeed = SpeedAbs
+            EmBrakeLastSpeed = SpeedAbs
+
+            # Reset the Throttle & Brake values.
+            playerControlsResetThrottle(PlayerControls)
+
+            # Set the PIDF controller's setpoint & feedforward to 0.
+            pidSetFeedforward(PIDF, "Throttle", 0)
+            pidSetSetPoint(PIDF, 0)
+
+            # Set the Emergency Brake state to 2.
+            EmBrakeState = 2
+
+            # Restart the Emergency Brake timer.
+            timer("Emergency Brake", EmBrakeObserverTickInterval)
+        }
+
+        # Emergency Brake state 2.
+        # This state is used to monitor the locomotive's speed to ensure that the locomotive is stopping.
+        # If the locomotive's speed is not decreasing, the Emergency Brake state is set to 3.
+        # If the locomotive is stopped, the Emergency Brake state is set to 4.
+        elseif (EmBrakeState == 2)
+        {
+            #[ I HOPE IT STOPS! ]#
+
+            # Get the current speed of the locomotive.
+            EmBrakeThisSpeed = SpeedAbs
+
+            # If the locomotive's speed is not decreasing, set the Emergency Brake state to 3.
+            if (EmBrakeThisSpeed >= EmBrakeLastSpeed)
+            {
+                EmBrakeState = 3
+            }
+
+            # If the locomotive is stopped, set the Emergency Brake state to 4.
+            elseif (EmBrakeThisSpeed == 0)
+            {
+                EmBrakeState = 4
+            }
+
+            # Set the last speed to the current speed.
+            EmBrakeLastSpeed = EmBrakeThisSpeed
+
+            # Restart the Emergency Brake timer.
+            timer("Emergency Brake", EmBrakeObserverTickInterval)
+        }
+
+        # Emergency Brake state 3.
+        # This state disables the PIDF controller, sets the locomotive's traction motors to 0, &
+        # uses the locomotive's brakes to stop the locomotive.
+        # If the locomotive is stopped, the Emergency Brake state is set to 4.
+        # If the locomotive's speed still is not decreasing, tougher measures are taken.
+        elseif (EmBrakeState == 3)
+        {
+            #[ I WASN'T ASKING!!! ]#
+
+            # Get the current speed of the locomotive.
+            EmBrakeThisSpeed = SpeedAbs
+
+            # If the locomotive is stopped, set the Emergency Brake state to 4.
+            if (EmBrakeThisSpeed == 0)
+            {
+                EmBrakeState = 4
+            }
+
+            # If the locomotive's speed still is not decreasing, set the Emergency Brake state to 5.
+            elseif (EmBrakeThisSpeed >= EmBrakeLastSpeed)
+            {
+                EmBrakeState = 5
+            }
+
+            # Set the last speed to the current speed.
+            EmBrakeLastSpeed = EmBrakeThisSpeed
+
+            # Disable the PIDF controller.
+            pidSetMode(PIDF, "Manual")
+            pidSetOutput(PIDF, 0)
+            runOnTick(0)
+
+            # Set the locomotive's traction motors to 0.
+            semDirectControlTrucks(Trucks, 0, Direction)
+
+            # Set the locomotive's brakes to 100%.
+            semDirectControlBrakes(Trucks, 2)
+
+            # Restart the Emergency Brake timer.
+            timer("Emergency Brake", EmBrakeObserverTickInterval)
+        }
+
+        # Emergency Brake state 4.
+        # This state releases the locomotive's brakes & re-enables the PIDF controller.
+        # But first, it needs to ensure that the locomotive is stopped.
+        # Then, it verifies that the locomotive is stopped.
+        # If the locomotive is stopped, the Emergency Brake state is set to 0.
+        # In this state, do the following:
+        # - The Emergency Brake is released.
+        # - The locomotive's traction motors are set to 0.
+        # - The locomotive's brakes are set to 0.
+        # - The PIDF controller is re-enabled.
+        # Otherwise, if the locomotive is not stopped, the Emergency Brake state is set to 5.
+        # Here, I am using the EmBrakeState to determine what the next action should be.
+        elseif (EmBrakeState == 4)
+        {
+            #[ YOU SHOULD HAVE LISTENED TO ME!!! ]#
+
+            # Get the current speed of the locomotive.
+            EmBrakeThisSpeed = SpeedAbs
+
+            # If the locomotive is stopped, set the Emergency Brake state to 0.
+            if (EmBrakeThisSpeed == 0)
+            {
+                EmBrakeState = 0
+            }
+
+            # If the locomotive is not stopped, set the Emergency Brake state to 5.
+            else
+            {
+                EmBrakeState = 5
+            }
+
+            # Set the last speed to the current speed.
+            EmBrakeLastSpeed = EmBrakeThisSpeed
+
+            # If the locomotive is stopped, release the Emergency Brake.
+            if (EmBrakeState == 0)
+            {
+                # Release the Emergency Brake.
+                playerControlsClearEmergencyBrakeIsActive(PlayerControls)
+
+                # Set the locomotive's traction motors to 0.
+                semDirectControlTrucks(Trucks, 0, Direction)
+
+                # Set the locomotive's brakes to 0.
+                semDirectControlBrakes(Trucks, 0)
+
+                # Re-enable the PIDF controller.
+                pidSetMode(PIDF, "Automatic")
+                runOnTick(1)
+            }
+
+            # Restart the Emergency Brake timer.
+            timer("Emergency Brake", EmBrakeObserverTickInterval)
+        }
+
+        # Emergency Brake state 5.
+        # This state freezes the entire train, to prevent derailments &/or collisions.
+        # This is the last resort to stop the locomotive & it should never be reached.
+        # Otherwise, a non-recoverable fault is tripped.
+        # This means that RailDriver is completely disabled & it will need to be manually reset.
+        # Also, your train will need to be manually unfrozen too.
+        elseif (EmBrakeState == 5)
+        {
+            #[ YA CAN'T RUNAWAY ON ME, IF YOU'RE FROZEN!!! ]#
+
+            # Freeze the entire train.
+            semFreezeTrain()
+            semDirectControlBrakes(Trucks, 0)
+
+            # Disable RailDriver.
+            stopAllTimers()
+            runOnKeys(TrainDriver, 0)
+            runOnTick(0)
+
+            # Set the Emergency Brake state to 0.
+            EmBrakeState = 0
+
+            # Unlock the RailDriver, so that it can be manually reset.
+            if (semE2IsLocked())
+            {
+                semUnlockE2()
+            }
+
+            # Display an error message.
+            error("The train has been frozen due to a non-recoverable fault.")
+        }
+
+        # Emergency Brake state 6.
+        # This state is for tuning the Emergency Brake.
+        # Only use this state if you know what you are doing.
+        # When the locomotive is moving, do the following:
+        # - Reset the Throttle.
+        # - Set the Setpoint & Feedforward to 0.
+        # - Disable the PIDF controller.
+        # - Set the locomotive's traction motors to 0.
+        # - Set the locomotive's brakes to 100%.
+        # When the locomotive is stopped, do the following:
+        # - Release the Emergency Brake.
+        # - Set the Emergency Brake state to 0.
+        # - Re-enable the PIDF controller.
+        # - Set the locomotive's traction motors to 0.
+        # - Set the locomotive's brakes to 0.
+        elseif (EmBrakeState == 6)
+        {
+            # Get the current speed of the locomotive.
+            EmBrakeThisSpeed = SpeedAbs
+
+            # If the locomotive is moving, do the following:
+            if (EmBrakeThisSpeed > 0)
+            {
+                # Reset the Throttle.
+                playerControlsResetThrottle(PlayerControls)
+
+                # Set the Setpoint & Feedforward to 0.
+                pidSetFeedforward(PIDF, "Throttle", 0)
+                pidSetSetPoint(PIDF, 0)
+
+                # Disable the PIDF controller.
+                pidSetMode(PIDF, "Manual")
+                pidSetOutput(PIDF, 0)
+                runOnTick(0)
+
+                # Set the locomotive's traction motors to 0.
+                semDirectControlTrucks(Trucks, 0, Direction)
+
+                # Set the locomotive's brakes to 100%.
+                semDirectControlBrakes(Trucks, 2)
+            }
+
+            # If the locomotive is stopped, do the following:
+            else
+            {
+                # Release the Emergency Brake.
+                playerControlsClearEmergencyBrakeIsActive(PlayerControls)
+
+                # Set the Emergency Brake state to 0.
+                EmBrakeState = 0
+
+                # Re-enable the PIDF controller.
+                pidSetMode(PIDF, "Automatic")
+                runOnTick(1)
+
+                # Set the locomotive's traction motors to 0.
+                semDirectControlTrucks(Trucks, 0, Direction)
+
+                # Set the locomotive's brakes to 0.
+                semDirectControlBrakes(Trucks, 0)
+            }
+
+            # Set the last speed to the current speed.
+            EmBrakeLastSpeed = EmBrakeThisSpeed
+
+            # Restart the Emergency Brake timer.
+            timer("Emergency Brake", EmBrakeObserverTickInterval)
+        }
+    }
+
+    catch(Exception)
+    {
+        printColor(vec(255, 0, 0), "[RailDriver | EmBrake | Fatal Error]", vec(255, 255, 255), ": " + Exception)
     }
 }
 
