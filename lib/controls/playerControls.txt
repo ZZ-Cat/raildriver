@@ -975,7 +975,7 @@ function number playerControlsValid(Controls:table, Speed)
                         {
                             # Reset the Direction Fault.
                             Controls["Faults", table]["Direction", number] = 0
-                            Controls["Faults", table]["Message", string] = ""
+                            Controls["Faults", table]["Message", string] = "Direction Fault Cleared."
                         }
                         else
                         {
@@ -1148,7 +1148,7 @@ function number playerControlsValid(Controls:table, Speed)
             if (Controls["Flags", table]["Emergency Brake is Released", number] == 1)
             {
                 # Check if the locomotive is stopped.
-                if (Controls["Speed", number] == 0)
+                if (Speed == 0)
                 {
                     # Check if the Direction is set to the same direction as what was last valid.
                     if (Controls["Direction", number] == Controls["Last Valid Direction", number])
@@ -1158,7 +1158,7 @@ function number playerControlsValid(Controls:table, Speed)
                         {
                             # Clear the Throttle Fault.
                             Controls["Faults", table]["Throttle", number] = 0
-                            Controls["Faults", table]["Message", string] = ""
+                            Controls["Faults", table]["Message", string] = "Throttle Fault Cleared."
                         }
                         else
                         {
