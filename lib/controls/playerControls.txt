@@ -918,6 +918,12 @@ function number playerControlsGetBrakeMap(Controls:table, BrakeInputType:string,
     return Controls["Brake Map", table][BrakeInputType, array][BrakeIndex, number]
 }
 
+# This function manually sets the Emergency Brake to active.
+function void playerControlsSetEmergencyBrakeActive(Controls:table)
+{
+    Controls["Flags", table]["Emergency Brake is Released", number] = 0
+}
+
 # This function checks whether or not the player controls are valid.
 function number playerControlsValid(Controls:table, Speed)
 {

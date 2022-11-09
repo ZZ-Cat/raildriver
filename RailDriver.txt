@@ -360,6 +360,23 @@ if (keyClk())
             ErrorText = "[RailDriver | PlyCtrls | Fault Cleared]"
         }
 
+        else
+        {
+            if (!playerControlsEmergencyBrakeIsActive(PlayerControls))
+            {
+                # Initialize the Emergency Brake Observer.
+                # The Emergency Brake's Observer Interval is 2 Hz.
+                # The initial timeout is 5 seconds, to give the player time to reset the fault.
+                # After the timeout, the Emergency Brake will be automatically applied.
+                EmBrakeState = 1
+                EmBrakeObserverTickInterval = 1000 / 2
+                timer("Emergency Brake", 5000)
+
+                # Set the Emergency Brake to active.
+                playerControlsSetEmergencyBrakeActive(PlayerControls)
+            }
+        }
+
         printColor(ErrorColor, ErrorText, vec(255, 255, 255), ": " + Exception)
     }
 }
