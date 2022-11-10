@@ -58,7 +58,7 @@ Okay, I digress. Where was I? Oh yea. Now, I remember. This is what you're here 
 - [ ] A new wireless control link protocol that I have aptly named "DLCT".
   - This one in particular is gonna be exciting, because you won't need to wire anything by hand ever again.
 It will also have its own authentication (among other brilliant features) & I will make it _very_ robust & interference free. You're welcome. =^/.~=
-- [ ] PID-assisted Emergency Stop.
+- [x] PID-assisted Emergency Stop.
   - This will use the PIDF control loop to help stop the entire train as quickly as possible.
   - I will make this so that it can be manually triggered as well as automatically triggered by things such as derailment detection.
 - [ ] OTA automatic updates.
