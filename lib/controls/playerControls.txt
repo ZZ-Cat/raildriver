@@ -856,6 +856,7 @@ function void playerControlsClearEmergencyBrakeIsActive(Controls:table)
 function void playerControlsResetThrottle(Controls:table)
 {
     Controls["Throttle", number] = 1
+    Controls["Last Valid Throttle", number] = 1
 }
 
 # This function returns the direction of the locomotive.
@@ -951,186 +952,56 @@ function number playerControlsValid(Controls:table, Speed)
         return 0
     }
 
+    #[
+        This section of code fixes #18.
+    ]#
     # Direction Fault.
     if (Controls["Faults", table]["Direction", number] != 0)
     {
-        # Check if the Direction has been updated.
+        # Check if the Direction is Updated.
         if (Controls["Flags", table]["Direction is Updated", number] == 1)
         {
-            # Direction Fault Reset.
-            # Certain conditions must be met before the fault can be reset.
-            # These conditions are:
-            # 1. The Emergency Brake must be released.
-            # 2. The Throttle must be set to Idle.
-            # 3. The locomotive must be stopped.
-            # 4. The Direction must be set to Neutral.
-            # If these conditions are met, then the Direction Fault can be reset.
-            # If any of these conditions are not met, then the Direction Fault cannot be reset.
-            # A Fault Message will be displayed to the player, indicating which Faults are preventing the Direction Fault from being reset.
-            # Check if the Emergency Brake is released.
-            if (Controls["Flags", table]["Emergency Brake is Released", number] == 1)
+            # The Direction needs to be equal to its Last Valid Direction before the fault is cleared.
+            if (Controls["Direction", number] == Controls["Last Valid Direction", number])
             {
-                # Check if the Throttle is set to Idle.
-                if (Controls["Throttle", number] == 1)
-                {
-                    # Check if the locomotive is stopped.
-                    if (Speed == 0)
-                    {
-                        # Check if the Direction is set to Neutral.
-                        if (Controls["Direction", number] == 0)
-                        {
-                            # Reset the Direction Fault.
-                            Controls["Faults", table]["Direction", number] = 0
-                            Controls["Faults", table]["Message", string] = "Direction Fault Cleared."
-                        }
-                        else
-                        {
-                            # Set the Direction Fault.
-                            Controls["Faults", table]["Direction", number] = 1
-                            Controls["Faults", table]["Message", string] = "Direction Fault: Direction must be set to Neutral."
-                        }
-                    }
-                    else
-                    {
-                        # Set the Direction Fault.
-                        Controls["Faults", table]["Direction", number] = 1
-                        Controls["Faults", table]["Message", string] = "Direction Fault: Locomotive must be stopped."
-                    }
-                }
-                else
-                {
-                    # Set the Direction Fault.
-                    Controls["Faults", table]["Direction", number] = 1
-                    Controls["Faults", table]["Message", string] = "Direction Fault: Throttle must be set to Idle."
-                }
+                # Clear the Direction Fault.
+                Controls["Faults", table]["Direction", number] = 0
+                Controls["Faults", table]["Message", string] = "Direction Fault Cleared."
+
+                # Clear the Direction is Updated & Player Controls Updated flags.
+                Controls["Flags", table]["Direction is Updated", number] = 0
+                Controls["Flags", table]["Player Controls Updated", number] = 0
+
+                # Return false.
+                return 0
             }
+            
             else
             {
-                # Set the Direction Fault.
-                Controls["Faults", table]["Direction", number] = 1
-                Controls["Faults", table]["Message", string] = "Direction Fault: Emergency Brake must be released."
-            }
+                # Advise the player that they need to set the Direction to its Last Valid Direction, whether it be Forward, Neutral or Reverse.
+                local LastValidDirection = Controls["Last Valid Direction", number] == 1 ? "Forward" : Controls["Last Valid Direction", number] == -1 ? "Reverse" : "Neutral"
+                Controls["Faults", table]["Message", string] = "Direction Fault: Direction needs to be set to " + Controls["Last Valid Direction", number] + "."
 
-            # Clear the Direction is Updated flag.
-            # Clear the Player Controls Updated flag.
-            # Return false.
-            Controls["Flags", table]["Direction is Updated", number] = 0
-            Controls["Flags", table]["Player Controls Updated", number] = 0
-            return 0
+                # Clear the Direction is Updated & Player Controls Updated flags.
+                Controls["Flags", table]["Direction is Updated", number] = 0
+                Controls["Flags", table]["Player Controls Updated", number] = 0
+
+                # Return false.
+                return 0
+            }
         }
 
-        # Any other Player Controls that were updated will indicate to the player that the Direction Fault needs to be reset.
-        # If the Direction Fault is not reset, then the player will not be able to control the locomotive.
+        # Check if the Throttle is Updated.
         elseif (Controls["Flags", table]["Throttle is Updated", number] == 1)
         {
-            # Set the Throttle to the last valid value.
-            Controls["Throttle", number] = Controls["Last Valid Throttle", number]
+            # Advise the player that the Throttle cannot be updated.
+            Controls["Faults", table]["Message", string] = "Direction Fault: Throttle cannot be updated."
 
-            # Set the Direction Fault.
-            Controls["Faults", table]["Direction", number] = 1
-            Controls["Faults", table]["Message", string] = "Direction Fault: Direction must be reset."
-
-            # Clear the Throttle is Updated flag.
-            # Clear the Player Controls Updated flag.
-            # Return false.
+            # Clear the Throttle is Updated & Player Controls Updated flags.
             Controls["Flags", table]["Throttle is Updated", number] = 0
             Controls["Flags", table]["Player Controls Updated", number] = 0
-            return 0
-        }
-        elseif (Controls["Flags", table]["Brake is Updated", number] == 1)
-        {
-            # Set the Brake to the last valid value.
-            Controls["Brake", number] = Controls["Last Valid Brake", number]
 
-            # Set the Direction Fault.
-            Controls["Faults", table]["Direction", number] = 1
-            Controls["Faults", table]["Message", string] = "Direction Fault: Direction must be reset."
-
-            # Clear the Brake is Updated flag.
-            # Clear the Player Controls Updated flag.
             # Return false.
-            Controls["Flags", table]["Brake is Updated", number] = 0
-            Controls["Flags", table]["Player Controls Updated", number] = 0
-            return 0
-        }
-        elseif (Controls["Flags", table]["Emergency Brake is Updated", number] == 1)
-        {
-            # Set the Emergency Brake to the last valid value.
-            Controls["Emergency Brake", number] = Controls["Last Valid Emergency Brake", number]
-
-            # Set the Direction Fault.
-            Controls["Faults", table]["Direction", number] = 1
-            Controls["Faults", table]["Message", string] = "Direction Fault: Direction must be reset."
-
-            # Clear the Emergency Brake is Updated flag.
-            # Clear the Player Controls Updated flag.
-            # Return false.
-            Controls["Flags", table]["Emergency Brake is Updated", number] = 0
-            Controls["Flags", table]["Player Controls Updated", number] = 0
-            return 0
-        }
-        elseif (Controls["Flags", table]["Horn is Updated", number] == 1)
-        {   
-            # Set the Horn to the last valid value.
-            Controls["Horn", number] = Controls["Last Valid Horn", number]
-
-            # Set the Direction Fault.
-            Controls["Faults", table]["Direction", number] = 1
-            Controls["Faults", table]["Message", string] = "Direction Fault: Direction must be reset."
-
-            # Clear the Horn is Updated flag.
-            # Clear the Player Controls Updated flag.
-            # Return false.
-            Controls["Flags", table]["Horn is Updated", number] = 0
-            Controls["Flags", table]["Player Controls Updated", number] = 0
-            return 0
-        }
-        elseif (Controls["Flags", table]["Bell is Updated", number] == 1)
-        {
-            # Set the Bell to the last valid value.
-            Controls["Bell", number] = Controls["Last Valid Bell", number]
-
-            # Set the Direction Fault.
-            Controls["Faults", table]["Direction", number] = 1
-            Controls["Faults", table]["Message", string] = "Direction Fault: Direction must be reset."
-
-            # Clear the Bell is Updated flag.
-            # Clear the Player Controls Updated flag.
-            # Return false.
-            Controls["Flags", table]["Bell is Updated", number] = 0
-            Controls["Flags", table]["Player Controls Updated", number] = 0
-            return 0
-        }
-        elseif (Controls["Flags", table]["Headlights is Updated", number] == 1)
-        {
-            # Set the Headlights to the last valid value.
-            Controls["Headlights", number] = Controls["Last Valid Headlights", number]
-
-            # Set the Direction Fault.
-            Controls["Faults", table]["Direction", number] = 1
-            Controls["Faults", table]["Message", string] = "Direction Fault: Direction must be reset."
-
-            # Clear the Headlights is Updated flag.
-            # Clear the Player Controls Updated flag.
-            # Return false.
-            Controls["Flags", table]["Headlights is Updated", number] = 0
-            Controls["Flags", table]["Player Controls Updated", number] = 0
-            return 0
-        }
-        elseif (Controls["Flags", table]["Ditch Lights is Updated", number] == 1)
-        {
-            # Set the Ditch Lights to the last valid value.
-            Controls["Ditch Lights", number] = Controls["Last Valid Ditch Lights", number]
-
-            # Set the Direction Fault.
-            Controls["Faults", table]["Direction", number] = 1
-            Controls["Faults", table]["Message", string] = "Direction Fault: Direction must be reset."
-
-            # Clear the Ditch Lights is Updated flag.
-            # Clear the Player Controls Updated flag.
-            # Return false.
-            Controls["Flags", table]["Ditch Lights is Updated", number] = 0
-            Controls["Flags", table]["Player Controls Updated", number] = 0
             return 0
         }
     }
@@ -1138,456 +1009,253 @@ function number playerControlsValid(Controls:table, Speed)
     # Throttle Fault.
     elseif (Controls["Faults", table]["Throttle", number] != 0)
     {
-        # Check if the Throttle is updated.
+        # Check if the Throttle is Updated.
         if (Controls["Flags", table]["Throttle is Updated", number] == 1)
         {
-            # Throttle Fault Reset.
-            # If the Throttle Fault has been set, certain conditions must be met before the Throttle Fault can be reset.
-            # These conditions are:
-            #  1. The Emergency Brake must be released.
-            #  2. The locomotive must be stopped.
-            #  3. The Direction must be set to the same direction as what was last valid.
-            #  4. The Throttle must be set to Idle.
-            # If any of these conditions are not met, then the Throttle Fault cannot be reset.
-            # A Fault Message will be displayed to the player, indicating which Faults are preventing the Throttle Fault from being reset.
-            # Check if the Emergency Brake is released.
-            if (Controls["Flags", table]["Emergency Brake is Released", number] == 1)
+            # The Throttle needs to be equal to its Last Valid Throttle before the fault is cleared.
+            if (Controls["Throttle", number] == Controls["Last Valid Throttle", number])
             {
-                # Check if the locomotive is stopped.
-                if (Speed == 0)
-                {
-                    # Check if the Direction is set to the same direction as what was last valid.
-                    if (Controls["Direction", number] == Controls["Last Valid Direction", number])
-                    {
-                        # Check if the Throttle is set to Idle.
-                        if (Controls["Throttle", number] == 1)
-                        {
-                            # Clear the Throttle Fault.
-                            Controls["Faults", table]["Throttle", number] = 0
-                            Controls["Faults", table]["Message", string] = "Throttle Fault Cleared."
-                        }
-                        else
-                        {
-                            # Set the Throttle Fault.
-                            Controls["Faults", table]["Throttle", number] = 1
-                            Controls["Faults", table]["Message", string] = "Throttle Fault: Throttle must be set to Idle."
-                        }
-                    }
-                    else
-                    {
-                        # Get the name of the last valid Direction.
-                        # Valid names are Forward, Neutral, and Reverse.
-                        # Forward is 1, Neutral is 0, and Reverse is -1.
-                        local LastValidDirectionName = ""
-                        if (Controls["Last Valid Direction", number] == 1)
-                        {
-                            LastValidDirectionName = "Forward"
-                        }
-                        elseif (Controls["Last Valid Direction", number] == 0)
-                        {
-                            LastValidDirectionName = "Neutral"
-                        }
-                        elseif (Controls["Last Valid Direction", number] == -1)
-                        {
-                            LastValidDirectionName = "Reverse"
-                        }
-                        
-                        # Set the Throttle Fault.
-                        Controls["Faults", table]["Throttle", number] = 1
-                        Controls["Faults", table]["Message", string] = "Throttle Fault: Direction must be set to " + LastValidDirectionName + "."
-                    }
-                }
-                else
-                {
-                    # Set the Throttle Fault.
-                    Controls["Faults", table]["Throttle", number] = 1
-                    Controls["Faults", table]["Message", string] = "Throttle Fault: Locomotive must be stopped."
-                }
+                # Clear the Throttle Fault.
+                Controls["Faults", table]["Throttle", number] = 0
+                Controls["Faults", table]["Message", string] = "Throttle Fault Cleared."
+
+                # Clear the Throttle is Updated & Player Controls Updated flags.
+                Controls["Flags", table]["Throttle is Updated", number] = 0
+                Controls["Flags", table]["Player Controls Updated", number] = 0
+
+                # Return false.
+                return 0
             }
+            
             else
             {
-                # Set the Throttle Fault.
-                Controls["Faults", table]["Throttle", number] = 1
-                Controls["Faults", table]["Message", string] = "Throttle Fault: Emergency Brake must be released."
-            }
+                # Advise the player that they need to set the Throttle to its Last Valid Throttle.
+                Controls["Faults", table]["Message", string] = "Throttle Fault: Throttle needs to be set to Notch " + Controls["Last Valid Throttle", number] + "."
 
-            # Clear the Throttle is Updated flag.
-            # Clear the Player Controls Updated flag.
-            # Return false.
-            Controls["Flags", table]["Throttle is Updated", number] = 0
-            Controls["Flags", table]["Player Controls Updated", number] = 0
-            return 0
+                # Clear the Throttle is Updated & Player Controls Updated flags.
+                Controls["Flags", table]["Throttle is Updated", number] = 0
+                Controls["Flags", table]["Player Controls Updated", number] = 0
+
+                # Return false.
+                return 0
+            }
         }
 
-        # Any other Player Controls that were updated will indicate to the player that the Throttle Fault needs to be reset.
-        # If the Throttle Fault is not reset, then the player will not be able to control the locomotive.
+        # Check if the Direction is Updated.
         elseif (Controls["Flags", table]["Direction is Updated", number] == 1)
         {
-            # Set the Direction to the last valid value.
-            Controls["Direction", number] = Controls["Last Valid Direction", number]
+            # Advise the player that the Direction cannot be updated.
+            Controls["Faults", table]["Message", string] = "Throttle Fault: Direction cannot be updated."
 
-            # Set the Throttle Fault.
-            Controls["Faults", table]["Throttle", number] = 1
-            Controls["Faults", table]["Message", string] = "Throttle Fault: Throttle must be reset."
-
-            # Clear the Direction is Updated flag.
-            # Clear the Player Controls Updated flag.
-            # Return false.
+            # Clear the Direction is Updated & Player Controls Updated flags.
             Controls["Flags", table]["Direction is Updated", number] = 0
             Controls["Flags", table]["Player Controls Updated", number] = 0
-            return 0
-        }
-        elseif (Controls["Flags", table]["Brake is Updated", number] == 1)
-        {
-            # Set the Brake to the last valid value.
-            Controls["Brake", number] = Controls["Last Valid Brake", number]
 
-            # Set the Throttle Fault.
-            Controls["Faults", table]["Throttle", number] = 1
-            Controls["Faults", table]["Message", string] = "Throttle Fault: Throttle must be reset."
-
-            # Clear the Brake is Updated flag.
-            # Clear the Player Controls Updated flag.
             # Return false.
-            Controls["Flags", table]["Brake is Updated", number] = 0
-            Controls["Flags", table]["Player Controls Updated", number] = 0
-            return 0
-        }
-        elseif (Controls["Flags", table]["Emergency Brake is Updated", number] == 1)
-        {
-            # Set the Emergency Brake to the last valid value.
-            Controls["Emergency Brake", number] = Controls["Last Valid Emergency Brake", number]
-
-            # Set the Throttle Fault.
-            Controls["Faults", table]["Throttle", number] = 1
-            Controls["Faults", table]["Message", string] = "Throttle Fault: Throttle must be reset."
-
-            # Clear the Emergency Brake is Updated flag.
-            # Clear the Player Controls Updated flag.
-            # Return false.
-            Controls["Flags", table]["Emergency Brake is Updated", number] = 0
-            Controls["Flags", table]["Player Controls Updated", number] = 0
-            return 0
-        }
-        elseif (Controls["Flags", table]["Horn is Updated", number] == 1)
-        {
-            # Set the Horn to the last valid value.
-            Controls["Horn", number] = Controls["Last Valid Horn", number]
-
-            # Set the Throttle Fault.
-            Controls["Faults", table]["Throttle", number] = 1
-            Controls["Faults", table]["Message", string] = "Throttle Fault: Throttle must be reset."
-
-            # Clear the Horn is Updated flag.
-            # Clear the Player Controls Updated flag.
-            # Return false.
-            Controls["Flags", table]["Horn is Updated", number] = 0
-            Controls["Flags", table]["Player Controls Updated", number] = 0
-            return 0
-        }
-        elseif (Controls["Flags", table]["Bell is Updated", number] == 1)
-        {
-            # Set the Bell to the last valid value.
-            Controls["Bell", number] = Controls["Last Valid Bell", number]
-
-            # Set the Throttle Fault.
-            Controls["Faults", table]["Throttle", number] = 1
-            Controls["Faults", table]["Message", string] = "Throttle Fault: Throttle must be reset."
-
-            # Clear the Bell is Updated flag.
-            # Clear the Player Controls Updated flag.
-            # Return false.
-            Controls["Flags", table]["Bell is Updated", number] = 0
-            Controls["Flags", table]["Player Controls Updated", number] = 0
-            return 0
-        }
-        elseif (Controls["Flags", table]["Headlights is Updated", number] == 1)
-        {
-            # Set the Headlights to the last valid value.
-            Controls["Headlights", number] = Controls["Last Valid Headlights", number]
-
-            # Set the Throttle Fault.
-            Controls["Faults", table]["Throttle", number] = 1
-            Controls["Faults", table]["Message", string] = "Throttle Fault: Throttle must be reset."
-
-            # Clear the Headlights is Updated flag.
-            # Clear the Player Controls Updated flag.
-            # Return false.
-            Controls["Flags", table]["Headlights is Updated", number] = 0
-            Controls["Flags", table]["Player Controls Updated", number] = 0
-            return 0
-        }
-        elseif(Controls["Flags", table]["Ditch Lights is Updated", number] == 1)
-        {
-            # Set the Ditch Lights to the last valid value.
-            Controls["Ditch Lights", number] = Controls["Last Valid Ditch Lights", number]
-
-            # Set the Throttle Fault.
-            Controls["Faults", table]["Throttle", number] = 1
-            Controls["Faults", table]["Message", string] = "Throttle Fault: Throttle must be reset."
-
-            # Clear the Ditch Lights is Updated flag.
-            # Clear the Player Controls Updated flag.
-            # Return false.
-            Controls["Flags", table]["Ditch Lights is Updated", number] = 0
-            Controls["Flags", table]["Player Controls Updated", number] = 0
             return 0
         }
     }
 
-    # Brake Fault.
-    elseif (Controls["Faults", table]["Brake", number] != 0)
-    {
-        # Check if the Brake has been updated.
-        if (Controls["Flags", table]["Brake is Updated", number] == 1)
+    #[
+        Notes from ZZ Cat:
+        These are placeholders.
+        When I get around to implementing the Brake Map, I will add the appropriate fault checks & fault recovery.
+
+        # Brake Fault.
+        elseif (Controls["Faults", table]["Brake", number] != 0)
         {
-            # Brake Fault Reset.
-            #[
-                Notes from ZZ Cat:
-                I need to write code that will reset the Brake Fault.
-                The implementation of this code is a little more complex than the other Faults,
-                because the Brake Fault is dependent on what Mode the locomotive is in.
-
-                On top of that, the locomotive must be stopped before the Brake Fault can be reset.
-                Also, right now, I can't think of anything that could potentially trigger a Brake Fault beyond
-                trying to apply the Brake when the locomotive is in a mode that doesn't support manual braking,
-                such as Velocity Mode.
-
-                In either Acceleration Mode or Torque Mode, I can't see any way that the Brake Fault could be
-                triggered without the locomotive being in a state where it is already stopped, or the
-                locomotive is in a situation where it is desirable to have the Brake applied while the Throttle
-                is also set to anything other than Idle.
-
-                Maybe if the player has the brake applied & the Throttle is set to anything other than Idle?
-                That doesn't make sense to me, because I can think of four scenarios where this would be desired,
-                right off the bat. Such as in a situation where the locomotive is on a hill, & the player is
-                using the brake to prevent the locomotive from rolling backwards as it accelerates up the hill
-                from a stop. 
-                The second scenario is where the locomotive is descending a hill, & the player is using the brake
-                to help regulate the locomotive's speed as it descends the hill.
-                The third scenario would be in a yard, where the locomotive is set up to couple to a train,
-                & the player is using both the throttle & brake together to help regulate the locomotive's speed
-                as it approaches the train.
-                The fourth scenario would be when the locomotive is approaching a station, & the player is using
-                both the throttle & brake together to help regulate the locomotive's speed as it approaches the
-                station. This one in particular is a very common scenario (I have even done this myself), & it
-                is useful for helping to prevent the locomotive from overshooting & undershooting the station.
-
-                I can also think of a situation where the player can use the Brake to slow down the locomotive
-                when it is in Velocity Mode, but I don't think that's a good idea.
-                In Velocity Mode, the control loop has total control over the locomotive's speed.
-                All the player is doing is setting the locomotive's target speed with the Throttle.
-                The control loop is then responsible for regulating the locomotive's speed to match the target speed.
-                If the player is trying to slow down the locomotive or bring it to a complete stop, they should
-                always be using the Throttle to do so. The Brake should only be used to bring the locomotive to a stop
-                when it is in Acceleration Mode or Torque Mode.
-                Otherwise, the player is going to be constantly fighting the control loop.
-                The player is better off just letting the control loop do its job, like it was designed to do.
-
-                I think the only way that the Brake Fault could be triggered is if the player is trying to apply
-                the Brake when the locomotive is in Velocity Mode.
-                Apart from that, I can't think of any other way that the Brake Fault could be triggered.
-                
-                Realistically, I don't think the Brake Fault will ever be triggered.
-                So, I'm not going to worry about implementing code to reset the Brake Fault & (by extension) I'm
-                not going to worry about writing code for the entire Brake Fault system.
-                This goes without saying for the Emergency Brake Fault as well.
-
-                I'm going to leave this code here, in case I change my mind in the future.
-                Also, I may revisit this code if it turns out that I'm wrong about the Brake Fault never being
-                triggered, or someone else requests that I implement the Brake Fault system.
-
-                If you are reading this, & you want me to implement the Brake Fault system, please let me know.
-                You are welcome to submit an issue on RailDriver's GitHub page, or you can contact me on Discord.
-                My Discord is ZZ Cat#0174.
-            ]#
+            # Return false.
+            return 0
         }
-    }
 
-    # Emergency Brake Fault.
-    elseif (Controls["Faults", table]["Emergency Brake", number] != 0)
-    {
-        # Check if the Emergency Brake has been updated.
-        if (Controls["Flags", table]["Emergency Brake is Updated", number] == 1)
+        # Emergency Brake Fault.
+        elseif (Controls["Faults", table]["Emergency Brake", number] != 0)
         {
-            # Emergency Brake Fault Reset.
+            # Return false.
+            return 0
         }
-    }
+    ]#
 
+    # No faults were triggered.
     else
     {
-        # Check if the Direction has been updated.
+        # Check if the Direction is Updated.
         if (Controls["Flags", table]["Direction is Updated", number] == 1)
         {
-            # Emergency Brake Interlock.
-            # The Emergency Brake must be released before the Direction can be changed.
-            # Any attempt to change the Direction while the Emergency Brake is active will result in a Direction Fault.
-            # This is to prevent the locomotive from moving in the wrong direction, which could cause a Rollback Runaway.
-            if (Controls["Flags", table]["Emergency Brake is Released", number] == 0)
+            # An attempt to change the direction was made.
+
+            # Check if the Emergency Brake is active.
+            if (Controls["Flags", table]["Emergency Brake is Released", number] != 1)
             {
-                Controls["Direction", number] = Controls["Last Valid Direction", number]
+                # The Emergency Brake is active.
+
+                # Clear the Direction is Updated flag.
                 Controls["Flags", table]["Direction is Updated", number] = 0
                 Controls["Flags", table]["Player Controls Updated", number] = 0
+
+                # Set Direction Fault.
                 Controls["Faults", table]["Direction", number] = 1
                 Controls["Faults", table]["Message", string] = "Direction cannot be changed while the Emergency Brake is active."
+
+                # Return false.
                 return 0
             }
 
-            # Speed Fault Interlock.
-            # The Direction cannot be changed, if the locomotive is already moving.
-            # Any attempt to change the Direction whilst the locomotive is moving will result in a Direction Fault.
-            if (Speed > 0)
+            # Check if the locomotive is moving.
+            elseif (Speed != 0)
             {
-                Controls["Direction", number] = Controls["Last Valid Direction", number]
+                # The locomotive is moving.
+
+                # Clear the Direction is Updated flag.
                 Controls["Flags", table]["Direction is Updated", number] = 0
                 Controls["Flags", table]["Player Controls Updated", number] = 0
+
+                # Set Direction Fault.
                 Controls["Faults", table]["Direction", number] = 1
                 Controls["Faults", table]["Message", string] = "Direction cannot be changed while the locomotive is moving."
+
+                # Return false.
                 return 0
             }
 
-            # Throttle Interlock.
-            # The Throttle must be set to Idle, before the Direction can be changed.
-            # Any attempt to change the Direction whilst the Throttle is not set to 0 will result in a Direction Fault.
-            if (Controls["Throttle", number] != 1)
+            # Check if the Throttle is not at Idle.
+            elseif (Controls["Throttle", number] != 1)
             {
-                Controls["Direction", number] = Controls["Last Valid Direction", number]
+                # The Throttle is not at Idle.
+
+                # Clear the Direction is Updated flag.
                 Controls["Flags", table]["Direction is Updated", number] = 0
                 Controls["Flags", table]["Player Controls Updated", number] = 0
+
+                # Set Direction Fault.
                 Controls["Faults", table]["Direction", number] = 1
-                Controls["Faults", table]["Message", string] = "Direction cannot be changed while the Throttle is not set to Idle."
+                Controls["Faults", table]["Message", string] = "Direction cannot be changed while the Throttle is not at Idle."
+
+                # Return false.
                 return 0
             }
-
-            # Range Checks are now obsolete, because the Direction is already clamped to 1 or -1.
 
             # Direction is valid.
-            # Set the Last Valid Direction to the current Direction.
-            # Leave the Direction is Updated flag set to 1.
-            # Clear the Player Controls Updated flag.
-            # Return true.
-            Controls["Last Valid Direction", number] = Controls["Direction", number]
-            Controls["Flags", table]["Player Controls Updated", number] = 0
-            return 1
-        }
-
-        # Check if the Throttle has been updated.
-        elseif (Controls["Flags", table]["Throttle is Updated", number] == 1)
-        {
-            # Emergency Brake Interlock.
-            # The Emergency Brake must be released before the Throttle can be changed.
-            # Any attempt to change the Throttle while the Emergency Brake is active will result in a Throttle Fault.
-            # This is to prevent the Throttle from fighting the Emergency Brake.
-            if (Controls["Flags", table]["Emergency Brake is Released", number] == 0)
-            {
-                Controls["Throttle", number] = Controls["Last Valid Throttle", number]
-                Controls["Flags", table]["Throttle is Updated", number] = 0
-                Controls["Flags", table]["Player Controls Updated", number] = 0
-                Controls["Faults", table]["Throttle", number] = 1
-                Controls["Faults", table]["Message", string] = "Throttle cannot be changed while the Emergency Brake is active."
-                return 0
-            }
-
-            # Direction Interlock.
-            # The Direction must be set to either Forward or Reverse, before the Throttle can be changed.
-            # Any attempt to change the Throttle whilst the Direction is set to Neutral will result in a Throttle Fault.
-            if (Controls["Direction", number] == 0)
-            {
-                Controls["Throttle", number] = Controls["Last Valid Throttle", number]
-                Controls["Flags", table]["Throttle is Updated", number] = 0
-                Controls["Flags", table]["Player Controls Updated", number] = 0
-                Controls["Faults", table]["Throttle", number] = 1
-                Controls["Faults", table]["Message", string] = "Throttle cannot be changed while the Direction is set to Neutral."
-                return 0
-            }
-
-            # No need for a Brake Interlock.
-            # The Brake is not used in Velocity Mode.
-            # In Acceleration Mode & Torque Mode, the Brake is allowed to be used at the same time as the Throttle.
-            # See my notes above as to why I will not trigger a Throttle Fault if the player attempts to use the Brake
-            # when the locomotive is in Velocity Mode.
-
-            # Range Checks are also obsolete, because the Throttle is already clamped to the range specified for each mode.
-
-            # Throttle is valid.
-            # Set the Last Valid Throttle to the current Throttle.
-            # Leave the Throttle is Updated flag set to 1.
-            # Clear the Player Controls Updated flag.
-            # Return true.
-            Controls["Last Valid Throttle", number] = Controls["Throttle", number]
-            Controls["Flags", table]["Player Controls Updated", number] = 0
-            return 1
-        }
-
-        # Check if the Brake has been updated.
-        elseif (Controls["Flags", table]["Brake is Updated", number] == 1)
-        {
-            #[
-                Notes from ZZ Cat:
-                The Brake is not used in Velocity Mode.
-                Currently, I will not trigger a Brake Fault if the player attempts to use the Brake
-                when the locomotive is in Velocity Mode.
-
-                For now, I have decided to have the Brake get silently ignored in Velocity Mode.
-                Simply put, if the player attempts to use the Brake, nothing will happen.
-                This also means that this function will return a false positive.
-                But, the Brake won't actually be set to anything, so it won't cause any problems.
-
-                Also, my usual Brake Interlocks are not needed in Velocity Mode... for now, at least.
-
-                See my notes in the Brake Fault code above for more information.
-            ]#
-
-            # Set the Brake to 1.
-            # Clear the Brake is Updated flag.
-            # Clear the Player Controls Updated flag.
-            # Clear the Brake Fault.
-            # Return true.
-            Controls["Brake", number] = 1
-            Controls["Flags", table]["Brake is Updated", number] = 0
-            Controls["Flags", table]["Player Controls Updated", number] = 0
-            Controls["Faults", table]["Brake", number] = 0
-            return 1
-        }
-
-        # Check if the Emergency Brake has been updated.
-        elseif (Controls["Flags", table]["Emergency Brake is Updated", number] == 1)
-        {
-            # The Emergency Brake does not need to interlock with itself.
-            # Though, the Emergency Brake does need to verify whether-or-not it is released.
-            # This does not need to trigger an Emergency Brake Fault, even though the
-            # Emergency Brake is used in all three modes.
-            # There are no other additional interlocks, because the Emergency Brake needs to be
-            # able to override all other controls in order to stop the locomotive.
-            # If the Emergency Brake is released, then it needs to be applied.
-            # If the Emergency Brake is already applied, this is invalid. But, it won't trigger a fault.
-            # It will simply indicate to the player that the Emergency Brake is already applied.
-            if (Controls["Flags", table]["Emergency Brake is Released", number] == 1)
-            {
-                # Emergency Brake is released.
-                # Set the Emergency Brake to 1.
-                # Set the Emergency Brake is Released flag to 0.
-                # Leave the Emergency Brake is Updated flag set to 1.
-                # Clear the Player Controls Updated flag.
-                # Clear the Emergency Brake Fault.
-                # Return true.
-                Controls["Emergency Brake", number] = 1
-                Controls["Flags", table]["Emergency Brake is Released", number] = 0
-                Controls["Flags", table]["Player Controls Updated", number] = 0
-                Controls["Faults", table]["Emergency Brake", number] = 0
-                return 1
-            }
             else
             {
-                # Emergency Brake is already applied.
-                # Clear the Emergency Brake is Updated flag.
-                # Clear the Player Controls Updated flag.
-                # Clear the Emergency Brake Fault.
+                # Clear the Direction is Updated flag.
+                #Controls["Flags", table]["Direction is Updated", number] = 0
+                Controls["Flags", table]["Player Controls Updated", number] = 0
+
+                # Set the Last Valid Direction.
+                Controls["Last Valid Direction", number] = Controls["Direction", number]
+
+                # Return true.
+                return 1
+            }
+        }
+
+        # Check if the Throttle is Updated.
+        elseif (Controls["Flags", table]["Throttle is Updated", number] == 1)
+        {
+            # An attempt to change the Throttle was made.
+
+            # Check if the Emergency Brake is active.
+            if (Controls["Flags", table]["Emergency Brake is Released", number] != 1)
+            {
+                # The Emergency Brake is active.
+
+                # Clear the Throttle is Updated flag.
+                Controls["Flags", table]["Throttle is Updated", number] = 0
+                Controls["Flags", table]["Player Controls Updated", number] = 0
+
+                # Set Throttle Fault.
+                Controls["Faults", table]["Throttle", number] = 1
+                Controls["Faults", table]["Message", string] = "Throttle cannot be changed while the Emergency Brake is active."
+
                 # Return false.
+                return 0
+            }
+
+            # Check if the Direction is set to Neutral.
+            elseif (Controls["Direction", number] == 0)
+            {
+                # The Direction is set to Neutral.
+
+                # Clear the Throttle is Updated flag.
+                Controls["Flags", table]["Throttle is Updated", number] = 0
+                Controls["Flags", table]["Player Controls Updated", number] = 0
+
+                # Set Throttle Fault.
+                Controls["Faults", table]["Throttle", number] = 1
+                Controls["Faults", table]["Message", string] = "Throttle cannot be changed while the Direction is set to Neutral."
+
+                # Return false.
+                return 0
+            }
+
+            # Throttle is valid.
+            else
+            {
+                # Clear the Throttle is Updated flag.
+                #Controls["Flags", table]["Throttle is Updated", number] = 0
+                Controls["Flags", table]["Player Controls Updated", number] = 0
+
+                # Set the Last Valid Throttle.
+                Controls["Last Valid Throttle", number] = Controls["Throttle", number]
+
+                # Return true.
+                return 1
+            }
+        }
+
+        # Check if the Brake is Updated.
+        elseif (Controls["Flags", table]["Brake is Updated", number] == 1)
+        {
+            # Currently, the Brake is not yet implemented.
+            # This is a placeholder for future development.
+
+            # Clear the Brake is Updated & Player Controls Updated flags.
+            Controls["Flags", table]["Brake is Updated", number] = 0
+            Controls["Flags", table]["Player Controls Updated", number] = 0
+
+            # Return true.
+            return 1
+        }
+
+        # Check if the Emergency Brake is Updated.
+        elseif (Controls["Flags", table]["Emergency Brake is Updated", number] == 1)
+        {
+            # An attempt to apply or release the Emergency Brake was made.
+
+            # Check if the Emergency Brake is Released.
+            if (Controls["Flags", table]["Emergency Brake is Released", number] == 1)
+            {
+                # The Emergency Brake is Released. 
+                # Apply the Emergency Brake.
+                Controls["Emergency Brake", number] = 1
+
+                # Clear the Emergency Brake is Released flag.
+                Controls["Flags", table]["Emergency Brake is Released", number] = 0
+
+                # Clear the Emergency Brake is Updated & Player Controls Updated flags.
+                #Controls["Flags", table]["Emergency Brake is Updated", number] = 0
+                Controls["Flags", table]["Player Controls Updated", number] = 0
+
+                # Return true.
+                return 1
+            }
+
+            else
+            {
+                # The Emergency Brake is already applied. The Emergency Brake cannot be applied again.
+
+                # Set the Emergency Brake Fault.
+                # No fault is actually triggered, because the Emergency Brake is automatically released,
+                # when the locomotive is stopped.
+                Controls["Faults", table]["Emergency Brake", number] = 0 # <--- This is a placeholder for future development.
+                Controls["Faults", table]["Message", string] = "The Emergency Brake is already applied."
+
+                # Clear the Emergency Brake is Updated & Player Controls Updated flags.
                 Controls["Flags", table]["Emergency Brake is Updated", number] = 0
                 Controls["Flags", table]["Player Controls Updated", number] = 0
-                Controls["Faults", table]["Emergency Brake", number] = 0
-                Controls["Faults", table]["Message", string] = "Emergency Brake is already applied."
+
+                # Return false.
                 return 0
             }
         }
