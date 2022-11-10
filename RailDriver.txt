@@ -22,7 +22,7 @@
 @persist [Direction Throttle Brake EmergencyBrake]:number
 @persist [PlayerControls ThrottleMap BrakeMap]:table TrainDriver:entity
 @persist PIDF:table
-@persist EmBrakeState EmBrakeThisSpeed EmBrakeLastSpeed EmBrakeObserverTickInterval
+@persist EmBrakeState EmBrakeThisSpeed EmBrakeLastSpeed EmBrakeObserverTickInterval EmBrakePCFaultTimeoutSet
 @persist Speed SpeedAbs SpeedMPH
 @outputs Debugger:table
 @strict
@@ -351,7 +351,47 @@ if (keyClk())
 
     catch (Exception)
     {
-        printColor(vec(255, 0, 0), "[RailDriver | PlyCtrls | Error]", vec(255, 255, 255), ": " + Exception)
+        local ErrorColor = vec(255, 0, 0)
+        local ErrorText = "[RailDriver | PlyCtrls | Error]"
+
+        if (Exception:find("Fault Cleared."))
+        {
+            ErrorColor = vec(0, 255, 0)
+            ErrorText = "[RailDriver | PlyCtrls | Fault Cleared]"
+
+            if (EmBrakePCFaultTimeoutSet)
+            {
+                # Clear the Emergency Brake Observer.
+                stoptimer("Emergency Brake")
+                EmBrakeState = 0
+
+                # Clear the Emergency Brake is Active flag.
+                playerControlsClearEmergencyBrakeIsActive(PlayerControls)
+            }
+        }
+
+        else
+        {
+            if (!playerControlsEmergencyBrakeIsActive(PlayerControls))
+            {
+                if (!EmBrakePCFaultTimeoutSet)
+                {
+                    # Initialize the Emergency Brake Observer.
+                    # The Emergency Brake's Observer Interval is 2 Hz.
+                    # The initial timeout is 5 seconds, to give the player time to reset the fault.
+                    # After the timeout, the Emergency Brake will be automatically applied.
+                    EmBrakeState = 1
+                    EmBrakeObserverTickInterval = 1000 / 2
+                    timer("Emergency Brake", 5000)
+                    EmBrakePCFaultTimeoutSet = 1
+
+                    # Set the Emergency Brake to active.
+                    playerControlsSetEmergencyBrakeActive(PlayerControls)
+                }
+            }
+        }
+
+        printColor(ErrorColor, ErrorText, vec(255, 255, 255), ": " + Exception)
     }
 }
 
@@ -377,6 +417,8 @@ if (clk("Emergency Brake"))
         if (EmBrakeState == 1)
         {
             #[ STOP THE TRAIN!!! ]#
+
+            EmBrakePCFaultTimeoutSet = 0
 
             # Get the current speed of the locomotive.
             EmBrakeThisSpeed = SpeedAbs
