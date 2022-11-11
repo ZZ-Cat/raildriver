@@ -1,0 +1,307 @@
+#[
+    This script header is a part of RailDriver.
+
+    RailDriver. Smart Locomotive Control script for Garry's Mod Train Build Servers.
+    Copyright © 2022, Cassandra "ZZ Cat" Robinson. All rights reserved.
+
+    This E2 script is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This E2 script is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this E2 script.  If not, see <https://www.gnu.org/licenses/>.
+]#
+
+@name RailDriver/lib/cli
+
+#[
+    RailDriver CLI Library
+
+    This library provides a simple command-line interface for RailDriver, using the
+    in-game chat. It is intended to be used by the RailDriver E2 script, but can be
+    used by other E2 scripts as well.
+]#
+
+# This array contains all the commands that have been registered.
+# It is a 2D array, with the first dimension being the command name, and the second
+# dimension being the command data.
+# The command data is a table with the following keys:
+#   - "help": The help text for the command.
+#   - "func": The function to call when the command is executed.
+#   - "args": The number of arguments the command takes.
+#   - "minArgs": The minimum number of arguments the command takes.
+#   - "maxArgs": The maximum number of arguments the command takes.
+#   - "argHelp": An array of help text for each argument.
+#   - "argTypes": An array of types for each argument.
+#   - "argNames": An array of names for each argument.
+#   - "argDefaults": An array of default values for each argument.
+#   - "argRequired": An array of booleans indicating whether each argument is required.
+#   - "argFlags": An array of flags for each argument.
+#   - "argChoices": An array of choices for each argument.
+#   - "argChoicesHelp": An array of help text for each argument's choices.
+#   - "argChoicesFlags": An array of flags for each argument's choices.
+#   - "argChoicesDefaults": An array of default values for each argument's choices.
+#   - "argChoicesRequired": An array of booleans indicating whether each argument's
+#       choices are required.
+#   - "argChoicesNames": An array of names for each argument's choices.
+#   - "argChoicesTypes": An array of types for each argument's choices.
+#   - "argChoicesHelp": An array of help text for each argument's choices.
+@persist CliCommands:table
+
+# This is the prefix used for all RailDriver chat commands.
+# It is recommended that you change this to something unique to your server.
+# For example, you could use the name of your server, or the name of your E2 script.
+# This prefix is case-insensitive.
+#@persist CliPrefix:string 
+#CliPrefix = "raildriver"
+
+# This function initializes the RailDriver CLI library.
+# It should be called once, at the beginning of the E2 script.
+# It is recommended that you call this function from the E2's "Initialize" event.
+# This function returns 1 if the library was successfully initialized, or 0 if it
+# was not.
+# @param CliPrefix:string The prefix to use for all RailDriver chat commands.
+# @param CliRegisterCommand:string The name of the function to call when a command is registered.
+# @param CliUnregisterCommand:string The name of the function to call when a command is unregistered.
+# @param CliOnChat:string The name of the function to call when a chat message is received.
+# @return number 1 if the library was successfully initialized, or 0 if it was not.
+function table cliInit(CliPrefix:string, CliRegisterCommand:string, CliUnregisterCommand:string, CliOnChat:string)
+{
+    # Check if the RailDriver CLI library has already been initialized.
+    if (CliCommands:count() > 0)
+    {
+        # The RailDriver CLI library has already been initialized.
+        return table()
+    }
+
+    # Register the RailDriver CLI library's chat commands.
+    CliCommands["help", table] = table(
+        "help", "Displays help for a command.", "cliHelp", 1, 1, 1,
+        table("command"), table("string"), table("command"), table(), table(1), table(),
+        table(), table(), table(), table(), table(), table(), table(), table()
+    )
+    CliCommands["restart", table] = table(
+        "restart", "Restarts the E2 script.", "cliRestart", 0, 0, 0,
+        table(), table(), table(), table(), table(), table(),
+        table(), table(), table(), table(), table(), table(), table(), table()
+    )
+    runOnChat(1)
+
+    # Return the RailDriver CLI library's API.
+    local Table = table()
+    Table["prefix", string] = CliPrefix
+    Table["registerCommand", string] = CliRegisterCommand
+    Table["unregisterCommand", string] = CliUnregisterCommand
+    Table["onChat", string] = CliOnChat
+    return Table
+}
+
+# This function registers a RailDriver CLI command.
+# It should be called once, for each command that you want to register.
+# It is recommended that you call this function from the E2's "Initialize" event.
+# This function returns 1 if the command was successfully registered, or 0 if it
+# was not.
+# @param Command:string The name of the command to register.
+# @param Description:string The description of the command to register.
+# @param Callback:string The name of the function to call when the command is executed.
+# @return number 1 if the command was successfully registered, or 0 if it was not.
+function number cliRegisterCommand(Command:string, Description:string, Callback:string)
+{
+    # Register the command.
+    CliCommands[Command, table] = table(
+        Command, Description, Callback, 0, 0, 0,
+        table(), table(), table(), table(), table(), table(),
+        table(), table(), table(), table(), table(), table(), table(), table()
+    )
+    return 1
+}
+
+# This function unregisters a RailDriver CLI command.
+# It should be called once, for each command that you want to unregister.
+# It is recommended that you call this function from the E2's "Initialize" event.
+# This function returns 1 if the command was successfully unregistered, or 0 if it
+# was not.
+# @param Command:string The name of the command to unregister.
+# @return number 1 if the command was successfully unregistered, or 0 if it was not.
+function number cliUnregisterCommand(Command:string)
+{
+    # Unregister the command.
+    CliCommands[Command, table] = table()
+    return 1
+}
+
+# This function is internally called when a chat message has been processed.
+# It is used to call a command's callback function when a command is executed.
+# It is not intended to be called by other E2 scripts.
+# @param Function:string The name of the function to call.
+# @param Player:entity The player who executed the command.
+# @param Args:array The arguments that were passed to the function from the chat message.
+# @return number 1 if the callback function was successfully called, or 0 if it was not.
+function number callFunction(Function:string, Args:array)
+{
+    # Check if the callback function exists.
+    if (Function == "")
+    {
+        # The callback function does not exist.
+        return 0
+    }
+
+    # Call the callback function.
+    stoptimer(Function)
+    timer(Function, 100)
+
+    # Return success.
+    return 1
+}
+
+# This function internally processes a RailDriver CLI command.
+# It is not intended to be called by other E2 scripts.
+# @param Arguments:string The arguments from the chat message.
+# @return number 1 if the command was successfully processed, or 0 if it was not.
+function number cliCommands(Arguments:array)
+{
+    # Check if the RailDriver CLI library has been initialized.
+    if (CliCommands:count() == 0)
+    {
+        # The RailDriver CLI library has not been initialized.
+        return 0
+    }
+
+    # Prefix has already been stripped from the chat message.
+    # Arguments[1, string] is the command name.
+    # Arguments[2, string] is the first argument.
+    # Arguments[3, string] is the second argument.
+    # Arguments[4, string] is the third argument.
+    # etc.
+
+    # Check if the command exists.
+    if (!CliCommands:exists(Arguments[1, string]))
+    {
+        # The command does not exist.
+        return 0
+    }
+
+    # Get the command's data.
+    local Command = CliCommands[Arguments[1, string], table]
+    local CommandName = Command["name", string]
+    local CommandDescription = Command["description", string]
+    local CommandCallback = Command["callback", string]
+
+    # Check if the command has been disabled.
+    if (Command["disabled", number] == 1)
+    {
+        # The command has been disabled.
+        return 0
+    }
+
+    # Check if the command has been restricted.
+    if (Command["restricted", number] == 1)
+    {
+        # The command has been restricted.
+        return 0
+    }
+
+    # Execute the command.
+    local Args = array()
+    local ArgCount = Arguments:count()
+    for (I = 2, ArgCount)
+    {
+        Args[I - 1, string] = Arguments[I, string]
+    }
+    callFunction(CommandCallback, Args)
+
+    return 1
+}
+
+# This function is called when a chat message is received.
+# It should not be called directly.
+# @param Message:string The chat message that was sent.
+# @return number 1 if the chat message was handled, or 0 if it was not.
+function number cliOnChat(Message:string)
+{
+    # Check if the chat message is a RailDriver CLI command.
+    if (Message:find(CliPrefix))
+    {
+        # Parse the chat message.
+        local Command = Message:sub(CliPrefix:length() + 1):trim()
+        local Arguments = Command:explode(" ")
+
+        # Check if the command exists.
+        if (Arguments[1, string])
+        {
+            # Process the command.
+            local Result = cliCommands(Arguments)
+            return Result
+        }
+    }
+
+    # The chat message was not handled.
+    return 0
+}
+
+# This function handles chat messages.
+# It should be called once, for each chat message.
+# It is recommended that you call this function from the E2's "Chat" event.
+# @param Message:string The chat message.
+function void handleChat(Message:string)
+{
+    Message:lower()
+
+    # Check if the chat message is a RailDriver CLI command.
+    if (Message:find(CliPrefix))
+    {
+        # Parse the command.
+        local Command = array()
+        Command = Message:explode(" ")
+
+        # Check if the command is valid.
+        if (Command[1, string] == CliPrefix)
+        {
+            #[
+                Currently, these are placeholders for the RailDriver CLI commands.
+                These placeholders will be replaced with the actual commands in a future update.
+            ]#
+            # Check if the command is "help".
+            if (Command[2, string] == "help")
+            {
+                # Print the help message.
+                print("RailDriver CLI Help")
+                print("  " + CliPrefix + " help")
+                print("    Prints this help message.")
+                print("  " + CliPrefix + " version")
+                print("    Prints the RailDriver version.")
+                #print("  " + CliPrefix + " status")
+                #print("    Prints the RailDriver status.")
+                #print("  " + CliPrefix + " start")
+                #print("    Starts RailDriver.")
+                #print("  " + CliPrefix + " stop")
+                #print("    Stops RailDriver.")
+                print("  " + CliPrefix + " restart")
+                print("    Restarts RailDriver.")
+                #print("  " + CliPrefix + " set <setting> <value>")
+                #print("    Sets RailDriver's setting.")
+                #print("  " + CliPrefix + " get <setting>")
+                #print("    Gets RailDriver's setting.")
+                #print("  " + CliPrefix + " list")
+                #print("    Lists RailDriver's settings.")
+                #print("  " + CliPrefix + " save")
+                #print("    Saves RailDriver's current settings.")
+                #print("  " + CliPrefix + " load")
+                #print("    Loads RailDriver's saved settings.")
+                #print("  " + CliPrefix + " reset")
+                #print("    Resets RailDriver's settings to their default values.")
+            }
+            elseif(Command[2, string] == "version")
+            {
+                # Print the RailDriver version.
+                print("RailDriver Version: " + "1.0.0-RC1")
+            }
+        }
+    }
+}
