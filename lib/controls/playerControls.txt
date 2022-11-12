@@ -619,6 +619,7 @@ function table playerControlsInit(KeyboardControls:table, ThrottleMap:table, Bra
     Controls["Ditch Lights", number] = 0
     Controls["TrainDriver", entity] = TrainDriver
     Controls["Controls", table] = encodeKeyboardControls(KeyboardControls)
+    Controls["Key Bindings", table] = KeyboardControls
 
     # 'table:toArray()' is bugged, so I am directly using the throttle and brake maps.
     Controls["Throttle Map", table] = ThrottleMap
@@ -1425,4 +1426,10 @@ function number playerControlsClearAllFaults(Controls:table)
         Controls["Faults", table]["Message", string] = "No faults found."
         return 0
     }
+}
+
+# This function returns the key binding of the specified control.
+function string playerControlsGetKeyBinding(Controls:table, Control:string)
+{
+    return Controls["Key Bindings", table][Control, string]
 }

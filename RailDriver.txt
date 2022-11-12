@@ -51,8 +51,16 @@ if (first() | duped())
         #include "e2shared/RailDriver/lib/cli"
         #include "e2shared/RailDriver/lib/pidf"
 
-        # Initialize the command line interface.
-        cliInit()
+        # Initialize the command line interface with a prefix of ".raildriver".
+        CLI = cliInit(".raildriver")
+        if (CLI:count() == 0)
+        {
+            # An empty command line interface is not useful.
+            error("Failed to initialize the command line interface.")
+        }
+
+        # Enable the command line interface.
+        runOnChat(1)
 
         # Set the driver to the player who spawned the E2.
         TrainDriver = owner()
@@ -163,6 +171,9 @@ if (first() | duped())
             error("Failed to initialize PIDF controller.")
         }
 
+        # Show the RailDriver welcome message.
+        printColor(vec(0, 255, 0), "[RailDriver | Info]", vec(255, 255, 255), ": Welcome to RailDriver!")
+        printColor(vec(0, 255, 0), "[RailDriver | Info]", vec(255, 255, 255), ": Type '.raildriver help' for a list of commands.")
         timer("Debug", 100)
     }
 
@@ -188,7 +199,71 @@ if (first() | duped())
 
 if (chatClk(TrainDriver))
 {
-    handleChat(TrainDriver:lastSaid())
+    # The in-game chat is used to send commands to the E2.
+    # This is, for all intents and purposes, a CLI.
+    if (cliProcessMessage(CLI, TrainDriver:lastSaid()))
+    {
+        # Commands are processed by the CLI.
+        # If the CLI returns true, then the command was processed successfully.
+        # All that needs to be done here is to check if each command was updated.
+        # All commands are case-insensitive.
+        if (cliHelpIsUpdated(CLI))
+        {
+            # The help command was updated.
+            # Print the help message to the chat.
+            local Message = ""
+            Message += "Commands:\n"
+            Message += "All commands are prefixed with '.raildriver',\n"
+            Message += "and are case-insensitive.\n"
+            Message += "help - " + cliGetHelp(CLI, "help") + "\n"
+            Message += "about - " + cliGetHelp(CLI, "about") + "\n"
+            Message += "controls - " + cliGetHelp(CLI, "controls") + "\n"
+            Message += "restart - " + cliGetHelp(CLI, "restart") + "\n"
+
+            printColor(vec(0, 255, 0), "[RailDriver | Help]", vec(255, 255, 255), ": " + Message)
+        }
+
+        elseif(cliAboutIsUpdated(CLI))
+        {
+            # The about command was updated.
+            # Print the about message to the chat.
+            local Message = "Smart locomotive controller script for Garry's Mod train build servers.\n"
+            Message += "Version:      0.1.0\n"
+            Message += "Author:       Cassandra 'ZZ Cat' Robinson\n"
+            Message += "License:      GNU Affero General Public License v3.0\n"
+            Message += "Source Code:  https://github.com/ZZ-Cat/RailDriver \n"
+
+            printColor(vec(0, 255, 0), "[RailDriver | About]", vec(255, 255, 255), ": " + Message)
+        }
+
+        elseif (cliControlsIsUpdated(CLI))
+        {
+            # The controls command was updated.
+            # Print the controls message to the chat.
+            local Message = ""
+            Message += "Controls:\n"
+            Message += "Increase Reverser:  " + playerControlsGetKeyBinding(PlayerControls, "Increase Reverser") + "\n"
+            Message += "Decrease Reverser:  " + playerControlsGetKeyBinding(PlayerControls, "Decrease Reverser") + "\n"
+            Message += "Increase Throttle:  " + playerControlsGetKeyBinding(PlayerControls, "Increase Throttle") + "\n"
+            Message += "Decrease Throttle:  " + playerControlsGetKeyBinding(PlayerControls, "Decrease Throttle") + "\n"
+            Message += "Increase Brake:     " + playerControlsGetKeyBinding(PlayerControls, "Increase Brake") + "\n"
+            Message += "Decrease Brake:     " + playerControlsGetKeyBinding(PlayerControls, "Decrease Brake") + "\n"
+            Message += "Emergency Brake:    " + playerControlsGetKeyBinding(PlayerControls, "Emergency Brake") + "\n"
+            #Message += "Horn:               " + playerControlsGetKeyBinding(PlayerControls, "Horn") + "\n"
+            #Message += "Bell:               " + playerControlsGetKeyBinding(PlayerControls, "Bell") + "\n"
+            #Message += "Ditch Lights:       " + playerControlsGetKeyBinding(PlayerControls, "Ditch Lights") + "\n"
+            #Message += "Headlights:         " + playerControlsGetKeyBinding(PlayerControls, "Headlights") + "\n"
+
+            printColor(vec(0, 255, 0), "[RailDriver | Controls]", vec(255, 255, 255), ": " + Message)
+        }
+
+        elseif (cliRestartIsUpdated(CLI))
+        {
+            # The restart command was updated.
+            # Restart the E2.
+            reset()
+        }
+    }
 }
 
 if (clk(speedometerGetClockId(Speedo)))
