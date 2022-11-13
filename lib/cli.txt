@@ -48,7 +48,7 @@ function table cliCreateQueue(Name:string)
 # @param Cli A handle to the CLI library.
 # @param Name The name of the queue.
 # @return Exists Whether the queue exists.
-function number cliQueueExists(table Cli, Name:string)
+function number cliQueueExists(Cli:table, Name:string)
 {
     # Check if the queue exists.
     local Exists = 0
