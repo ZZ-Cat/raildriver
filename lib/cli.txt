@@ -270,6 +270,14 @@ function table cliInit(CliPrefix:string)
     # Initialize the CLI chat print queue.
     Cli = cliCreateQueue("ChatPrint")
 
+    # Check if the queue was created successfully.
+    if (!cliQueueExists(Cli, "ChatPrint"))
+    {
+        # The queue was not created successfully. This should never happen.
+        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Failed to create queue 'ChatPrint'.")
+        return table()
+    }
+
     # Initialize the CLI library.
     Cli["Prefix", string] = CliPrefix
     Cli["Commands", table] = table()
