@@ -186,8 +186,13 @@ function number cliPushQueueItem(Cli:table, Name:string, Item:table)
     # Push the item onto the queue.
     Cli["Queues", table][Name, table]["Items", table]:unshiftTable(Item)
 
-    # Reset the queue empty flag.
-    Cli["Queues", table][Name, table]["Flags", table]["is empty", number] = 0
+    # Check if the queue is empty.
+    if (cliIsQueueEmpty(Cli, Name))
+    {
+        # The queue is empty. This should never happen.
+        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Failed to push item onto queue '" + Name + "'.")
+        return 0
+    }
 
     # Return success.
     return 1
