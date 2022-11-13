@@ -211,10 +211,10 @@ function table cliPopQueueItem(Cli:table, Name:string)
     }
 
     # Check if the queue is empty.
-    if (Cli["Queues", table][Name, table]["Items", table]:count() == 0)
+    if (cliIsQueueEmpty(Cli, Name))
     {
-        # The queue is empty.
-        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Queue '" + Name + "' is empty.")
+        # The queue is empty. This should never happen.
+        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": No items to pop from queue '" + Name + "'.")
         return table()
     }
 
