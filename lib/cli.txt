@@ -52,7 +52,7 @@ function number cliQueueExists(Cli:table, Name:string)
 {
     # Check if the queue exists.
     local Exists = 0
-    if (Cli["Queues", table][Name, table])
+    if (Cli["Queues", table]:exists(Name))
     {
         Exists = 1
     }
