@@ -222,10 +222,10 @@ function table cliPopQueueItem(Cli:table, Name:string)
     local Item = Cli["Queues", table][Name, table]["Items", table]:popTable()
 
     # Check if the queue is now empty.
-    if (Cli["Queues", table][Name, table]["Items", table]:count() == 0)
+    if (cliIsQueueEmpty(Cli, Name))
     {
-        # Set the queue empty flag.
-        Cli["Queues", table][Name, table]["Flags", table]["is empty", number] = 1
+        # The queue is now empty. Set the queue empty flag.
+        cliSetQueueEmptyFlag(Cli, Name, 1)
     }
 
     # Return the item.
