@@ -35,6 +35,7 @@ function table cliCreateQueue(Name:string)
 {
     # Create the queue.
     local Cli = table()
+    Cli["Queues", table] = table()
     Cli["Queues", table][Name, table] = table()
     Cli["Queues", table][Name, table]["Items", table] = table()
     Cli["Queues", table][Name, table]["Flags", table] = table()
