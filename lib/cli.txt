@@ -44,6 +44,28 @@ function table cliCreateQueue(Name:string)
     return Cli
 }
 
+# This function is called internally to check if a queue exists.
+# @param Cli A handle to the CLI library.
+# @param Name The name of the queue.
+# @return Exists Whether the queue exists.
+function number cliQueueExists(table Cli, Name:string)
+{
+    # Check if the queue exists.
+    local Exists = 0
+    if (Cli["Queues", table][Name, table])
+    {
+        Exists = 1
+    }
+    else
+    {
+        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Queue '" + Name + "' does not exist.")
+        Exists = 0
+    }
+
+    # Return whether the queue exists.
+    return Exists
+}
+
 # This function is called internally to destroy a queue.
 # @param Cli A handle to the CLI library.
 # @param Name The name of the queue.
@@ -51,10 +73,8 @@ function table cliCreateQueue(Name:string)
 function number cliDestroyQueue(Cli:table, Name:string)
 {
     # Check if the queue exists.
-    if (Cli["Queues", table]:exists(Name) != 1)
+    if (!cliQueueExists(Cli, Name))
     {
-        # The queue does not exist.
-        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Queue '" + Name + "' does not exist.")
         return 0
     }
 
@@ -77,10 +97,8 @@ function number cliDestroyQueue(Cli:table, Name:string)
 function number cliIsQueueEmpty(Cli:table, Name:string)
 {
     # Check if the queue exists.
-    if (Cli["Queues", table]:exists(Name) != 1)
+    if (!cliQueueExists(Cli, Name))
     {
-        # The queue does not exist.
-        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Queue '" + Name + "' does not exist.")
         return 0
     }
 
@@ -107,10 +125,8 @@ function number cliIsQueueEmpty(Cli:table, Name:string)
 function number cliGetQueueItemCount(Cli:table, Name:string)
 {
     # Check if the queue exists.
-    if (Cli["Queues", table]:exists(Name) != 1)
+    if (!cliQueueExists(Cli, Name))
     {
-        # The queue does not exist.
-        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Queue '" + Name + "' does not exist.")
         return 0
     }
 
@@ -126,10 +142,8 @@ function number cliGetQueueItemCount(Cli:table, Name:string)
 function number cliPushQueueItem(Cli:table, Name:string, Item:table)
 {
     # Check if the queue exists.
-    if (Cli["Queues", table]:exists(Name) != 1)
+    if (!cliQueueExists(Cli, Name))
     {
-        # The queue does not exist.
-        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Queue '" + Name + "' does not exist.")
         return 0
     }
 
@@ -150,10 +164,8 @@ function number cliPushQueueItem(Cli:table, Name:string, Item:table)
 function table cliPopQueueItem(Cli:table, Name:string)
 {
     # Check if the queue exists.
-    if (Cli["Queues", table]:exists(Name) != 1)
+    if (!cliQueueExists(Cli, Name))
     {
-        # The queue does not exist.
-        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Queue '" + Name + "' does not exist.")
         return table()
     }
 
@@ -186,10 +198,8 @@ function table cliPopQueueItem(Cli:table, Name:string)
 function number cliClearQueue(Cli:table, Name:string)
 {
     # Check if the queue exists.
-    if (Cli["Queues", table]:exists(Name) != 1)
+    if (!cliQueueExists(Cli, Name))
     {
-        # The queue does not exist.
-        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Queue '" + Name + "' does not exist.")
         return 0
     }
 
