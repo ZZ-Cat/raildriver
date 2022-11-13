@@ -90,6 +90,42 @@ function number cliDestroyQueue(Cli:table, Name:string)
     return 1
 }
 
+# This function is called internally to set the queue empty flag.
+# @param Cli A handle to the CLI library.
+# @param Name The name of the queue.
+# @param Value The value to set the queue empty flag to.
+# @return true if the queue empty flag was set successfully, false otherwise.
+function number cliSetQueueEmptyFlag(Cli:table, Name:string, Value:number)
+{
+    # Check if the queue exists.
+    if (!cliQueueExists(Cli, Name))
+    {
+        return 0
+    }
+
+    # Set the queue empty flag.
+    Cli["Queues", table][Name, table]["Flags", table]["is empty", number] = Value
+
+    # Return success.
+    return 1
+}
+
+# This function is called internally to get the queue empty flag.
+# @param Cli A handle to the CLI library.
+# @param Name The name of the queue.
+# @return Value The value of the queue empty flag.
+function number cliGetQueueEmptyFlag(Cli:table, Name:string)
+{
+    # Check if the queue exists.
+    if (!cliQueueExists(Cli, Name))
+    {
+        return 0
+    }
+
+    # Return the queue empty flag.
+    return Cli["Queues", table][Name, table]["Flags", table]["is empty", number]
+}
+
 # This function is called internally to check if a queue is empty.
 # @param Cli A handle to the CLI library.
 # @param Name The name of the queue.
