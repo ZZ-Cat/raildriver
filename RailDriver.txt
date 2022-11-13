@@ -51,6 +51,9 @@ if (first() | duped())
         #include "e2shared/RailDriver/lib/cli"
         #include "e2shared/RailDriver/lib/pidf"
 
+        # Set the driver to the player who spawned the E2.
+        TrainDriver = owner()
+
         # Initialize the command line interface with a prefix of ".raildriver".
         CLI = cliInit(".raildriver")
         if (CLI:count() == 0)
@@ -61,9 +64,6 @@ if (first() | duped())
 
         # Enable the command line interface.
         runOnChat(1)
-
-        # Set the driver to the player who spawned the E2.
-        TrainDriver = owner()
 
         # Initialize Smart Entity Management.
         if (semInit())
