@@ -142,12 +142,12 @@ function number cliIsQueueEmpty(Cli:table, Name:string)
     if (Cli["Queues", table][Name, table]["Items", table]:count() == 0)
     {
         # The queue is empty.
-        Cli["Queues", table][Name, table]["Flags", table]["is empty", number] = 1
+        cliSetQueueEmptyFlag(Cli, Name, 1)
     }
     else
     {
         # The queue is not empty.
-        Cli["Queues", table][Name, table]["Flags", table]["is empty", number] = 0
+        cliSetQueueEmptyFlag(Cli, Name, 0)
     }
 
     # Return the queue empty flag.
