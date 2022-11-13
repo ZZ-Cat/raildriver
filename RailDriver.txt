@@ -172,8 +172,11 @@ if (first() | duped())
         }
 
         # Show the RailDriver welcome message.
-        printColor(vec(0, 255, 0), "[RailDriver | Info]", vec(255, 255, 255), ": Welcome to RailDriver!")
-        printColor(vec(0, 255, 0), "[RailDriver | Info]", vec(255, 255, 255), ": Type '.raildriver help' for a list of commands.")
+        if (cliPrintToChat(CLI, "info", "Welcome to RailDriver!\nType '.raildriver help' for a list of commands."))
+        {
+            timer("Chat Print", 100)
+        }
+
         timer("Debug", 100)
     }
 
@@ -220,7 +223,10 @@ if (chatClk(TrainDriver))
             Message += "controls - " + cliGetHelp(CLI, "controls") + "\n"
             Message += "restart - " + cliGetHelp(CLI, "restart") + "\n"
 
-            printColor(vec(0, 255, 0), "[RailDriver | Help]", vec(255, 255, 255), ": " + Message)
+            if (cliPrintToChat(CLI, "help", Message))
+            {
+                timer("Chat Print", 100)
+            }
         }
 
         elseif(cliAboutIsUpdated(CLI))
@@ -233,7 +239,10 @@ if (chatClk(TrainDriver))
             Message += "License:      GNU Affero General Public License v3.0\n"
             Message += "Source Code:  https://github.com/ZZ-Cat/RailDriver \n"
 
-            printColor(vec(0, 255, 0), "[RailDriver | About]", vec(255, 255, 255), ": " + Message)
+            if (cliPrintToChat(CLI, "about", Message))
+            {
+                timer("Chat Print", 100)
+            }
         }
 
         elseif (cliControlsIsUpdated(CLI))
@@ -254,7 +263,10 @@ if (chatClk(TrainDriver))
             #Message += "Ditch Lights:       " + playerControlsGetKeyBinding(PlayerControls, "Ditch Lights") + "\n"
             #Message += "Headlights:         " + playerControlsGetKeyBinding(PlayerControls, "Headlights") + "\n"
 
-            printColor(vec(0, 255, 0), "[RailDriver | Controls]", vec(255, 255, 255), ": " + Message)
+            if (cliPrintToChat(CLI, "controls", Message))
+            {
+                timer("Chat Print", 100)
+            }
         }
 
         elseif (cliRestartIsUpdated(CLI))
@@ -263,6 +275,23 @@ if (chatClk(TrainDriver))
             # Restart the E2.
             reset()
         }
+    }
+}
+
+if (clk("Chat Print"))
+{
+    stoptimer("Chat Print")
+
+    if (playerCanPrint())
+    {
+        if (cliChatPrintHandler(CLI) == 1)
+        {
+            timer("Chat Print", 500)
+        }
+    }
+    else
+    {
+        timer("Chat Print", 500)
     }
 }
 
