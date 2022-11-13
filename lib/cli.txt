@@ -151,7 +151,7 @@ function number cliIsQueueEmpty(Cli:table, Name:string)
     }
 
     # Return the queue empty flag.
-    return Cli["Queues", table][Name, table]["Flags", table]["is empty", number]
+    return cliGetQueueEmptyFlag(Cli, Name)
 }
 
 # This function is called internally to get the number of items in a queue.
