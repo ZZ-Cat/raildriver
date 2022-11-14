@@ -1,0 +1,854 @@
+#[
+    This script header is a part of RailDriver.
+
+    RailDriver. Smart Locomotive Control script for Garry's Mod Train Build Servers.
+    Copyright © 2022, Cassandra "ZZ Cat" Robinson. All rights reserved.
+
+    This E2 script is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This E2 script is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this E2 script.  If not, see <https://www.gnu.org/licenses/>.
+]#
+
+@name RailDriver/lib/cli
+
+#[
+    RailDriver CLI Library
+
+    This library provides a simple command-line interface for RailDriver, using the
+    in-game chat. It is intended to be used by the RailDriver E2 script, but can be
+    used by other E2 scripts as well.
+]#
+
+@persist MessagesToPrint:array ReceivedItem:table
+
+# This function is called internally to create a queue.
+# @param Name The name of the queue.
+# @return Cli A handle to the CLI library.
+function table cliCreateQueue(Name:string)
+{
+    # Create the queue.
+    local Cli = table()
+    Cli["Queues", table] = table()
+    Cli["Queues", table][Name, table] = table()
+    Cli["Queues", table][Name, table]["Items", table] = table()
+    Cli["Queues", table][Name, table]["Flags", table] = table()
+    Cli["Queues", table][Name, table]["Flags", table]["is empty", number] = 1
+
+    # Return the queue.
+    return Cli
+}
+
+# This function is called internally to check if a queue exists.
+# @param Cli A handle to the CLI library.
+# @param Name The name of the queue.
+# @return Exists Whether the queue exists.
+function number cliQueueExists(Cli:table, Name:string)
+{
+    # Check if the queue exists.
+    local Exists = 0
+    if (Cli["Queues", table]:exists(Name))
+    {
+        Exists = 1
+    }
+    else
+    {
+        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Queue '" + Name + "' does not exist.")
+        Exists = 0
+    }
+
+    # Return whether the queue exists.
+    return Exists
+}
+
+# This function is called internally to destroy a queue.
+# @param Cli A handle to the CLI library.
+# @param Name The name of the queue.
+# @return true if the queue was destroyed successfully, false otherwise.
+function number cliDestroyQueue(Cli:table, Name:string)
+{
+    # Check if the queue exists.
+    if (!cliQueueExists(Cli, Name))
+    {
+        return 0
+    }
+
+    # Destroy the queue.
+    if (Cli["Queues", table]:remove(Name) != 1)
+    {
+        # Failed to destroy the queue.
+        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Failed to destroy queue '" + Name + "'.")
+        return 0
+    }
+
+    # Return success.
+    return 1
+}
+
+# This function is called internally to set the queue empty flag.
+# @param Cli A handle to the CLI library.
+# @param Name The name of the queue.
+# @param Value The value to set the queue empty flag to.
+# @return true if the queue empty flag was set successfully, false otherwise.
+function number cliSetQueueEmptyFlag(Cli:table, Name:string, Value:number)
+{
+    # Check if the queue exists.
+    if (!cliQueueExists(Cli, Name))
+    {
+        return 0
+    }
+
+    # Set the queue empty flag.
+    Cli["Queues", table][Name, table]["Flags", table]["is empty", number] = Value
+
+    # Return success.
+    return 1
+}
+
+# This function is called internally to get the queue empty flag.
+# @param Cli A handle to the CLI library.
+# @param Name The name of the queue.
+# @return Value The value of the queue empty flag.
+function number cliGetQueueEmptyFlag(Cli:table, Name:string)
+{
+    # Check if the queue exists.
+    if (!cliQueueExists(Cli, Name))
+    {
+        return 0
+    }
+
+    # Return the queue empty flag.
+    return Cli["Queues", table][Name, table]["Flags", table]["is empty", number]
+}
+
+# This function is called internally to check if a queue is empty.
+# @param Cli A handle to the CLI library.
+# @param Name The name of the queue.
+# @return true if the queue is empty, false otherwise.
+function number cliIsQueueEmpty(Cli:table, Name:string)
+{
+    # Check if the queue exists.
+    if (!cliQueueExists(Cli, Name))
+    {
+        return 0
+    }
+
+    # Check if the queue is empty.
+    if (Cli["Queues", table][Name, table]["Items", table]:count() == 0)
+    {
+        # The queue is empty.
+        cliSetQueueEmptyFlag(Cli, Name, 1)
+    }
+    else
+    {
+        # The queue is not empty.
+        cliSetQueueEmptyFlag(Cli, Name, 0)
+    }
+
+    # Return the queue empty flag.
+    return cliGetQueueEmptyFlag(Cli, Name)
+}
+
+# This function is called internally to get the number of items in a queue.
+# @param Cli A handle to the CLI library.
+# @param Name The name of the queue.
+# @return The number of items in the queue.
+function number cliGetQueueItemCount(Cli:table, Name:string)
+{
+    # Check if the queue exists.
+    if (!cliQueueExists(Cli, Name))
+    {
+        return 0
+    }
+
+    # Return the number of items in the queue.
+    return Cli["Queues", table][Name, table]["Items", table]:count()
+}
+
+# This function is called internally to push an item onto a queue.
+# @param Cli A handle to the CLI library.
+# @param Name The name of the queue.
+# @param Item The item to push onto the queue.
+# @return true if the item was pushed successfully, false otherwise.
+function number cliPushQueueItem(Cli:table, Name:string, Item:table)
+{
+    # Check if the queue exists.
+    if (!cliQueueExists(Cli, Name))
+    {
+        return 0
+    }
+
+    # Push the item onto the queue.
+    Cli["Queues", table][Name, table]["Items", table]:unshiftTable(Item)
+
+    # Check if the queue is empty.
+    if (cliIsQueueEmpty(Cli, Name))
+    {
+        # The queue is empty. This should never happen.
+        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Failed to push item onto queue '" + Name + "'.")
+        return 0
+    }
+
+    # Debug.
+    # print("Pushed item onto queue '" + Name + "'.")
+    # printTable(Item)
+
+    # Return success.
+    return 1
+}
+
+# This function is called internally to pop an item from a queue.
+# @param Cli A handle to the CLI library.
+# @param Name The name of the queue.
+# @return The item that was popped from the queue.
+function table cliPopQueueItem(Cli:table, Name:string)
+{
+    # Check if the queue exists.
+    if (!cliQueueExists(Cli, Name))
+    {
+        return table()
+    }
+
+    # Check if the queue is empty.
+    if (cliIsQueueEmpty(Cli, Name))
+    {
+        # The queue is empty. This should never happen.
+        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": No items to pop from queue '" + Name + "'.")
+        return table()
+    }
+
+    # Pop the item from the queue.
+    local Item = Cli["Queues", table][Name, table]["Items", table]:popTable()
+
+    # Check if the queue is now empty.
+    if (cliIsQueueEmpty(Cli, Name))
+    {
+        # The queue is now empty. Set the queue empty flag.
+        cliSetQueueEmptyFlag(Cli, Name, 1)
+    }
+
+    # Debug.
+    # print("Popped item from queue '" + Name + "'.")
+    # printTable(Item)
+
+    # Return the item.
+    return Item
+}
+
+# This function is called internally to clear a queue.
+# @param Cli A handle to the CLI library.
+# @param Name The name of the queue.
+# @return true if the queue was cleared successfully, false otherwise.
+function number cliClearQueue(Cli:table, Name:string)
+{
+    # Check if the queue exists.
+    if (!cliQueueExists(Cli, Name))
+    {
+        return 0
+    }
+
+    # Clear the queue.
+    Cli["Queues", table][Name, table]["Items", table]:clear()
+
+    # Check if the queue is now empty.
+    if (!cliIsQueueEmpty(Cli, Name))
+    {
+        # The queue is not empty. This should never happen.
+        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Failed to clear queue '" + Name + "'.")
+        return 0
+    }
+
+    # Return success.
+    return 1
+}
+
+# This function is called by the RailDriver E2 script to initialize the CLI.
+# It should be called once, at the beginning of the script.
+# @param CliPrefix The prefix to use for CLI commands.
+# @return table A handle to the CLI library.
+function table cliInit(CliPrefix:string)
+{
+    local Cli = table()
+
+    # Initialize the CLI chat print queue.
+    Cli = cliCreateQueue("ChatPrint")
+
+    # Check if the queue was created successfully.
+    if (!cliQueueExists(Cli, "ChatPrint"))
+    {
+        # The queue was not created successfully. This should never happen.
+        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Failed to create queue 'ChatPrint'.")
+        return table()
+    }
+
+    # Initialize the CLI library.
+    Cli["Prefix", string] = CliPrefix
+    Cli["Commands", table] = table()
+    Cli["Commands", table]["Flags", table] = table()
+
+    # Initialize message properties.
+    Cli["Message Properties", table] = table()
+    Cli["Message Properties", table]["Max Lines", number] = 20
+    Cli["Message Properties", table]["Max Message Title Length", number] = 64
+    Cli["Message Properties", table]["Max Message Text Length", number] = 64
+    Cli["Message Properties", table]["Max Length", number] = Cli["Message Properties", table]["Max Message Title Length", number] + Cli["Message Properties", table]["Max Message Text Length", number]
+
+    # Initialize the CLI flags.
+    Cli["Flags", table]["Print To Chat", number] = 0
+
+    # Register the help command.
+    Cli["Commands", table]["help", table] = table()
+    Cli["Commands", table]["help", table]["Arguments", array] = array()
+    Cli["Commands", table]["help", table]["help", string] = "Displays this help message."
+    Cli["Commands", table]["Flags", table]["help is updated", number] = 0
+
+    # Register the about command.
+    Cli["Commands", table]["about", table] = table()
+    Cli["Commands", table]["about", table]["Arguments", array] = array()
+    Cli["Commands", table]["about", table]["help", string] = "Displays information about RailDriver."
+    Cli["Commands", table]["Flags", table]["about is updated", number] = 0
+
+    # Register the controls command.
+    Cli["Commands", table]["controls", table] = table()
+    Cli["Commands", table]["controls", table]["Arguments", array] = array()
+    Cli["Commands", table]["controls", table]["help", string] = "Displays a list of available player controls."
+    Cli["Commands", table]["Flags", table]["controls is updated", number] = 0
+
+    # Register the restart command.
+    Cli["Commands", table]["restart", table] = table()
+    Cli["Commands", table]["restart", table]["Arguments", array] = array()
+    Cli["Commands", table]["restart", table]["help", string] = "Restarts the RailDriver script."
+    Cli["Commands", table]["Flags", table]["restart is updated", number] = 0
+
+    # Return the CLI library.
+    return Cli
+}
+
+# This function is called by the RailDriver E2 script to register a new command.
+# @param Cli A handle to the CLI library.
+# @param Command The command to register.
+# @param Arguments An array of argument names.
+# @param Help The help text for the command.
+# @return true if the command was registered successfully, false otherwise.
+function number cliRegisterCommand(Cli:table, Command:string, Arguments:array, Help:string)
+{
+    # Check if the command already exists.
+    if (Cli["Commands", table]:exists(Command) == 1)
+    {
+        # The command already exists.
+        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Command '" + Command + "' already exists.")
+        return 0
+    }
+
+    # Register the command, help text, and flags.
+    Cli["Commands", table][Command, table] = table()
+    Cli["Commands", table][Command, table]["Arguments", array] = Arguments
+    Cli["Commands", table][Command, table]["help", string] = Help
+    Cli["Commands", table]["Flags", table][Command + " is updated", number] = 0
+
+    # Return success.
+    return 1
+}
+
+# This function is called by the RailDriver E2 script to unregister an existing command.
+# @param Cli A handle to the CLI library.
+# @param Command The command to unregister.
+# @return true if the command was unregistered successfully, false otherwise.
+function number cliUnregisterCommand(Cli:table, Command:string)
+{
+    # Check if the command exists.
+    if (Cli["Commands", table]:exists(Command) != 1)
+    {
+        # The command does not exist.
+        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Command '" + Command + "' does not exist.")
+        return 0
+    }
+
+    # Unregister the command, argumants, help text, and flags.
+    Cli["Commands", table][Command, table] = table()
+    Cli["Commands", table][Command, table]["Arguments", array] = array()
+    Cli["Commands", table][Command, table]["help", string] = ""
+    Cli["Commands", table]["Flags", table][Command + " is updated", number] = 0
+
+    # Return success.
+    return 1
+}
+
+# This function is called by the RailDriver E2 script to check if a command has been updated.
+# @param Cli A handle to the CLI library.
+# @param Command The command to check.
+# @return true if the command has been updated, false otherwise.
+function number cliIsCommandUpdated(Cli:table, Command:string)
+{
+    # Command is case-insensitive.
+    Command = Command:lower():trim()
+
+    # Check if the command exists.
+    if (Cli["Commands", table]:exists(Command) != 1)
+    {
+        # The command does not exist.
+        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Command '" + Command + "' does not exist.")
+        return 0
+    }
+
+    # Check if the command has been updated.
+    if (Cli["Commands", table]["Flags", table][Command + " is updated", number] == 0)
+    {
+        # The command has not been updated.
+        return 0
+    }
+
+    # Reset the command update flag.
+    Cli["Commands", table]["Flags", table][Command + " is updated", number] = 0
+
+    # Return success.
+    return 1
+}
+
+# This function is called by the RailDriver E2 script to check if the help command has been updated.
+# @param Cli A handle to the CLI library.
+# @return true if the help command has been updated, false otherwise.
+function number cliHelpIsUpdated(Cli:table)
+{
+    # Check if the help command has been updated.
+    if (Cli["Commands", table]["Flags", table]["help is updated", number] == 0)
+    {
+        return 0
+    }
+
+    # Reset the help command update flag.
+    Cli["Commands", table]["Flags", table]["help is updated", number] = 0
+
+    # Return success.
+    return 1
+}
+
+# This function is called by the RailDriver E2 script to check if the about command has been updated.
+# @param Cli A handle to the CLI library.
+# @return true if the about command has been updated, false otherwise.
+function number cliAboutIsUpdated(Cli:table)
+{
+    # Check if the about command has been updated.
+    if (Cli["Commands", table]["Flags", table]["about is updated", number] == 0)
+    {
+        return 0
+    }
+
+    # Reset the about command update flag.
+    Cli["Commands", table]["Flags", table]["about is updated", number] = 0
+
+    # Return success.
+    return 1
+}
+
+# This function is called by the RailDriver E2 script to check if the controls command has been updated.
+# @param Cli A handle to the CLI library.
+# @return true if the controls command has been updated, false otherwise.
+function number cliControlsIsUpdated(Cli:table)
+{
+    # Check if the controls command has been updated.
+    if (Cli["Commands", table]["Flags", table]["controls is updated", number] == 0)
+    {
+        return 0
+    }
+
+    # Reset the controls command update flag.
+    Cli["Commands", table]["Flags", table]["controls is updated", number] = 0
+
+    # Return success.
+    return 1
+}
+
+# This function is called by the RailDriver E2 script to check if the restart command has been updated.
+# @param Cli A handle to the CLI library.
+# @return true if the restart command has been updated, false otherwise.
+function number cliRestartIsUpdated(Cli:table)
+{
+    # Check if the restart command has been updated.
+    if (Cli["Commands", table]["Flags", table]["restart is updated", number] == 0)
+    {
+        return 0
+    }
+
+    # Reset the restart command update flag.
+    Cli["Commands", table]["Flags", table]["restart is updated", number] = 0
+
+    # Return success.
+    return 1
+}
+
+# This function is called by the RailDriver E2 script to get the help text for a command.
+# @param Cli A handle to the CLI library.
+# @param Command The command to get the help text for.
+# @return The help text for the command.
+function string cliGetHelp(Cli:table, Command:string)
+{
+    # Command is case-insensitive.
+    Command = Command:lower():trim()
+
+    # Check if the command exists.
+    if (Cli["Commands", table][Command, table] == table())
+    {
+        return ""
+    }
+
+    # Return the help text.
+    return Cli["Commands", table][Command, table]["help", string]
+}
+
+# This function is called by the RailDriver E2 script to process a chat message.
+# No callbacks are made by this function. Instead, the cliCommandIsUpdated function
+# should be called to check if a command has been updated.
+# @param Cli A handle to the CLI library.
+# @param Message The chat message to process.
+# @return true if the message was processed successfully, false otherwise.
+function number cliProcessMessage(Cli:table, Message:string)
+{
+    # Message is case-insensitive.
+    Message = Message:lower():sub(1, 64):trim()
+
+    # Check if the message is a command.
+    if (Message:sub(1, Cli["Prefix", string]:length()) != Cli["Prefix", string])
+    {
+        return 0
+    }
+
+    # Hide the message from the chat.
+    hideChat(1)
+
+    # Parse the command and arguments.
+    local Command = Message:sub(Cli["Prefix", string]:length() + 1):trim()
+    local Arguments = Command:explode(" ")
+
+    # Check if the command exists.
+    if (Cli["Commands", table]:exists(Arguments[1, string]) != 1)
+    {
+        # The command does not exist.
+        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Command '" + Arguments[1, string] + "' does not exist.")
+        return 0
+    }
+
+    # Update the command.
+    Cli["Commands", table][Arguments[1, string], table]["Arguments", array] = Arguments
+    Cli["Commands", table]["Flags", table][Arguments[1, string] + " is updated", number] = 1
+
+    # Return success.
+    return 1
+}
+
+# This function is called by the RailDriver E2 script to print a message to the chat.
+# @param Cli A handle to the CLI library.
+# @param Source The source of the message.
+#        This is used to determine where the message has come from.
+#        The source can be from anywhere within the RailDriver E2 script.
+#        If no source is specified, the message is assumed to be from the CLI & the source will be
+#        omitted from the message title.
+# @param Type The type of the message.
+#        This is used to determine what colour the message title should be.
+#        Valid types are: "error", "info", "success", "warning", "help", "about", "controls", "command".
+#        - "error" is red.
+#        - "info" is blue.
+#        - "success" is green.
+#        - "warning" is gold.
+#        - "help" is sky blue.
+#        - "about" is sky blue.
+#        - "controls" is sky blue.
+#        - "command" is dark blue.
+#        - All other types are dark grey, because they are not valid.
+#        The type is case-insensitive, and the message type is automatically capitalised.
+# @param Message The message to print.
+# @return true if the message was printed successfully, false otherwise.
+function number cliPrintToChat(Cli:table, Source:string, Type:string, Message:string)
+{
+    local Item = table()
+
+    Item["Message Text", array] = Message:explode("\n")
+
+    # Push the item to the ChatPrint queue.
+    if (cliPushQueueItem(Cli, "ChatPrint", Item) != 1)
+    {
+        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Failed to push item to ChatPrint queue.")
+        return 0
+    }
+
+    # Set the print to chat flag.
+    Cli["Flags", table]["print to chat", number] = 1
+
+    #[
+    # Only push the message properties to the ChatPrint queue once per this function call.
+    if (Cli["Flags", table]["Print To Chat", number] == 0)
+    {
+        Cli["Flags", table]["Print To Chat", number] = 1
+
+        Source = Source:trim() # Source is case-sensitive.
+        Type = Type:upper():trim() # Type is case-insensitive.
+
+        # Check if the type is valid.
+        if (Type != "ERROR" & Type != "INFO" & Type != "SUCCESS" & Type != "WARNING" & Type != "HELP" & Type != "ABOUT" & Type != "CONTROLS" & Type != "COMMAND")
+        {
+            Type = "UNKNOWN"
+        }
+
+        # Check if the source is empty.
+        if (Source == "")
+        {
+            Item["Message Title", string] = "[RailDriver | " + Type + "]"
+        }
+        else
+        {
+            Item["Message Title", string] = "[RailDriver | " + Source + " | " + Type + "]"
+        }
+
+        # Set the message title colour.
+        if (Type == "ERROR")
+        {
+            Item["Message Title Color", vector] = vec(255, 0, 0)
+        }
+        elseif (Type == "INFO")
+        {
+            Item["Message Title Color", vector] = vec(0, 0, 255)
+        }
+        elseif (Type == "SUCCESS")
+        {
+            Item["Message Title Color", vector] = vec(0, 255, 0)
+        }
+        elseif (Type == "WARNING")
+        {
+            Item["Message Title Color", vector] = vec(255, 215, 0)
+        }
+        elseif (Type == "HELP")
+        {
+            Item["Message Title Color", vector] = vec(135, 206, 235)
+        }
+        elseif (Type == "ABOUT")
+        {
+            Item["Message Title Color", vector] = vec(135, 206, 235)
+        }
+        elseif (Type == "CONTROLS")
+        {
+            Item["Message Title Color", vector] = vec(135, 206, 235)
+        }
+        elseif (Type == "COMMAND")
+        {
+            Item["Message Title Color", vector] = vec(0, 0, 139)
+        }
+        elseif (Type == "UNKNOWN")
+        {
+            Item["Message Title Color", vector] = vec(169, 169, 169)
+        }
+
+        # Message colour is always white.
+        Item["Message Color", vector] = vec(255, 255, 255)
+
+        # If the message title is too long, then don't push it to the queue.
+        # Print an error message instead, and return failure.
+        if (Item["Message Title", string]:length() > Cli["Message Properties", table]["Max Message Title Length", number])
+        {
+            printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR] ", vec(255, 255, 255),": Message title is too long.")
+            Cli["Flags", table]["Print To Chat", number] = 0
+            return 0
+        }
+
+        # Push the message properties to the queue.
+        if (cliPushQueueItem(Cli, "ChatPrint", Item) == 0)
+        {
+            printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR] ", vec(255, 255, 255),": Failed to push message properties to the queue.")
+            Cli["Flags", table]["Print To Chat", number] = 0
+            return 0
+        }
+
+        # Reset the Item table.
+        Item:clear()
+    }
+
+    Message = ": " + Message:trim()
+    ]#
+
+    # Debug.
+    # printTable(Item)
+
+    #[
+    # If the message text contains a '\n' character, then split the message into multiple lines.
+    # Then, push each line to the queue.
+    # Otherwise, push the message to the queue.
+    # This is done to prevent the message text from being truncated.
+    if (Message:find("\n") != 0)
+    {
+        local Lines = Message:explode("\n")
+        for (Line = 1, Lines:count())
+        {
+            Item["Message Text", string] = Lines[Line, string]
+
+            # If the message text is too long, then don't push it to the queue.
+            # Print an error message instead, and return failure.
+            if (Item["Message Text", string]:length() > Cli["Message Properties", table]["Max Message Text Length", number])
+            {
+                printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR] ", vec(255, 255, 255),": Message text is too long.")
+                Cli["Flags", table]["Print To Chat", number] = 0
+                return 0
+            }
+
+            # Push the message to the queue.
+            if (cliPushQueueItem(Cli, "ChatPrint", Item) == 0)
+            {
+                printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR] ", vec(255, 255, 255),": Failed to push message to the queue.")
+                Cli["Flags", table]["Print To Chat", number] = 0
+                return 0
+            }
+        }
+    }
+    else
+    {
+        # If the message text is too long, then don't push it to the queue.
+        # Print an error message instead, and return failure.
+        if (Item["Message Text", string]:length() > Cli["Message Properties", table]["Max Message Text Length", number])
+        {
+            printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR] ", vec(255, 255, 255),": Message text is too long.")
+            Cli["Flags", table]["Print To Chat", number] = 0
+            return 0
+        }
+
+        # Push the message to the queue.
+        if (cliPushQueueItem(Cli, "ChatPrint", Item) == 0)
+        {
+            printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR] ", vec(255, 255, 255),": Failed to push message to the queue.")
+            Cli["Flags", table]["Print To Chat", number] = 0
+            return 0
+        }
+    }
+
+    # Reset the Print To Chat flag.
+    Cli["Flags", table]["Print To Chat", number] = 0
+    ]#
+
+    # Return success.
+    return 1
+}
+
+function number cliPrintToChat(Cli:table, Type:string, Message:string)
+{
+    return cliPrintToChat(Cli, "", Type, Message)
+}
+
+# This function is called by the RailDriver E2 script to handle printing multiple messages to the chat.
+# This is done to prevent the message text from being truncated.
+# This function should be called once per clock cycle. Each time this function returns 1, it will
+# print the next message to the chat. When this function returns 0, it means that all messages have
+# been printed to the chat.
+# @param Cli A handle to the CLI library.
+# @return true if the next message was printed successfully, false otherwise.
+function number cliChatPrintHandler(Cli:table)
+{
+    if (ReceivedItem:count() == 0)
+    {
+        if (cliIsQueueEmpty(Cli, "ChatPrint") == 1)
+        {
+            return 0
+        }
+
+        ReceivedItem = cliPopQueueItem(Cli, "ChatPrint")
+
+        if (ReceivedItem:count() == 0)
+        {
+            printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR] ", vec(255, 255, 255),": Failed to pop message from the queue.")
+            return 0
+        }
+
+        MessagesToPrint = ReceivedItem["Message Text", array]
+
+        if (MessagesToPrint:count() == 0)
+        {
+            printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR] ", vec(255, 255, 255),": Failed to get message to print.")
+            ReceivedItem:clear()
+            return 0
+        }
+    }
+
+    local MessageToPrint = MessagesToPrint:shiftString()
+
+    print(MessageToPrint)
+
+    if (MessagesToPrint:count() == 0)
+    {
+        ReceivedItem:clear()
+        return 0
+    }
+
+    #[
+    # Check if the chat print queue is empty.
+    if (cliIsQueueEmpty(Cli, "ChatPrint") == 1)
+    {
+        # Return false. There are no messages to print. This is not an error.
+        return 0
+    }
+
+    # Pop the first item from the chat print queue.
+    local Item = cliPopQueueItem(Cli, "ChatPrint")
+
+    # Check if the Item table is valid.
+    if (Item:count() == 0)
+    {
+        # Print an error message.
+        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR] ", vec(255, 255, 255),": Failed to pop item from the chat print queue.")
+        return 0
+    }
+    ]#
+
+    # Debug.
+    # printTable(Item)
+
+    #[
+    # Check if the item contains a message title.
+    if (Item:exists("Message Title"))
+    {
+        # Check if the item contains a message title color.
+        if (Item:exists("Message Title Color"))
+        {
+            # Check if the item contains a message color.
+            if (Item:exists("Message Color"))
+            {
+                printColor(Item["Message Title Color", vector], Item["Message Title", string], Item["Message Color", vector], Item["Message Text", string])
+            }
+            else
+            {
+                printColor(Item["Message Title Color", vector], Item["Message Title", string], Item["Message Text", string])
+            }
+        }
+        else
+        {
+            # Check if the item contains a message color.
+            if (Item:exists("Message Color"))
+            {
+                printColor(Item["Message Title", string], Item["Message Color", vector], Item["Message Text", string])
+            }
+            else
+            {
+                printColor(Item["Message Title", string], Item["Message Text", string])
+            }
+        }
+    }
+    else
+    {
+        # Check if the item contains a message color.
+        if (Item:exists("Message Color"))
+        {
+            printColor(Item["Message Color", vector], Item["Message Text", string])
+        }
+        else
+        {
+            print(Item["Message Text", string])
+        }
+    }
+    ]#
+
+    # Return success.
+    return 1
+}
