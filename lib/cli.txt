@@ -568,6 +568,7 @@ function number cliPrintToChat(Cli:table, Source:string, Type:string, Message:st
 {
     local Item = table()
 
+    #[
     # Only push the message properties to the ChatPrint queue once per this function call.
     if (Cli["Flags", table]["Print To Chat", number] == 0)
     {
@@ -655,10 +656,12 @@ function number cliPrintToChat(Cli:table, Source:string, Type:string, Message:st
     }
 
     Message = ": " + Message:trim()
+    ]#
 
     # Debug.
     # printTable(Item)
 
+    #[
     # If the message text contains a '\n' character, then split the message into multiple lines.
     # Then, push each line to the queue.
     # Otherwise, push the message to the queue.
@@ -710,6 +713,7 @@ function number cliPrintToChat(Cli:table, Source:string, Type:string, Message:st
 
     # Reset the Print To Chat flag.
     Cli["Flags", table]["Print To Chat", number] = 0
+    ]#
 
     # Return success.
     return 1
@@ -729,6 +733,7 @@ function number cliPrintToChat(Cli:table, Type:string, Message:string)
 # @return true if the next message was printed successfully, false otherwise.
 function number cliChatPrintHandler(Cli:table)
 {
+    #[
     # Check if the chat print queue is empty.
     if (cliIsQueueEmpty(Cli, "ChatPrint") == 1)
     {
@@ -746,10 +751,12 @@ function number cliChatPrintHandler(Cli:table)
         printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR] ", vec(255, 255, 255),": Failed to pop item from the chat print queue.")
         return 0
     }
+    ]#
 
     # Debug.
     # printTable(Item)
 
+    #[
     # Check if the item contains a message title.
     if (Item:exists("Message Title"))
     {
@@ -791,6 +798,7 @@ function number cliChatPrintHandler(Cli:table)
             print(Item["Message Text", string])
         }
     }
+    ]#
 
     # Return success.
     return 1
