@@ -195,6 +195,10 @@ function number cliPushQueueItem(Cli:table, Name:string, Item:table)
         return 0
     }
 
+    # Debug.
+    # print("Pushed item onto queue '" + Name + "'.")
+    # printTable(Item)
+
     # Return success.
     return 1
 }
@@ -228,6 +232,10 @@ function table cliPopQueueItem(Cli:table, Name:string)
         # The queue is now empty. Set the queue empty flag.
         cliSetQueueEmptyFlag(Cli, Name, 1)
     }
+
+    # Debug.
+    # print("Popped item from queue '" + Name + "'.")
+    # printTable(Item)
 
     # Return the item.
     return Item
@@ -646,7 +654,10 @@ function number cliPrintToChat(Cli:table, Source:string, Type:string, Message:st
         Item:clear()
     }
 
-    Item["Message Text", string] = ": " + Message:trim()
+    Message = ": " + Message:trim()
+
+    # Debug.
+    # printTable(Item)
 
     # If the message text contains a '\n' character, then split the message into multiple lines.
     # Then, push each line to the queue.
@@ -735,6 +746,9 @@ function number cliChatPrintHandler(Cli:table)
         printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR] ", vec(255, 255, 255),": Failed to pop item from the chat print queue.")
         return 0
     }
+
+    # Debug.
+    # printTable(Item)
 
     # Check if the item contains a message title.
     if (Item:exists("Message Title"))

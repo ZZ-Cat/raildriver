@@ -286,7 +286,7 @@ if (clk("Chat Print"))
     {
         if (cliChatPrintHandler(CLI) == 1)
         {
-            timer("Chat Print", 500)
+            timer("Chat Print", 100)
         }
     }
     else
