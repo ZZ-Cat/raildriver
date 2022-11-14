@@ -32,20 +32,23 @@ Until I get OTA Updates out the door, you're stuck with doing this The Old Schoo
 
 You need these before you can use RailDriver.
 
-- Garry's Mod!
-- Wiremod.
-- The FC&N Official Server Addons Pack.
+- [Garry's Mod](https://store.steampowered.com/app/4000/Garrys_Mod)!
+- [Wiremod](https://steamcommunity.com/id/wireteam/myworkshopfiles/?appid=4000)!
+- [The FC&N Server Addons Pack](https://steamcommunity.com/sharedfiles/filedetails/?id=390798140).
 It's not imperative that you use literally everything in this addon pack.
 But, I highly recommend you at the _very least_ get the following items:
-  - gm_sunsetgulch
-    - If you go this route, you _will_ need to install Half-Life 2: Episode 2 to see some of the texturess in that map.
-  - Grovestreetgman's Propper Trains
-  - Grovestreetgman's Shared Textures
-  - Grovestreetgman's Train Parts
-  - Grovestreetgman's Train Sounds
-  - Magnum's Train Model Pack (Consolidated)
-  - Magnum's Trakpak2
-  - The Big Propper Train Shared Texture Pack
+  - [gm_sunsetgulch](https://steamcommunity.com/sharedfiles/filedetails/?id=311697867)
+    - If you go this route, you _will_ need to install [Half-Life 2: Episode 2](https://store.steampowered.com/app/420/HalfLife_2_EpisodeTwo) to see some of the texturess in that map.
+    - You _will_ also need [Magnum's Trakpak 2](https://steamcommunity.com/sharedfiles/filedetails/?id=391016040).
+  - [Grovestreetgman's Propper Trains](https://steamcommunity.com/sharedfiles/filedetails/?id=1195015027)
+  - [Grovestreetgman's Shared Textures](https://steamcommunity.com/sharedfiles/filedetails/?id=676234187)
+  - [Grovestreetgman's Train Parts](https://steamcommunity.com/sharedfiles/filedetails/?id=276309010)
+  - [Grovestreetgman's Train Sounds](https://steamcommunity.com/sharedfiles/filedetails/?id=240020348)
+  - [Magnum's Train Model Pack (Consolidated)](https://steamcommunity.com/sharedfiles/filedetails/?id=260954002)
+  - [Magnum's Trakpak 2](https://steamcommunity.com/sharedfiles/filedetails/?id=391016040)
+    - **NB:** This _is_ discontinued, but is still being maintained, & it is required if you want to run in Sunset Gulch.
+      [TrakPak 3](https://steamcommunity.com/sharedfiles/filedetails/?id=2379202601) is its successor.
+  - [The Big Propper Train Shared Texture Pack](https://steamcommunity.com/sharedfiles/filedetails/?id=1227050421)
 
 By rights, you should also at least have one locomotive already pre-made.
 If you don't have this, you need to do some prep-work:
