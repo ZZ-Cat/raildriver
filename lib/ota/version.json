@@ -1,0 +1,74 @@
+{
+    "RailDriver":
+    {
+        "About":
+        {
+            "Name": "RailDriver",
+            "Description": "Smart locomotive controller script for Garry's Mod train build servers.",
+            "Author": "Cassandra \"ZZ Cat\" Robinson",
+            "Copyright":"Copyright (c) 2022, Cassandra \"ZZ Cat\" Robinson. All rights reserved.",
+            "License":"GNU Affero General Public License v3.0",
+            "Source Code":"https://github.com/ZZ-Cat/RailDriver"
+        },
+        "Main":
+        {
+            "File":"RailDriver.txt",
+            "Path":"e2shared/RailDriver",
+            "Version":"0.1.0"
+        },
+        "Libraries":
+        {
+            "Command-Line Interface":
+            {
+                "File":"cli.txt",
+                "Path":"e2shared/RailDriver/lib",
+                "Version":"0.1.0"
+            },
+            "Controls":
+            {
+                "Player Controls":
+                {
+                    "File":"playerControls.txt",
+                    "Path":"e2shared/RailDriver/lib/controls",
+                    "Version":"0.1.0"
+                }
+            },
+            "Over-The-Air Updates":
+            {
+                "Local":
+                {
+                    "File":"local.txt",
+                    "Path":"e2shared/RailDriver/lib/ota",
+                    "Version":"0.1.0"
+                }
+            },
+            "PIDF Controller":
+            {
+                "File":"pidf.txt",
+                "Path":"e2shared/RailDriver/lib",
+                "Version":"0.1.0"
+            },
+            "Sensors":
+            {
+                "Speedometer":
+                {
+                    "File":"speedometer.txt",
+                    "Path":"e2shared/RailDriver/lib/sensors",
+                    "Version":"0.1.0"
+                }
+            },
+            "Smart Entity Management":
+            {
+                "File":"smartEntityManagement.txt",
+                "Path":"e2shared/RailDriver/lib",
+                "Version":"0.1.0"
+            },
+            "Timers":
+            {
+                "File":"timers.txt",
+                "Path":"e2shared/RailDriver/lib",
+                "Version":"0.1.0"
+            }
+        }
+    }
+}
