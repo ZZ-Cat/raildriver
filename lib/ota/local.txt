@@ -390,6 +390,23 @@ function void otaLocalFileLoadedHandler(Ota:table)
     }
 }
 
+# This function returns the About section of RailDriver's version file.
+# @param Ota A handle to the OTA library.
+# @return string The About section of RailDriver's version file.
+function string otaLocalGetAboutMessage(Ota:table)
+{
+    local Str = ""
+    Str += Ota["RailDriver", table]["About", table]["Name", string] + "\n"
+    Str += Ota["RailDriver", table]["About", table]["Description", string] + "\n"
+    Str += "Version:      " + Ota["RailDriver", table]["Main", table]["Version", string] + "\n"
+    Str += "Author:       " + Ota["RailDriver", table]["About", table]["Author", string] + "\n"
+    Str += "Copyright:    " + Ota["RailDriver", table]["About", table]["Copyright", string] + "\n"
+    Str += "License:      " + Ota["RailDriver", table]["About", table]["License", string] + "\n"
+    Str += "Source Code:  " + Ota["RailDriver", table]["About", table]["Source Code", string] + "\n"
+
+    return Str
+}
+
 function string otaLocalDebugGetVersionFileContents(Ota:table)
 {
     return Ota["Debug", table]["JSON", string]

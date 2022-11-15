@@ -255,13 +255,7 @@ if (chatClk(TrainDriver))
         {
             # The about command was updated.
             # Print the about message to the chat.
-            local Message = "Smart locomotive controller script for Garry's Mod train build servers.\n"
-            Message += "Version:      0.1.0\n"
-            Message += "Author:       Cassandra 'ZZ Cat' Robinson\n"
-            Message += "License:      GNU Affero General Public License v3.0\n"
-            Message += "Source Code:  https://github.com/ZZ-Cat/RailDriver \n"
-
-            if (cliPrintToChat(CLI, "about", Message))
+            if (cliPrintToChat(CLI, "about", otaLocalGetAboutMessage(OTALocal)))
             {
                 timer("Chat Print", 100)
             }
