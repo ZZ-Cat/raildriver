@@ -20,7 +20,7 @@
 @model models/beer/wiremod/gate_e2_nano.mdl
 @persist Trucks:array Speedo:table
 @persist [Direction Throttle Brake EmergencyBrake]:number
-@persist [CLI PlayerControls ThrottleMap BrakeMap]:table TrainDriver:entity
+@persist [OTALocal CLI PlayerControls ThrottleMap BrakeMap]:table TrainDriver:entity
 @persist PIDF:table
 @persist EmBrakeState EmBrakeThisSpeed EmBrakeLastSpeed EmBrakeObserverTickInterval EmBrakePCFaultTimeoutSet
 @persist Speed SpeedAbs SpeedMPH
@@ -45,6 +45,7 @@ if (first() | duped())
 
     try
     {
+        #include "e2shared/RailDriver/lib/ota/local"
         #include "e2shared/RailDriver/lib/smartEntityManagement"
         #include "e2shared/RailDriver/lib/sensors/speedometer"
         #include "e2shared/RailDriver/lib/controls/playerControls"
@@ -154,6 +155,13 @@ if (first() | duped())
         else 
         {
             error("Failed to initialize PIDF controller.")
+        }
+
+        # Initialize OTA.
+        OTALocal = otaLocalInit()
+        if (OTALocal:count() == 0)
+        {
+            error("Failed to initialize local Over The Air (OTA) Updates.")
         }
 
         # Show the RailDriver welcome message.
