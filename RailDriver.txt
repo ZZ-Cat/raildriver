@@ -208,6 +208,19 @@ if (clk(otaLocalGetClockID(OTALocal)))
     }
 }
 
+if (fileClk())
+{
+    try
+    {
+        otaLocalFileLoadedHandler(OTALocal)
+    }
+
+    catch (Exception)
+    {
+        printColor(vec(255, 0, 0), "[RailDriver | File | Error]", vec(255, 255, 255), ": " + Exception)
+    }
+}
+
 if (chatClk(TrainDriver))
 {
     # The in-game chat is used to send commands to the E2.
