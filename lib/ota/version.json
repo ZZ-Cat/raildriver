@@ -6,7 +6,7 @@
             "Name": "RailDriver",
             "Description": "Smart locomotive controller script for Garry's Mod train build servers.",
             "Author": "Cassandra \"ZZ Cat\" Robinson",
-            "Copyright":"Copyright (c) 2022, Cassandra \"ZZ Cat\" Robinson. All rights reserved.",
+            "Copyright":"(c) 2022, Cassandra \"ZZ Cat\" Robinson. All rights reserved.",
             "License":"GNU Affero General Public License v3.0",
             "Source Code":"https://github.com/ZZ-Cat/RailDriver"
         },
