@@ -44,6 +44,10 @@ function table otaLocalInit()
 
     Ota["File Path to Load", string] = ""
 
+    # Version file contents are stored here.
+    Ota["RailDriver", table] = table()
+
+    # Flags.
     Ota["Flags", table] = table()
     Ota["Flags", table]["File Upload Started", number] = 0
     Ota["Flags", table]["File Upload Complete", number] = 0
@@ -164,6 +168,8 @@ function void otaLocalFileLoadedHandler(Ota:table)
 
             print("RailDriver Version: " + RailDriverVersion)
 
+            # Store the file contents in the OTA handle.
+            Ota["RailDriver", table] = FileContentsTable["RailDriver", table]:clone()
         }
         else
         {
