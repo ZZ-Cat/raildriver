@@ -134,6 +134,201 @@ function void otaLocalLoadFileHandler(Ota:table)
     }
 }
 
+# This function returns true if the version file is valid.
+# It is used internally by the OTA library.
+# @param Ota A handle to the OTA library.
+# @param Data:table The version file contents.
+# @return number 1 if the version file is valid, 0 otherwise.
+function number otaLocalIsVersionFileValid(Ota:table, Data:table)
+{
+    # Check if the version file is valid.
+    if (Data["RailDriver", table] == table())
+    {
+        return 0
+    }
+
+    # Check if the About section is valid.
+    if (Data["RailDriver", table]["About", table] == table())
+    {
+        return 0
+    }
+    if (Data["RailDriver", table]["About", table]["Name", string] == "")
+    {
+        return 0
+    }
+    if (Data["RailDriver", table]["About", table]["Description", string] == "")
+    {
+        return 0
+    }
+    if (Data["RailDriver", table]["About", table]["Author", string] == "")
+    {
+        return 0
+    }
+    if (Data["RailDriver", table]["About", table]["Copyright", string] == "")
+    {
+        return 0
+    }
+    if (Data["RailDriver", table]["About", table]["License", string] == "")
+    {
+        return 0
+    }
+    if (Data["RailDriver", table]["About", table]["Source Code", string] == "")
+    {
+        return 0
+    }
+
+    # Check if the Main section is valid.
+    if (Data["RailDriver", table]["Main", table] == table())
+    {
+        return 0
+    }
+    if (Data["RailDriver", table]["Main", table]["File", string] == "")
+    {
+        return 0
+    }
+    if (Data["RailDriver", table]["Main", table]["Path", string] == "")
+    {
+        return 0
+    }
+    if (Data["RailDriver", table]["Main", table]["Version", string] == "")
+    {
+        return 0
+    }
+
+    # Check if the Libraries section is valid.
+    if (Data["RailDriver", table]["Libraries", table] == table())
+    {
+        return 0
+    }
+
+    # Check if the Command-Line Interface in the Libraries section is valid.
+    if (Data["RailDriver", table]["Libraries", table]["Command-Line Interface", table] == table())
+    {
+        return 0
+    }
+    if (Data["RailDriver", table]["Libraries", table]["Command-Line Interface", table]["File", string] == "")
+    {
+        return 0
+    }
+    if (Data["RailDriver", table]["Libraries", table]["Command-Line Interface", table]["Path", string] == "")
+    {
+        return 0
+    }
+    if (Data["RailDriver", table]["Libraries", table]["Command-Line Interface", table]["Version", string] == "")
+    {
+        return 0
+    }
+
+    # Check if the Controls section in the Libraries section is valid.
+    if (Data["RailDriver", table]["Libraries", table]["Controls", table] == table())
+    {
+        return 0
+    }
+
+    # Check if the Player Controls section in the Controls section is valid.
+    if (Data["RailDriver", table]["Libraries", table]["Controls", table]["Player Controls", table] == table())
+    {
+        return 0
+    }
+    if (Data["RailDriver", table]["Libraries", table]["Controls", table]["Player Controls", table]["File", string] == "")
+    {
+        return 0
+    }
+    if (Data["RailDriver", table]["Libraries", table]["Controls", table]["Player Controls", table]["Path", string] == "")
+    {
+        return 0
+    }
+    if (Data["RailDriver", table]["Libraries", table]["Controls", table]["Player Controls", table]["Version", string] == "")
+    {
+        return 0
+    }
+
+    # Check if the Over-The-Air Updates section in the Libraries section is valid.
+    if (Data["RailDriver", table]["Libraries", table]["Over-The-Air Updates", table] == table())
+    {
+        return 0
+    }
+
+    # Check if the Local section in the Over-The-Air Updates section is valid.
+    if (Data["RailDriver", table]["Libraries", table]["Over-The-Air Updates", table]["Local", table] == table())
+    {
+        return 0
+    }
+    if (Data["RailDriver", table]["Libraries", table]["Over-The-Air Updates", table]["Local", table]["File", string] == "")
+    {
+        return 0
+    }
+    if (Data["RailDriver", table]["Libraries", table]["Over-The-Air Updates", table]["Local", table]["Path", string] == "")
+    {
+        return 0
+    }
+    if (Data["RailDriver", table]["Libraries", table]["Over-The-Air Updates", table]["Local", table]["Version", string] == "")
+    {
+        return 0
+    }
+
+    # Check if the PIDF Controller section in the Libraries section is valid.
+    if (Data["RailDriver", table]["Libraries", table]["PIDF Controller", table] == table())
+    {
+        return 0
+    }
+    if (Data["RailDriver", table]["Libraries", table]["PIDF Controller", table]["File", string] == "")
+    {
+        return 0
+    }
+    if (Data["RailDriver", table]["Libraries", table]["PIDF Controller", table]["Path", string] == "")
+    {
+        return 0
+    }
+    if (Data["RailDriver", table]["Libraries", table]["PIDF Controller", table]["Version", string] == "")
+    {
+        return 0
+    }
+
+    # Check if the Sensors section in the Libraries section is valid.
+    if (Data["RailDriver", table]["Libraries", table]["Sensors", table] == table())
+    {
+        return 0
+    }
+
+    # Check if the Speedometer section in the Sensors section is valid.
+    if (Data["RailDriver", table]["Libraries", table]["Sensors", table]["Speedometer", table] == table())
+    {
+        return 0
+    }
+    if (Data["RailDriver", table]["Libraries", table]["Sensors", table]["Speedometer", table]["File", string] == "")
+    {
+        return 0
+    }
+    if (Data["RailDriver", table]["Libraries", table]["Sensors", table]["Speedometer", table]["Path", string] == "")
+    {
+        return 0
+    }
+    if (Data["RailDriver", table]["Libraries", table]["Sensors", table]["Speedometer", table]["Version", string] == "")
+    {
+        return 0
+    }
+
+    # Check if the Timers section in the Libraries section is valid.
+    if (Data["RailDriver", table]["Libraries", table]["Timers", table] == table())
+    {
+        return 0
+    }
+    if (Data["RailDriver", table]["Libraries", table]["Timers", table]["File", string] == "")
+    {
+        return 0
+    }
+    if (Data["RailDriver", table]["Libraries", table]["Timers", table]["Path", string] == "")
+    {
+        return 0
+    }
+    if (Data["RailDriver", table]["Libraries", table]["Timers", table]["Version", string] == "")
+    {
+        return 0
+    }
+    return 1
+}
+
 function void otaLocalFileLoadedHandler(Ota:table)
 {
     runOnFile(0)
@@ -162,11 +357,11 @@ function void otaLocalFileLoadedHandler(Ota:table)
                 error("Failed to decode version file: " + JsonError)
             }
 
-            #print("File Version loaded successfully.")
-
-            local RailDriverVersion = FileContentsTable["RailDriver", table]["Main", table]["Version", string]
-
-            print("RailDriver Version: " + RailDriverVersion)
+            # Check if the version file is valid.
+            if (otaLocalIsVersionFileValid(Ota, FileContentsTable) == 0)
+            {
+                error("Version file is invalid.")
+            }
 
             # Store the file contents in the OTA handle.
             Ota["RailDriver", table] = FileContentsTable["RailDriver", table]:clone()
