@@ -540,6 +540,14 @@ function number cliProcessMessage(Cli:table, Message:string)
         return 0
     }
 
+    # Check if the command has any arguments.
+    if (Arguments:count() > 0 & Cli["Commands", table][Command, table]["Arguments", array]:count() == 0)
+    {
+        # The command does not accept any arguments.
+        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Command '" + Command + "' does not accept any arguments.")
+        return 0
+    }
+
     # Update the command.
     Cli["Commands", table][Command, table]["Arguments", array] = Arguments
     Cli["Commands", table]["Flags", table][Command + " is updated", number] = 1
