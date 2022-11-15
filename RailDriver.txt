@@ -289,9 +289,24 @@ if (chatClk(TrainDriver))
         {
             # The restart command was updated.
             # Restart the E2.
-            reset()
+            if (cliPrintToChat(CLI, "restart", "Restarting..."))
+            {
+                runOnChat(0)
+                runOnTick(0)
+                runOnKeys(TrainDriver, 0)
+                stopAllTimers()
+                timer("Chat Print", 100)
+                timer("Restart", 1000)
+            }
         }
     }
+}
+
+if (clk("Restart"))
+{
+    # Restart the E2.
+    stopAllTimers()
+    reset()
 }
 
 if (clk("Chat Print"))
