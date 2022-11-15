@@ -548,6 +548,14 @@ function number cliProcessMessage(Cli:table, Message:string)
         return 0
     }
 
+    # Check if the command has the correct number of arguments.
+    if (Arguments:count() != Cli["Commands", table][Command, table]["Arguments", array]:count())
+    {
+        # The command does not have the correct number of arguments.
+        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Command '" + Command + "' requires " + Cli["Commands", table][Command, table]["Arguments", array]:count() + " argument(s).")
+        return 0
+    }
+
     # Update the command.
     Cli["Commands", table][Command, table]["Arguments", array] = Arguments
     Cli["Commands", table]["Flags", table][Command + " is updated", number] = 1
