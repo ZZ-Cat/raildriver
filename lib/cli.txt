@@ -328,6 +328,13 @@ function table cliInit(CliPrefix:string)
     Cli["Commands", table]["restart", table]["help", string] = "Restarts the RailDriver script."
     Cli["Commands", table]["Flags", table]["restart is updated", number] = 0
 
+    # Register the update command with the argument "local".
+    Cli["Commands", table]["update", table] = table()
+    Cli["Commands", table]["update", table]["Arguments", array] = array()
+    Cli["Commands", table]["update", table]["Arguments", array]:pushString("local")
+    Cli["Commands", table]["update", table]["help", string] = "Updates RailDriver from your e2shared folder."
+    Cli["Commands", table]["Flags", table]["update is updated", number] = 0
+
     # Return the CLI library.
     return Cli
 }
@@ -480,6 +487,24 @@ function number cliRestartIsUpdated(Cli:table)
 
     # Reset the restart command update flag.
     Cli["Commands", table]["Flags", table]["restart is updated", number] = 0
+
+    # Return success.
+    return 1
+}
+
+# This function is called by the RailDriver E2 script to check if the update command has been updated.
+# @param Cli A handle to the CLI library.
+# @return true if the update command has been updated, false otherwise.
+function number cliUpdateIsUpdated(Cli:table)
+{
+    # Check if the update command has been updated.
+    if (Cli["Commands", table]["Flags", table]["update is updated", number] == 0)
+    {
+        return 0
+    }
+
+    # Reset the update command update flag.
+    Cli["Commands", table]["Flags", table]["update is updated", number] = 0
 
     # Return success.
     return 1

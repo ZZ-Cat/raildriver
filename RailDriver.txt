@@ -299,6 +299,30 @@ if (chatClk(TrainDriver))
                 timer("Restart", 1000)
             }
         }
+
+        elseif (cliUpdateIsUpdated(CLI))
+        {
+            # The update command was updated.
+            # Currently, updating is not yet implemented.
+            # This is a placeholder for future updates.
+            if (cliPrintToChat(CLI, "warning", "OTA Updates are not yet implemented."))
+            {
+                timer("Chat Print", 100)
+            }
+
+            #[
+            # Update the E2.
+            if (cliPrintToChat(CLI, "update", "Updating..."))
+            {
+                runOnChat(0)
+                runOnTick(0)
+                runOnKeys(TrainDriver, 0)
+                stopAllTimers()
+                timer("Chat Print", 100)
+                timer("Update", 1000)
+            }
+            ]#
+        }
     }
 }
 
