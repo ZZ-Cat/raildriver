@@ -163,6 +163,7 @@ if (first() | duped())
         {
             error("Failed to initialize local Over The Air (OTA) Updates.")
         }
+        otaLocalLoadVersionFile(OTALocal)
 
         # Show the RailDriver welcome message.
         if (cliPrintToChat(CLI, "info", "Welcome to RailDriver!\nType '.raildriver help' for a list of commands."))
