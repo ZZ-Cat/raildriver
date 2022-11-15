@@ -19,3 +19,177 @@
 ]#
 
 @name RailDriver/lib/ota/local
+
+#[
+    Local OTA Updates library for RailDriver.
+
+    This library is used to check for and apply local Over-The-Air updates to RailDriver.
+    It accomplishes this by checking the local filesystem for a file named "version.json" &
+    comparing its contents to the current version of RailDriver. If the file exists and its
+    contents are different than the current version, the update is applied.
+]#
+
+# This function initializes the OTA library.
+# It should be called once at the beginning of the script.
+# @return Ota A handle to the OTA library.
+function table otaLocalInit()
+{
+    local Ota = table()
+    Ota["RailDriver E2", entity] = entity()
+    Ota["Version File Path", string] = "e2shared/RailDriver/lib/ota/version.json"
+    Ota["Clock ID", string] = "RailDriver OTA Clock"
+    Ota["Clock Delay", number] = 0
+    Ota["Upload Attempts", number] = 0
+    Ota["Upload Max Attempts", number] = 5
+
+    Ota["File Path to Load", string] = ""
+
+    Ota["Flags", table] = table()
+    Ota["Flags", table]["File Upload Started", number] = 0
+    Ota["Flags", table]["File Upload Complete", number] = 0
+
+    Ota["Debug", table]["JSON", string] = ""
+
+    return Ota
+}
+
+# This function starts the OTA Clock.
+# It should be called once at the beginning of the script.
+# @param Ota A handle to the OTA library.
+# @param Interval The interval at which to attempt to load the version file.
+# @return void
+function void otaLocalStartClock(Ota:table, Interval:number)
+{
+    Ota["Clock Delay", number] = Interval
+    timer(Ota["Clock ID", string], Ota["Clock Delay", number])
+}
+
+# This function stops the OTA Clock.
+# @param Ota A handle to the OTA library.
+# @return void
+function void otaLocalStopClock(Ota:table)
+{
+    stoptimer(Ota["Clock ID", string])
+}
+
+# This function restarts the OTA Clock with the last used interval.
+# @param Ota A handle to the OTA library.
+# @return void
+function void otaLocalRestartClock(Ota:table)
+{
+    otaLocalStopClock(Ota)
+    otaLocalStartClock(Ota, Ota["Clock Delay", number])
+}
+
+# This function returns the clock ID.
+# @param Ota A handle to the OTA library.
+# @return string The clock ID.
+function string otaLocalGetClockID(Ota:table)
+{
+    return Ota["Clock ID", string]
+}
+
+# This function starts loading the version file.
+# It should be called when the script is first loaded.
+# @param Ota A handle to the OTA library.
+# @return void
+function void otaLocalLoadVersionFile(Ota:table)
+{
+    Ota["File Path to Load", string] = ">" + Ota["Version File Path", string]
+    runOnFile(1)
+    otaLocalStartClock(Ota, 300)
+}
+
+function void otaLocalLoadFileHandler(Ota:table)
+{
+    if (Ota["Flags", table]["File Upload Started", number] == 0)
+    {
+        if (fileCanLoad())
+        {
+            otaLocalStopClock(Ota)
+            fileLoad(Ota["File Path to Load", string])
+            Ota["Flags", table]["File Upload Started", number] = 1
+        }
+        else
+        {
+            otaLocalStopClock(Ota)
+            Ota["Upload Attempts", number] = Ota["Upload Attempts", number] + 1
+            if (Ota["Upload Attempts", number] >= Ota["Upload Max Attempts", number])
+            {
+                Ota["Upload Attempts", number] = 0
+                Ota["Flags", table]["File Upload Started", number] = 0
+                Ota["Flags", table]["File Upload Complete", number] = 0
+                runOnFile(0)
+                error("Failed to load version file.")
+            }
+            else
+            {
+                otaLocalStartClock(Ota, 1000)
+            }
+        }
+    }
+}
+
+function void otaLocalFileLoadedHandler(Ota:table)
+{
+    runOnFile(0)
+    local FileStatus = fileStatus()
+
+    if (FileStatus == _FILE_OK)
+    {
+        Ota["Flags", table]["File Upload Started", number] = 0
+
+        local FileName = fileName()
+
+        if (FileName == ">" + Ota["Version File Path", string])
+        {
+            Ota["Flags", table]["File Upload Complete", number] = 1
+
+            local FileContents = fileRead()
+            if (FileContents == "")
+            {
+                error("Version file is empty.")
+            }
+            
+            local FileContentsTable = jsonDecode(FileContents)
+            local JsonError = jsonError()
+            if (JsonError != "")
+            {
+                error("Failed to decode version file: " + JsonError)
+            }
+
+            #print("File Version loaded successfully.")
+
+            local RailDriverVersion = FileContentsTable["RailDriver", table]["Main", table]["Version", string]
+
+            print("RailDriver Version: " + RailDriverVersion)
+
+        }
+        else
+        {
+            Ota["Flags", table]["File Upload Complete", number] = 0
+            error("Loaded file path mismatch.")
+        }
+    }
+    elseif (FileStatus == _FILE_UNKNOWN)
+    {
+        error("Unknown error while loading file.")
+    }
+    elseif (FileStatus == _FILE_TIMEOUT)
+    {
+        error("Loading file timed out.")
+    }
+    elseif (FileStatus == _FILE_404)
+    {
+        error("File not found.")
+    }
+    elseif (FileStatus == _FILE_TRANSFER_ERROR)
+    {
+        error("Failed to transfer file.")
+    }
+}
+
+function string otaLocalDebugGetVersionFileContents(Ota:table)
+{
+    return Ota["Debug", table]["JSON", string]
+}
