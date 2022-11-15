@@ -528,17 +528,21 @@ function number cliProcessMessage(Cli:table, Message:string)
     local Command = Message:sub(Cli["Prefix", string]:length() + 1):trim()
     local Arguments = Command:explode(" ")
 
+    # Remove the command from the arguments.
+    Command = Arguments[1, string]
+    Arguments:remove(1)
+
     # Check if the command exists.
-    if (Cli["Commands", table]:exists(Arguments[1, string]) != 1)
+    if (Cli["Commands", table]:exists(Command) != 1)
     {
         # The command does not exist.
-        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Command '" + Arguments[1, string] + "' does not exist.")
+        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Command '" + Command + "' does not exist.")
         return 0
     }
 
     # Update the command.
-    Cli["Commands", table][Arguments[1, string], table]["Arguments", array] = Arguments
-    Cli["Commands", table]["Flags", table][Arguments[1, string] + " is updated", number] = 1
+    Cli["Commands", table][Command, table]["Arguments", array] = Arguments
+    Cli["Commands", table]["Flags", table][Command + " is updated", number] = 1
 
     # Return success.
     return 1
