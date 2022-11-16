@@ -581,6 +581,18 @@ function number cliProcessMessage(Cli:table, Message:string)
         return 0
     }
 
+    # Check if the arguments are valid.
+    for (I = 1, Arguments:count())
+    {
+        # Check if the argument is valid.
+        if (Cli["Commands", table][Command, table]["Arguments", array][I, string]:find(Arguments[I, string]) == 0)
+        {
+            # The argument is not valid.
+            printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Argument '" + Arguments[I, string] + "' is not valid for command '" + Command + "'.")
+            return 0
+        }
+    }
+
     # Update the command.
     Cli["Commands", table][Command, table]["Arguments", array] = Arguments
     Cli["Commands", table]["Flags", table][Command + " is updated", number] = 1
