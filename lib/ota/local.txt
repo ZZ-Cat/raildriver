@@ -112,6 +112,8 @@ function void otaLocalLoadFileHandler(Ota:table)
         {
             otaLocalStopClock(Ota)
             fileLoad(Ota["File Path to Load", string])
+            Ota["Upload Attempts", number] = 0
+            Ota["Flags", table]["File Upload Complete", number] = 0
             Ota["Flags", table]["File Upload Started", number] = 1
         }
         else
@@ -124,7 +126,7 @@ function void otaLocalLoadFileHandler(Ota:table)
                 Ota["Flags", table]["File Upload Started", number] = 0
                 Ota["Flags", table]["File Upload Complete", number] = 0
                 runOnFile(0)
-                error("Failed to load version file.")
+                error("Failed to load file.")
             }
             else
             {
