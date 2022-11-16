@@ -104,6 +104,22 @@ function void otaLocalLoadVersionFile(Ota:table)
     otaLocalStartClock(Ota, 300)
 }
 
+# This function starts uploading RailDriver to the server.
+# It should be called when the CLI is used to update RailDriver.
+# @param Ota A handle to the OTA library.
+# @return void
+function void otaLocalUploadRailDriver(Ota:table)
+{
+    local FilePath = Ota["RailDriver", table]["Main", table]["Path", string] + "/" + Ota["RailDriver", table]["Main", table]["File", string]
+    Ota["File Path to Load", string] = ">" + FilePath
+
+    # Debug.
+    # print("Path: " + Ota["File Path to Load", string])
+
+    runOnFile(1)
+    otaLocalStartClock(Ota, 300)
+}
+
 function void otaLocalLoadFileHandler(Ota:table)
 {
     if (Ota["Flags", table]["File Upload Started", number] == 0)
@@ -367,6 +383,25 @@ function void otaLocalFileLoadedHandler(Ota:table)
 
             # Store the file contents in the OTA handle.
             Ota["RailDriver", table] = FileContentsTable["RailDriver", table]:clone()
+        }
+        elseif (FileName == ">" + Ota["RailDriver", table]["Main", table]["Path", string] + "/" + Ota["RailDriver", table]["Main", table]["File", string])
+        {
+            Ota["Flags", table]["File Upload Complete", number] = 1
+
+            local FileContents = fileRead()
+            if (FileContents == "")
+            {
+                error(Ota["RailDriver", table]["Main", table]["File", string] + " is empty.")
+            }
+
+            # Debug.
+            #print("RailDriver uploaded successfully, but not yet installed.")
+            #print(Ota["RailDriver", table]["Main", table]["File", string] + " Hash: " + hash(FileContents))
+            #print("RailDriver Hash: " + hash(getCode()))
+
+            # Update RailDriver
+            local E = entity()
+            E:remoteUpload(Ota["RailDriver", table]["Main", table]["Path", string] + "/" + Ota["RailDriver", table]["Main", table]["File", string])
         }
         else
         {

@@ -303,25 +303,33 @@ if (chatClk(TrainDriver))
         elseif (cliUpdateIsUpdated(CLI))
         {
             # The update command was updated.
-            # Currently, updating is not yet implemented.
-            # This is a placeholder for future updates.
-            if (cliPrintToChat(CLI, "warning", "OTA Updates are not yet implemented."))
+            # Get the arguments for the update command.
+            local Arguments = cliGetArguments(CLI, "update")
+
+            # Check if the argument is 'local'.
+            if (Arguments[1, string] == "local")
             {
-                timer("Chat Print", 100)
+                # Update the E2 using the local version.
+                if (cliPrintToChat(CLI, "update", "Updating..."))
+                {
+                    runOnChat(0)
+                    runOnTick(0)
+                    runOnKeys(TrainDriver, 0)
+                    stopAllTimers()
+                    timer("Chat Print", 100)
+                    otaLocalUploadRailDriver(OTALocal)
+                }
             }
 
-            #[
-            # Update the E2.
-            if (cliPrintToChat(CLI, "update", "Updating..."))
+            # Check if the argument is 'online'.
+            elseif (Arguments[1, string] == "online")
             {
-                runOnChat(0)
-                runOnTick(0)
-                runOnKeys(TrainDriver, 0)
-                stopAllTimers()
-                timer("Chat Print", 100)
-                timer("Update", 1000)
+                # Update the E2 using the online version.
+                if (cliPrintToChat(CLI, "warning", "Online updates are not yet implemented."))
+                {
+                    timer("Chat Print", 100)
+                }
             }
-            ]#
         }
     }
 }
