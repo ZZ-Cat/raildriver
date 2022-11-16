@@ -510,6 +510,27 @@ function number cliUpdateIsUpdated(Cli:table)
     return 1
 }
 
+# This function is called by the RailDriver E2 script to get the arguments for a command.
+# @param Cli A handle to the CLI library.
+# @param Command The command to get the arguments for.
+# @return An array of arguments for the command.
+function array cliGetArguments(Cli:table, Command:string)
+{
+    # Command is case-insensitive.
+    Command = Command:lower():trim()
+
+    # Check if the command exists.
+    if (Cli["Commands", table]:exists(Command) != 1)
+    {
+        # The command does not exist.
+        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Command '" + Command + "' does not exist.")
+        return array()
+    }
+
+    # Return the arguments for the command.
+    return Cli["Commands", table][Command, table]["Arguments", array]
+}
+
 # This function is called by the RailDriver E2 script to get the help text for a command.
 # @param Cli A handle to the CLI library.
 # @param Command The command to get the help text for.
