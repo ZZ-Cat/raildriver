@@ -309,15 +309,37 @@ if (chatClk(TrainDriver))
             # Check if the argument is 'local'.
             if (Arguments[1, string] == "local")
             {
+                local Message = ""
+
+                Message += "Updating...\n"
+
                 # Update the E2 using the local version.
-                if (cliPrintToChat(CLI, "update", "Updating..."))
+                if (otaLocalUploadRailDriver(OTALocal) == 1)
                 {
                     runOnChat(0)
                     runOnTick(0)
                     runOnKeys(TrainDriver, 0)
-                    stopAllTimers()
+                    local Timers = getTimers()
+                    for (I = 1, Timers:count())
+                    {
+                        if (Timers[I, string] == otaLocalGetClockID(OTALocal))
+                        {
+                            continue
+                        }
+                        else
+                        {
+                            stoptimer(Timers[I, string])
+                        }
+                    }
+                }
+                else
+                {
+                    Message += "Unable to update RailDriver.\n"
+                }
+
+                if (cliPrintToChat(CLI, "update", Message))
+                {
                     timer("Chat Print", 100)
-                    otaLocalUploadRailDriver(OTALocal)
                 }
             }
 

@@ -51,6 +51,8 @@ function table otaLocalInit()
     Ota["Flags", table] = table()
     Ota["Flags", table]["File Upload Started", number] = 0
     Ota["Flags", table]["File Upload Complete", number] = 0
+    Ota["Flags", table]["File Upload Failed", number] = 0
+    Ota["Flags", table]["Version File is Valid", number] = 0
 
     Ota["Debug", table]["JSON", string] = ""
 
@@ -100,6 +102,7 @@ function string otaLocalGetClockID(Ota:table)
 function void otaLocalLoadVersionFile(Ota:table)
 {
     Ota["File Path to Load", string] = ">" + Ota["Version File Path", string]
+    Ota["Flags", table]["Version File is Valid", number] = 0
     runOnFile(1)
     otaLocalStartClock(Ota, 300)
 }
@@ -108,8 +111,14 @@ function void otaLocalLoadVersionFile(Ota:table)
 # It should be called when the CLI is used to update RailDriver.
 # @param Ota A handle to the OTA library.
 # @return void
-function void otaLocalUploadRailDriver(Ota:table)
+function number otaLocalUploadRailDriver(Ota:table)
 {
+    # Check if the Version File is Valid.
+    if (Ota["Flags", table]["Version File is Valid", number] == 0 | Ota["Flags", table]["File Upload Failed", number] == 1)
+    {
+        return 0
+    }
+
     local FilePath = Ota["RailDriver", table]["Main", table]["Path", string] + "/" + Ota["RailDriver", table]["Main", table]["File", string]
     Ota["File Path to Load", string] = ">" + FilePath
 
@@ -118,6 +127,7 @@ function void otaLocalUploadRailDriver(Ota:table)
 
     runOnFile(1)
     otaLocalStartClock(Ota, 300)
+    return 1
 }
 
 function void otaLocalLoadFileHandler(Ota:table)
@@ -141,6 +151,7 @@ function void otaLocalLoadFileHandler(Ota:table)
                 Ota["Upload Attempts", number] = 0
                 Ota["Flags", table]["File Upload Started", number] = 0
                 Ota["Flags", table]["File Upload Complete", number] = 0
+                Ota["Flags", table]["File Upload Failed", number] = 1
                 runOnFile(0)
                 error("Failed to load file.")
             }
@@ -149,6 +160,10 @@ function void otaLocalLoadFileHandler(Ota:table)
                 otaLocalStartClock(Ota, 1000)
             }
         }
+    }
+    else
+    {
+        error("File upload already started.")
     }
 }
 
@@ -318,17 +333,21 @@ function number otaLocalIsVersionFileValid(Ota:table, RawData:string)
     # print("Hash File: " + HashFile)
     # print("Hash Calculated: " + HashCalculated)
 
-    return (HashFile == HashCalculated) ? 1 : 0
+    Ota["Flags", table]["Version File is Valid", number] = (HashFile == HashCalculated) ? 1 : 0
+
+    return Ota["Flags", table]["Version File is Valid", number]
 }
 
 function void otaLocalFileLoadedHandler(Ota:table)
 {
     runOnFile(0)
     local FileStatus = fileStatus()
+    
+    Ota["Flags", table]["File Upload Started", number] = 0
 
     if (FileStatus == _FILE_OK)
     {
-        Ota["Flags", table]["File Upload Started", number] = 0
+        Ota["Flags", table]["File Upload Failed", number] = 0
 
         local FileName = fileName()
 
@@ -340,6 +359,13 @@ function void otaLocalFileLoadedHandler(Ota:table)
             if (FileContents == "")
             {
                 error("Version file is empty.")
+            }
+            
+            local FileContentsTable = jsonDecode(FileContents)
+            local JsonError = jsonError()
+            if (JsonError != "")
+            {
+                error("Failed to decode version file: " + JsonError)
             }
 
             # Check if the version file is valid.
@@ -353,13 +379,6 @@ function void otaLocalFileLoadedHandler(Ota:table)
                 {
                     error("Version file is invalid.")
                 }
-            }
-            
-            local FileContentsTable = jsonDecode(FileContents)
-            local JsonError = jsonError()
-            if (JsonError != "")
-            {
-                error("Failed to decode version file: " + JsonError)
             }
 
             # Store the file contents in the OTA handle.
@@ -395,23 +414,28 @@ function void otaLocalFileLoadedHandler(Ota:table)
         else
         {
             Ota["Flags", table]["File Upload Complete", number] = 0
+            Ota["Flags", table]["File Upload Failed", number] = 1
             error("Loaded file path mismatch.")
         }
     }
     elseif (FileStatus == _FILE_UNKNOWN)
     {
+        Ota["Flags", table]["File Upload Failed", number] = 1
         error("Unknown error while loading file.")
     }
     elseif (FileStatus == _FILE_TIMEOUT)
     {
+        Ota["Flags", table]["File Upload Failed", number] = 1
         error("Loading file timed out.")
     }
     elseif (FileStatus == _FILE_404)
     {
+        Ota["Flags", table]["File Upload Failed", number] = 1
         error("File not found.")
     }
     elseif (FileStatus == _FILE_TRANSFER_ERROR)
     {
+        Ota["Flags", table]["File Upload Failed", number] = 1
         error("Failed to transfer file.")
     }
 }
