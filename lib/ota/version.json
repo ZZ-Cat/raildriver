@@ -14,7 +14,8 @@
         {
             "File":"RailDriver.txt",
             "Path":"e2shared/RailDriver",
-            "Version":"0.1.0"
+            "Version":"0.1.0",
+            "Hash":""
         },
         "Libraries":
         {
@@ -22,7 +23,8 @@
             {
                 "File":"cli.txt",
                 "Path":"e2shared/RailDriver/lib",
-                "Version":"0.1.0"
+                "Version":"0.1.0",
+                "Hash":""
             },
             "Controls":
             {
@@ -30,7 +32,8 @@
                 {
                     "File":"playerControls.txt",
                     "Path":"e2shared/RailDriver/lib/controls",
-                    "Version":"0.1.0"
+                    "Version":"0.1.0",
+                    "Hash":""
                 }
             },
             "Over-The-Air Updates":
@@ -39,14 +42,16 @@
                 {
                     "File":"local.txt",
                     "Path":"e2shared/RailDriver/lib/ota",
-                    "Version":"0.1.0"
+                    "Version":"0.1.0",
+                    "Hash":""
                 }
             },
             "PIDF Controller":
             {
                 "File":"pidf.txt",
                 "Path":"e2shared/RailDriver/lib",
-                "Version":"0.1.0"
+                "Version":"0.1.0",
+                "Hash":""
             },
             "Sensors":
             {
@@ -54,20 +59,23 @@
                 {
                     "File":"speedometer.txt",
                     "Path":"e2shared/RailDriver/lib/sensors",
-                    "Version":"0.1.0"
+                    "Version":"0.1.0",
+                    "Hash":""
                 }
             },
             "Smart Entity Management":
             {
                 "File":"smartEntityManagement.txt",
                 "Path":"e2shared/RailDriver/lib",
-                "Version":"0.1.0"
+                "Version":"0.1.0",
+                "Hash":""
             },
             "Timers":
             {
                 "File":"timers.txt",
                 "Path":"e2shared/RailDriver/lib",
-                "Version":"0.1.0"
+                "Version":"0.1.0",
+                "Hash":""
             }
         }
     }
