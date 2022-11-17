@@ -77,6 +77,30 @@
                 "Version":"0.1.0",
                 "Hash":""
             }
+        },
+        "Developers":
+        {
+            "Owner":
+            {
+                "Name":"Cassandra Robinson",
+                "Alias":"ZZ Cat",
+                "Social":
+                {
+                    "Discord":"ZZ Cat#0174",
+                    "GitHub":
+                    {
+                        "Username":"ZZ-Cat",
+                        "URL":"https://github.com/ZZ-Cat"
+                    },
+                    "Steam":
+                    {
+                        "Username":"ZZ Cat [CFH] [FC&N]",
+                        "ID":"STEAM_0:0:44701384",
+                        "ID64":"76561198049668496",
+                        "Profile":"https://steamcommunity.com/id/zz_cat"
+                    }
+                }
+            }
         }
     }
 }
