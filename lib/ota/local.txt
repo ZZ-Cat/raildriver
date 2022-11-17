@@ -446,13 +446,21 @@ function void otaLocalFileLoadedHandler(Ota:table)
 function string otaLocalGetAboutMessage(Ota:table)
 {
     local Str = ""
-    Str += Ota["RailDriver", table]["About", table]["Name", string] + "\n"
-    Str += Ota["RailDriver", table]["About", table]["Description", string] + "\n"
-    Str += "Version:      " + Ota["RailDriver", table]["Main", table]["Version", string] + "\n"
-    Str += "Author:       " + Ota["RailDriver", table]["About", table]["Author", string] + "\n"
-    Str += "Copyright:    " + Ota["RailDriver", table]["About", table]["Copyright", string] + "\n"
-    Str += "License:      " + Ota["RailDriver", table]["About", table]["License", string] + "\n"
-    Str += "Source Code:  " + Ota["RailDriver", table]["About", table]["Source Code", string] + "\n"
+
+    if (Ota["Flags", table]["Version File is Valid", number] == 1 & Ota["Flags", table]["File Upload Failed", number] == 0)
+    {
+        Str += Ota["RailDriver", table]["About", table]["Name", string] + "\n"
+        Str += Ota["RailDriver", table]["About", table]["Description", string] + "\n"
+        Str += "Version:      " + Ota["RailDriver", table]["Main", table]["Version", string] + "\n"
+        Str += "Author:       " + Ota["RailDriver", table]["About", table]["Author", string] + "\n"
+        Str += "Copyright:    " + Ota["RailDriver", table]["About", table]["Copyright", string] + "\n"
+        Str += "License:      " + Ota["RailDriver", table]["About", table]["License", string] + "\n"
+        Str += "Source Code:  " + Ota["RailDriver", table]["About", table]["Source Code", string] + "\n"
+    }
+    else
+    {
+        Str += "Unable to retrieve version information."
+    }
 
     return Str
 }
