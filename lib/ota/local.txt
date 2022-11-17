@@ -42,6 +42,7 @@ function table otaLocalInit()
     Ota["Upload Attempts", number] = 0
     Ota["Upload Max Attempts", number] = 5
 
+    # The selected file to upload.
     Ota["File Path to Load", string] = ""
 
     # Version file contents are stored here.
@@ -53,8 +54,6 @@ function table otaLocalInit()
     Ota["Flags", table]["File Upload Complete", number] = 0
     Ota["Flags", table]["File Upload Failed", number] = 0
     Ota["Flags", table]["Version File is Valid", number] = 0
-
-    Ota["Debug", table]["JSON", string] = ""
 
     return Ota
 }
@@ -119,21 +118,25 @@ function number otaLocalUploadRailDriver(Ota:table)
         return 0
     }
 
+    # Get RailDriver's file path.
     local FilePath = Ota["RailDriver", table]["Main", table]["Path", string] + "/" + Ota["RailDriver", table]["Main", table]["File", string]
     Ota["File Path to Load", string] = ">" + FilePath
 
-    # Debug.
-    # print("Path: " + Ota["File Path to Load", string])
-
+    # Start uploading RailDriver.
     runOnFile(1)
     otaLocalStartClock(Ota, 300)
     return 1
 }
 
+# This function is called to upload a file to the server.
+# @param Ota A handle to the OTA library.
+# @return void
 function void otaLocalLoadFileHandler(Ota:table)
 {
+    # Check if a file is already being uploaded.
     if (Ota["Flags", table]["File Upload Started", number] == 0)
     {
+        # Check if a file can be loaded at this time.
         if (fileCanLoad())
         {
             otaLocalStopClock(Ota)
@@ -142,10 +145,15 @@ function void otaLocalLoadFileHandler(Ota:table)
             Ota["Flags", table]["File Upload Complete", number] = 0
             Ota["Flags", table]["File Upload Started", number] = 1
         }
+
+        # Handle the case where a file cannot be loaded.
         else
         {
+            # Get the number of upload attempts.
             otaLocalStopClock(Ota)
             Ota["Upload Attempts", number] = Ota["Upload Attempts", number] + 1
+
+            # Check if the upload has failed too many times.
             if (Ota["Upload Attempts", number] >= Ota["Upload Max Attempts", number])
             {
                 Ota["Upload Attempts", number] = 0
@@ -155,12 +163,16 @@ function void otaLocalLoadFileHandler(Ota:table)
                 runOnFile(0)
                 error("Failed to load file.")
             }
+
+            # Restart the clock.
             else
             {
                 otaLocalStartClock(Ota, 1000)
             }
         }
     }
+
+    # Display an error if the file upload has already started.
     else
     {
         error("File upload already started.")
@@ -168,6 +180,7 @@ function void otaLocalLoadFileHandler(Ota:table)
 }
 
 # This function is used to internally update the Version File's hash.
+# This function needs to be rewritten, as its current state is now outdated.
 # @param Ota A handle to the OTA library.
 # @param Data The entire file's contents.
 # @param Hash The new hash.
@@ -178,7 +191,6 @@ function number otaLocalUpdateVersionFileHash(Ota:table, Data:table, Hash:number
     local T = table()
     T["Hash", string] = Hash:toString()
     Data["RailDriver", table] = Data["RailDriver", table]:add(T)
-    #Data["RailDriver", table]["Hash", string] = Hash:toString()
 
     # Check if the hash exists.
     if (Data:exists("RailDriver") == 1)
@@ -249,33 +261,13 @@ function number otaLocalPlayerIsDeveloper(Ota:table, Data:table, Player:entity)
 
         local OwnerTable = table()
         OwnerTable["Steam", table] = table()
-
-        # Use T:clone() to avoid modifying the original table.
-        # This is important because the original table is used to update the version file,
-        # & using T:removeTable(Index) globally removes the specified table from the original table.
         OwnerTable["Steam", table] = Data["RailDriver", table]["Developers", table]["Owner", table]["Social", table]["Steam", table]:clone()
-
-        # This has been commented out due to the fact that the T:removeTable(Index) function actually removes the table from the original table.
-        # OwnerTable["Steam", table] = Data["RailDriver", table]["Developers", table]["Owner", table]["Social", table]:removeTable("Steam")
-
-        # Debug.
-        # print("Owner Username: " + OwnerTable["Steam", table]["Username", string])
-        # print("Owner SteamID: " + OwnerTable["Steam", table]["ID", string])
-        # print("Owner SteamID64: " + OwnerTable["Steam", table]["ID64", string])
-        # print("This Person Username: " + ThisPersonTable["Steam", table]["Username", string])
-        # print("This Person SteamID: " + ThisPersonTable["Steam", table]["ID", string])
-        # print("This Person SteamID64: " + ThisPersonTable["Steam", table]["ID64", string])
-
-        # error("Stopping here, just 'cause I found where my bug is.")
 
         # Check if the player is the owner.
         # Check their Username, SteamID, and SteamID64.
         # If all three match, then they are the owner.
         if (ThisPersonTable["Steam", table]["Username", string] == OwnerTable["Steam", table]["Username", string] & ThisPersonTable["Steam", table]["ID", string] == OwnerTable["Steam", table]["ID", string] & ThisPersonTable["Steam", table]["ID64", string] == OwnerTable["Steam", table]["ID64", string])
         {
-            # Debug.
-            # print("This person is the owner."))
-
             return 1
         }
     }
@@ -283,6 +275,10 @@ function number otaLocalPlayerIsDeveloper(Ota:table, Data:table, Player:entity)
     return 0
 }
 
+# This function is used to check if the Version File is valid.
+# @param Ota A handle to the OTA library.
+# @param RawData The raw data from the Version File.
+# @return 1 if the Version File is valid, 0 otherwise.
 function number otaLocalIsVersionFileValid(Ota:table, RawData:string)
 {
     local Lines = RawData:explode("\n")
@@ -301,9 +297,6 @@ function number otaLocalIsVersionFileValid(Ota:table, RawData:string)
 
         if (LineName == "Hash")
         {
-            # Debug.
-            # print(LineName + ": " + LineValue)
-
             if (Lines[I - 1, string]:find(","))
             {
                 HashFile = LineValue:toNumber()
@@ -338,6 +331,9 @@ function number otaLocalIsVersionFileValid(Ota:table, RawData:string)
     return Ota["Flags", table]["Version File is Valid", number]
 }
 
+# This function is called to decide how an uploaded file should be handled.
+# @param Ota A handle to the OTA library.
+# @return void
 function void otaLocalFileLoadedHandler(Ota:table)
 {
     runOnFile(0)
@@ -390,7 +386,6 @@ function void otaLocalFileLoadedHandler(Ota:table)
             {
                 error("RailDriver section is missing from version file.")
             }
-            #Ota["RailDriver", table] = FileContentsTable["RailDriver", table]:clone()
         }
         elseif (FileName == ">" + Ota["RailDriver", table]["Main", table]["Path", string] + "/" + Ota["RailDriver", table]["Main", table]["File", string])
         {
@@ -401,11 +396,6 @@ function void otaLocalFileLoadedHandler(Ota:table)
             {
                 error(Ota["RailDriver", table]["Main", table]["File", string] + " is empty.")
             }
-
-            # Debug.
-            #print("RailDriver uploaded successfully, but not yet installed.")
-            #print(Ota["RailDriver", table]["Main", table]["File", string] + " Hash: " + hash(FileContents))
-            #print("RailDriver Hash: " + hash(getCode()))
 
             # Update RailDriver
             local E = entity()
@@ -463,9 +453,4 @@ function string otaLocalGetAboutMessage(Ota:table)
     }
 
     return Str
-}
-
-function string otaLocalDebugGetVersionFileContents(Ota:table)
-{
-    return Ota["Debug", table]["JSON", string]
 }
