@@ -341,13 +341,6 @@ function void otaLocalFileLoadedHandler(Ota:table)
             {
                 error("Version file is empty.")
             }
-            
-            local FileContentsTable = jsonDecode(FileContents)
-            local JsonError = jsonError()
-            if (JsonError != "")
-            {
-                error("Failed to decode version file: " + JsonError)
-            }
 
             # Check if the version file is valid.
             if (otaLocalIsVersionFileValid(Ota, FileContents) != 1)
@@ -360,6 +353,13 @@ function void otaLocalFileLoadedHandler(Ota:table)
                 {
                     error("Version file is invalid.")
                 }
+            }
+            
+            local FileContentsTable = jsonDecode(FileContents)
+            local JsonError = jsonError()
+            if (JsonError != "")
+            {
+                error("Failed to decode version file: " + JsonError)
             }
 
             # Store the file contents in the OTA handle.
