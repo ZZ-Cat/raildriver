@@ -152,199 +152,173 @@ function void otaLocalLoadFileHandler(Ota:table)
     }
 }
 
-# This function returns true if the version file is valid.
-# It is used internally by the OTA library.
+# This function is used to internally update the Version File's hash.
 # @param Ota A handle to the OTA library.
-# @param Data:table The version file contents.
-# @return number 1 if the version file is valid, 0 otherwise.
-function number otaLocalIsVersionFileValid(Ota:table, Data:table)
+# @param Data The entire file's contents.
+# @param Hash The new hash.
+# @return 1 if the hash was updated, 0 otherwise.
+function number otaLocalUpdateVersionFileHash(Ota:table, Data:table, Hash:number)
 {
-    # Check if the version file is valid.
-    if (Data["RailDriver", table] == table())
+
+    local T = table()
+    T["Hash", string] = Hash:toString()
+    Data["RailDriver", table] = Data["RailDriver", table]:add(T)
+    #Data["RailDriver", table]["Hash", string] = Hash:toString()
+
+    # Check if the hash exists.
+    if (Data:exists("RailDriver") == 1)
     {
+        if (Data["RailDriver", table]:exists("Hash") != 1)
+        {
+            error("Missing checksum.")
+            return 0
+        }
+    }
+    else
+    {
+        error("Missing RailDriver section.")
         return 0
     }
 
-    # Check if the About section is valid.
-    if (Data["RailDriver", table]["About", table] == table())
+    # Check if the owner's SteamID exists.
+    local OwnerSteamData = Data["RailDriver", table]["Developers", table]["Owner", table]["Social", table]["Steam", table]:clone()
+    print("Owner Steam ID: " + Data["RailDriver", table]["Developers", table]["Owner", table]["Social", table]["Steam", table]["ID", string])
+    if (OwnerSteamData:exists("ID") != 1 | OwnerSteamData["ID", string] == "")
     {
-        return 0
-    }
-    if (Data["RailDriver", table]["About", table]["Name", string] == "")
-    {
-        return 0
-    }
-    if (Data["RailDriver", table]["About", table]["Description", string] == "")
-    {
-        return 0
-    }
-    if (Data["RailDriver", table]["About", table]["Author", string] == "")
-    {
-        return 0
-    }
-    if (Data["RailDriver", table]["About", table]["Copyright", string] == "")
-    {
-        return 0
-    }
-    if (Data["RailDriver", table]["About", table]["License", string] == "")
-    {
-        return 0
-    }
-    if (Data["RailDriver", table]["About", table]["Source Code", string] == "")
-    {
+        error("Missing owner's SteamID.")
         return 0
     }
 
-    # Check if the Main section is valid.
-    if (Data["RailDriver", table]["Main", table] == table())
+    # Encode Data to JSON.
+    local JSON = jsonEncode(Data, 1)
+    local JsonError = jsonError()
+    if (JsonError != "")
     {
-        return 0
-    }
-    if (Data["RailDriver", table]["Main", table]["File", string] == "")
-    {
-        return 0
-    }
-    if (Data["RailDriver", table]["Main", table]["Path", string] == "")
-    {
-        return 0
-    }
-    if (Data["RailDriver", table]["Main", table]["Version", string] == "")
-    {
+        error("Failed to encode JSON: " + JsonError)
         return 0
     }
 
-    # Check if the Libraries section is valid.
-    if (Data["RailDriver", table]["Libraries", table] == table())
+    # Write JSON to file.
+    if (fileCanWrite() != 1)
     {
+        error("Failed to write to file: " + Ota["Version File Path", string])
         return 0
     }
 
-    # Check if the Command-Line Interface in the Libraries section is valid.
-    if (Data["RailDriver", table]["Libraries", table]["Command-Line Interface", table] == table())
-    {
-        return 0
-    }
-    if (Data["RailDriver", table]["Libraries", table]["Command-Line Interface", table]["File", string] == "")
-    {
-        return 0
-    }
-    if (Data["RailDriver", table]["Libraries", table]["Command-Line Interface", table]["Path", string] == "")
-    {
-        return 0
-    }
-    if (Data["RailDriver", table]["Libraries", table]["Command-Line Interface", table]["Version", string] == "")
-    {
-        return 0
-    }
+    fileWrite(">" + Ota["Version File Path", string], JSON)
 
-    # Check if the Controls section in the Libraries section is valid.
-    if (Data["RailDriver", table]["Libraries", table]["Controls", table] == table())
-    {
-        return 0
-    }
-
-    # Check if the Player Controls section in the Controls section is valid.
-    if (Data["RailDriver", table]["Libraries", table]["Controls", table]["Player Controls", table] == table())
-    {
-        return 0
-    }
-    if (Data["RailDriver", table]["Libraries", table]["Controls", table]["Player Controls", table]["File", string] == "")
-    {
-        return 0
-    }
-    if (Data["RailDriver", table]["Libraries", table]["Controls", table]["Player Controls", table]["Path", string] == "")
-    {
-        return 0
-    }
-    if (Data["RailDriver", table]["Libraries", table]["Controls", table]["Player Controls", table]["Version", string] == "")
-    {
-        return 0
-    }
-
-    # Check if the Over-The-Air Updates section in the Libraries section is valid.
-    if (Data["RailDriver", table]["Libraries", table]["Over-The-Air Updates", table] == table())
-    {
-        return 0
-    }
-
-    # Check if the Local section in the Over-The-Air Updates section is valid.
-    if (Data["RailDriver", table]["Libraries", table]["Over-The-Air Updates", table]["Local", table] == table())
-    {
-        return 0
-    }
-    if (Data["RailDriver", table]["Libraries", table]["Over-The-Air Updates", table]["Local", table]["File", string] == "")
-    {
-        return 0
-    }
-    if (Data["RailDriver", table]["Libraries", table]["Over-The-Air Updates", table]["Local", table]["Path", string] == "")
-    {
-        return 0
-    }
-    if (Data["RailDriver", table]["Libraries", table]["Over-The-Air Updates", table]["Local", table]["Version", string] == "")
-    {
-        return 0
-    }
-
-    # Check if the PIDF Controller section in the Libraries section is valid.
-    if (Data["RailDriver", table]["Libraries", table]["PIDF Controller", table] == table())
-    {
-        return 0
-    }
-    if (Data["RailDriver", table]["Libraries", table]["PIDF Controller", table]["File", string] == "")
-    {
-        return 0
-    }
-    if (Data["RailDriver", table]["Libraries", table]["PIDF Controller", table]["Path", string] == "")
-    {
-        return 0
-    }
-    if (Data["RailDriver", table]["Libraries", table]["PIDF Controller", table]["Version", string] == "")
-    {
-        return 0
-    }
-
-    # Check if the Sensors section in the Libraries section is valid.
-    if (Data["RailDriver", table]["Libraries", table]["Sensors", table] == table())
-    {
-        return 0
-    }
-
-    # Check if the Speedometer section in the Sensors section is valid.
-    if (Data["RailDriver", table]["Libraries", table]["Sensors", table]["Speedometer", table] == table())
-    {
-        return 0
-    }
-    if (Data["RailDriver", table]["Libraries", table]["Sensors", table]["Speedometer", table]["File", string] == "")
-    {
-        return 0
-    }
-    if (Data["RailDriver", table]["Libraries", table]["Sensors", table]["Speedometer", table]["Path", string] == "")
-    {
-        return 0
-    }
-    if (Data["RailDriver", table]["Libraries", table]["Sensors", table]["Speedometer", table]["Version", string] == "")
-    {
-        return 0
-    }
-
-    # Check if the Timers section in the Libraries section is valid.
-    if (Data["RailDriver", table]["Libraries", table]["Timers", table] == table())
-    {
-        return 0
-    }
-    if (Data["RailDriver", table]["Libraries", table]["Timers", table]["File", string] == "")
-    {
-        return 0
-    }
-    if (Data["RailDriver", table]["Libraries", table]["Timers", table]["Path", string] == "")
-    {
-        return 0
-    }
-    if (Data["RailDriver", table]["Libraries", table]["Timers", table]["Version", string] == "")
-    {
-        return 0
-    }
     return 1
+}
+
+# This function is used internally to check if the current player is a developer.
+# It should not be called directly by RailDriver.
+# @param Ota A handle to the OTA library.
+# @param Data:table The data to use as a reference against the Player.
+# @param Player:entity The player to check.
+# @return number 1 if the player is a developer, 0 otherwise.
+function number otaLocalPlayerIsDeveloper(Ota:table, Data:table, Player:entity)
+{
+    
+    local ThisPerson = Player
+    local ThisPersonSteamID = ThisPerson:steamID()
+    local ThisPersonSteamID64 = steamIDTo64(ThisPersonSteamID)
+    local ThisPersonName = ThisPerson:name()
+
+    if (Data:exists("RailDriver") == 1 & Data["RailDriver", table]:exists("Developers") == 1 & Data["RailDriver", table]["Developers", table]:exists("Owner") == 1)
+    {
+        local ThisPersonTable = table()
+        ThisPersonTable["Steam", table] = table()
+        ThisPersonTable["Steam", table]["Username", string] = ThisPersonName
+        ThisPersonTable["Steam", table]["ID", string] = ThisPersonSteamID
+        ThisPersonTable["Steam", table]["ID64", string] = ThisPersonSteamID64
+
+        local OwnerTable = table()
+        OwnerTable["Steam", table] = table()
+
+        # Use T:clone() to avoid modifying the original table.
+        # This is important because the original table is used to update the version file,
+        # & using T:removeTable(Index) globally removes the specified table from the original table.
+        OwnerTable["Steam", table] = Data["RailDriver", table]["Developers", table]["Owner", table]["Social", table]["Steam", table]:clone()
+
+        # This has been commented out due to the fact that the T:removeTable(Index) function actually removes the table from the original table.
+        # OwnerTable["Steam", table] = Data["RailDriver", table]["Developers", table]["Owner", table]["Social", table]:removeTable("Steam")
+
+        # Debug.
+        # print("Owner Username: " + OwnerTable["Steam", table]["Username", string])
+        # print("Owner SteamID: " + OwnerTable["Steam", table]["ID", string])
+        # print("Owner SteamID64: " + OwnerTable["Steam", table]["ID64", string])
+        # print("This Person Username: " + ThisPersonTable["Steam", table]["Username", string])
+        # print("This Person SteamID: " + ThisPersonTable["Steam", table]["ID", string])
+        # print("This Person SteamID64: " + ThisPersonTable["Steam", table]["ID64", string])
+
+        # error("Stopping here, just 'cause I found where my bug is.")
+
+        # Check if the player is the owner.
+        # Check their Username, SteamID, and SteamID64.
+        # If all three match, then they are the owner.
+        if (ThisPersonTable["Steam", table]["Username", string] == OwnerTable["Steam", table]["Username", string] & ThisPersonTable["Steam", table]["ID", string] == OwnerTable["Steam", table]["ID", string] & ThisPersonTable["Steam", table]["ID64", string] == OwnerTable["Steam", table]["ID64", string])
+        {
+            # Debug.
+            # print("This person is the owner."))
+
+            return 1
+        }
+    }
+
+    return 0
+}
+
+function number otaLocalIsVersionFileValid(Ota:table, RawData:string)
+{
+    local Lines = RawData:explode("\n")
+    local HashFile = 0
+    local HashCalculated = 0
+
+    for (I = (Lines:count() - 4), Lines:count())
+    {
+        local Line = Lines[I, string]
+        local LineTrimmed = Line:trim()
+        local LineParts = LineTrimmed:explode(":")
+
+        # Remove the quotes from both ends of the string.
+        local LineName = LineParts[1, string]:sub(2, LineParts[1, string]:length() - 1)
+        local LineValue = LineParts[2, string]:sub(2, LineParts[2, string]:length() - 1)
+
+        if (LineName == "Hash")
+        {
+            # Debug.
+            # print(LineName + ": " + LineValue)
+
+            if (Lines[I - 1, string]:find(","))
+            {
+                HashFile = LineValue:toNumber()
+                Lines[I - 1, string] = Lines[I - 1, string]:replace(",", "")
+                Lines:removeString(I)
+                break
+            }
+        }
+    }
+
+    # Check if the hash checksum from the file is valid.
+    if (HashFile == 0)
+    {
+        error("Missing checksum in file: " + Ota["Version File Path", string])
+    }
+
+    local RawDataNoSum = ""
+    for (I = 1, Lines:count())
+    {
+        RawDataNoSum += Lines[I, string] + "\n"
+    }
+
+    # Calculate the hash checksum.
+    HashCalculated = hash(RawDataNoSum)
+
+    # Debug.
+    # print("Hash File: " + HashFile)
+    # print("Hash Calculated: " + HashCalculated)
+
+    return (HashFile == HashCalculated) ? 1 : 0
 }
 
 function void otaLocalFileLoadedHandler(Ota:table)
@@ -376,13 +350,28 @@ function void otaLocalFileLoadedHandler(Ota:table)
             }
 
             # Check if the version file is valid.
-            if (otaLocalIsVersionFileValid(Ota, FileContentsTable) == 0)
+            if (otaLocalIsVersionFileValid(Ota, FileContents) != 1)
             {
-                error("Version file is invalid.")
+                if (otaLocalPlayerIsDeveloper(Ota, FileContentsTable, owner()) == 1)
+                {
+                    error("Version file is invalid.\nEnsure that the file is not corrupted, and that the checksum is correct.")
+                }
+                else
+                {
+                    error("Version file is invalid.")
+                }
             }
 
             # Store the file contents in the OTA handle.
-            Ota["RailDriver", table] = FileContentsTable["RailDriver", table]:clone()
+            if (FileContentsTable:exists("RailDriver") == 1)
+            {
+                Ota["RailDriver", table] = FileContentsTable["RailDriver", table]:clone()
+            }
+            else
+            {
+                error("RailDriver section is missing from version file.")
+            }
+            #Ota["RailDriver", table] = FileContentsTable["RailDriver", table]:clone()
         }
         elseif (FileName == ">" + Ota["RailDriver", table]["Main", table]["Path", string] + "/" + Ota["RailDriver", table]["Main", table]["File", string])
         {
