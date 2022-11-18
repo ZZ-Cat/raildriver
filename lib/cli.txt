@@ -392,11 +392,9 @@ function number cliUnregisterCommand(Cli:table, Command:string)
         return 0
     }
 
-    # Unregister the command, argumants, help text, and flags.
-    Cli["Commands", table][Command, table] = table()
-    Cli["Commands", table][Command, table]["Arguments", array] = array()
-    Cli["Commands", table][Command, table]["help", string] = ""
-    Cli["Commands", table]["Flags", table][Command + " is updated", number] = 0
+    # Unregister the command, arguments, help text, and flags.
+    Cli["Commands", table]:remove(Command)
+    Cli["Commands", table]["Flags", table]:remove(Command + " is updated")
 
     # Return success.
     return 1
