@@ -434,7 +434,7 @@ function void otaLocalFileLoadedHandler(Ota:table)
                     runOnTick(0)
                     runOnKeys(owner(), 0)
                     stopAllTimers()
-                    timer("Restart", 5000)
+                    timer("Restart", 2000)
                 }
                 else
                 {
