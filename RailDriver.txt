@@ -213,6 +213,7 @@ if (first() | duped())
             stopAllTimers()
         }
 
+        SpeedAbs = 0
         runOnKeys(TrainDriver, 0)
         runOnTick(0)
         if (CLI:count() > 0)
@@ -268,11 +269,11 @@ if (chatClk(TrainDriver))
             Message += "Commands:\n"
             Message += "All commands are prefixed with '.raildriver',\n"
             Message += "and are case-insensitive.\n"
-            Message += "help - " + cliGetHelp(CLI, "help") + "\n"
-            Message += "about - " + cliGetHelp(CLI, "about") + "\n"
-            Message += "controls - " + cliGetHelp(CLI, "controls") + "\n"
-            Message += "restart - " + cliGetHelp(CLI, "restart") + "\n"
-            Message += "update - " + cliGetHelp(CLI, "update") + "\n"
+            Message += cliCommandExists(CLI, "help") ? "help - " + cliGetHelp(CLI, "help") + "\n" : ""
+            Message += cliCommandExists(CLI, "about") ? "about - " + cliGetHelp(CLI, "about") + "\n" : ""
+            Message += cliCommandExists(CLI, "controls") ? "controls - " + cliGetHelp(CLI, "controls") + "\n" : ""
+            Message += cliCommandExists(CLI, "restart") ? "restart - " + cliGetHelp(CLI, "restart") + "\n" : ""
+            Message += cliCommandExists(CLI, "update") ? "update - " + cliGetHelp(CLI, "update") + "\n" : ""
 
             if (cliPrintToChat(CLI, "help", Message))
             {
@@ -927,6 +928,10 @@ if (clk("Emergency Brake"))
         }
         runOnKeys(TrainDriver, 0)
         runOnTick(0)
+
+        # Unregister CLI controls & update commands.
+        cliUnregisterCommand(CLI, "controls")
+        cliUnregisterCommand(CLI, "update")
 
         # Unlock the RailDriver, so that it can be manually reset.
         if (semE2IsLocked())
