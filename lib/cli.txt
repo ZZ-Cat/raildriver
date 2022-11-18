@@ -332,7 +332,7 @@ function table cliInit(CliPrefix:string)
     Cli["Commands", table]["update", table] = table()
     Cli["Commands", table]["update", table]["Arguments", array] = array()
     Cli["Commands", table]["update", table]["Arguments", array]:pushString("local")
-    Cli["Commands", table]["update", table]["help", string] = "Updates RailDriver from your e2shared folder."
+    Cli["Commands", table]["update", table]["help", string] = "Uses Over-The-Air Updates to update RailDriver.\n  Arguments:\n    local - Updates RailDriver from your e2shared folder.\n    online - Coming soon."
     Cli["Commands", table]["Flags", table]["update is updated", number] = 0
 
     # Return the CLI library.

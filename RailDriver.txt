@@ -244,6 +244,7 @@ if (chatClk(TrainDriver))
             Message += "about - " + cliGetHelp(CLI, "about") + "\n"
             Message += "controls - " + cliGetHelp(CLI, "controls") + "\n"
             Message += "restart - " + cliGetHelp(CLI, "restart") + "\n"
+            Message += "update - " + cliGetHelp(CLI, "update") + "\n"
 
             if (cliPrintToChat(CLI, "help", Message))
             {
