@@ -402,6 +402,26 @@ function number cliUnregisterCommand(Cli:table, Command:string)
     return 1
 }
 
+# This function is called by the RailDriver E2 script to check if a command exists.
+# @param Cli A handle to the CLI library.
+# @param Command The command to check.
+# @return true if the command exists, false otherwise.
+function number cliCommandExists(Cli:table, Command:string)
+{
+    # Command is case-insensitive.
+    Command = Command:lower()
+
+    # Check if the command exists.
+    if (Cli["Commands", table]:exists(Command) == 1 & Cli["Commands", table][Command, table]:count() > 0)
+    {
+        # The command exists.
+        return 1
+    }
+
+    # The command does not exist.
+    return 0
+}
+
 # This function is called by the RailDriver E2 script to check if a command has been updated.
 # @param Cli A handle to the CLI library.
 # @param Command The command to check.
