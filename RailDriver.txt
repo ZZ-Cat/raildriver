@@ -168,7 +168,7 @@ if (first() | duped())
         # Show the RailDriver welcome message.
         if (cliPrintToChat(CLI, "info", "Welcome to RailDriver!\nType '.raildriver help' for a list of commands."))
         {
-            timer("Chat Print", 100)
+            timer("Chat Print", 2200)
         }
 
         timer("Debug", 100)
