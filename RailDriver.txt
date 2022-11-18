@@ -840,7 +840,7 @@ elseif (RailDriverState == 2)
                 }
 
                 # If the locomotive is not stopped, set the Emergency Brake state to 5.
-                else
+                elseif (EmBrakeThisSpeed >= EmBrakeLastSpeed)
                 {
                     EmBrakeState = 5
                 }
