@@ -217,15 +217,86 @@ function number otaLocalPlayerIsDeveloper(Ota:table, Data:table, Player:entity)
     return 0
 }
 
-# This function is used to internally update the Version File's hash.
-# This function needs to be rewritten, as its current state is now outdated.
+# This function is used to internally update the Version File.
 # @param Ota A handle to the OTA library.
 # @param RawData The raw data of the file.
-# @return 1 if the hash was updated, 0 otherwise.
-function number otaLocalUpdateVersionFileHash(Ota:table, RawData:string)
+# @return void
+function void otaLocalUpdateVersionFile(Ota:table, RawData:string)
 {
-    # Return false, for now.
-    return 0
+    local Lines = RawData:explode("\n")
+    local HashFile = 0
+    local HashCalculated = 0
+
+    for (I = (Lines:count() - 4), Lines:count())
+    {
+        local Line = Lines[I, string]
+        local LineTrimmed = Line:trim()
+        local LineParts = LineTrimmed:explode(":")
+
+        # Remove the quotes from both ends of the string.
+        local LineName = LineParts[1, string]:sub(2, LineParts[1, string]:length() - 1)
+        local LineValue = LineParts[2, string]:sub(2, LineParts[2, string]:length() - 1)
+
+        if (LineName == "Hash")
+        {
+            if (Lines[I - 1, string]:find(","))
+            {
+                HashFile = LineValue:toNumber()
+                Lines[I - 1, string] = Lines[I - 1, string]:replace(",", "")
+                Lines:removeString(I)
+                break
+            }
+        }
+    }
+
+    # Check if the hash checksum from the file is valid.
+    if (HashFile == 0)
+    {
+        error("No checksum found in the Version File.")
+    }
+
+    local RawDataNoSum = ""
+    for (I = 1, Lines:count())
+    {
+        RawDataNoSum += Lines[I, string] + "\n"
+    }
+
+    # Calculate the hash checksum.
+    HashCalculated = hash(RawDataNoSum)
+
+    # Add the calculated hash checksum to the RawData.
+    Lines = RawData:explode("\n")
+    for (I = (Lines:count() - 4), Lines:count())
+    {
+        local Line = Lines[I, string]
+        local LineTrimmed = Line:trim()
+        local LineParts = LineTrimmed:explode(":")
+
+        # Remove the quotes from both ends of the string.
+        local LineName = LineParts[1, string]:sub(2, LineParts[1, string]:length() - 1)
+        local LineValue = LineParts[2, string]:sub(2, LineParts[2, string]:length() - 1)
+
+        if (LineName == "Hash")
+        {
+            Lines[I, string] = "        \"Hash\":" + "\"" + HashCalculated + "\""
+            break
+        }
+    }
+
+    # Update the RawData.
+    RawData = ""
+    for (I = 1, Lines:count())
+    {
+        RawData += Lines[I, string] + "\n"
+    }
+
+    # Update the Version File.
+    if (fileCanWrite() != 1)
+    {
+        error("Cannot write to the Version File.")
+    }
+
+    fileWrite(">" + Ota["Version File Path", string], RawData)
 }
 
 # This function is used to check if the Version File is valid.
@@ -322,7 +393,18 @@ function void otaLocalFileLoadedHandler(Ota:table)
             {
                 if (otaLocalPlayerIsDeveloper(Ota, FileContentsTable, owner()) == 1)
                 {
-                    error("Version file is invalid.\nEnsure that the file is not corrupted, and that the checksum is correct.")
+                    # Update the version file.
+                    otaLocalUpdateVersionFile(Ota, FileContents)
+
+                    # Print a message to the player.
+                    print("Version file updated. Please wait while RailDriver restarts...")
+
+                    # Restart RailDriver.
+                    runOnChat(0)
+                    runOnTick(0)
+                    runOnKeys(owner(), 0)
+                    stopAllTimers()
+                    timer("Restart", 5000)
                 }
                 else
                 {
