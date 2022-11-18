@@ -1,1 +1,1 @@
-*.txt linguist-language=lua
+*.txt text eol=lf linguist-language=lua
