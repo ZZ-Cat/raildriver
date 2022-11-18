@@ -325,7 +325,7 @@ function table cliInit(CliPrefix:string)
     # Register the restart command.
     Cli["Commands", table]["restart", table] = table()
     Cli["Commands", table]["restart", table]["Arguments", array] = array()
-    Cli["Commands", table]["restart", table]["help", string] = "Restarts the RailDriver script."
+    Cli["Commands", table]["restart", table]["help", string] = "Restarts RailDriver."
     Cli["Commands", table]["Flags", table]["restart is updated", number] = 0
 
     # Register the update command with the argument "local".
