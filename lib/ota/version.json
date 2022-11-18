@@ -1,0 +1,107 @@
+{
+    "RailDriver":
+    {
+        "About":
+        {
+            "Name": "RailDriver",
+            "Description": "Smart locomotive controller script for Garry's Mod train build servers.",
+            "Author": "Cassandra \"ZZ Cat\" Robinson",
+            "Copyright":"(c) 2022, Cassandra \"ZZ Cat\" Robinson. All rights reserved.",
+            "License":"GNU Affero General Public License v3.0",
+            "Source Code":"https://github.com/ZZ-Cat/RailDriver"
+        },
+        "Main":
+        {
+            "File":"RailDriver.txt",
+            "Path":"e2shared/RailDriver",
+            "Version":"0.1.0",
+            "Hash":""
+        },
+        "Libraries":
+        {
+            "Command-Line Interface":
+            {
+                "File":"cli.txt",
+                "Path":"e2shared/RailDriver/lib",
+                "Version":"0.1.0",
+                "Hash":""
+            },
+            "Controls":
+            {
+                "Player Controls":
+                {
+                    "File":"playerControls.txt",
+                    "Path":"e2shared/RailDriver/lib/controls",
+                    "Version":"0.1.0",
+                    "Hash":""
+                }
+            },
+            "Over-The-Air Updates":
+            {
+                "Local":
+                {
+                    "File":"local.txt",
+                    "Path":"e2shared/RailDriver/lib/ota",
+                    "Version":"0.1.0",
+                    "Hash":""
+                }
+            },
+            "PIDF Controller":
+            {
+                "File":"pidf.txt",
+                "Path":"e2shared/RailDriver/lib",
+                "Version":"0.1.0",
+                "Hash":""
+            },
+            "Sensors":
+            {
+                "Speedometer":
+                {
+                    "File":"speedometer.txt",
+                    "Path":"e2shared/RailDriver/lib/sensors",
+                    "Version":"0.1.0",
+                    "Hash":""
+                }
+            },
+            "Smart Entity Management":
+            {
+                "File":"smartEntityManagement.txt",
+                "Path":"e2shared/RailDriver/lib",
+                "Version":"0.1.0",
+                "Hash":""
+            },
+            "Timers":
+            {
+                "File":"timers.txt",
+                "Path":"e2shared/RailDriver/lib",
+                "Version":"0.1.0",
+                "Hash":""
+            }
+        },
+        "Developers":
+        {
+            "Owner":
+            {
+                "Name":"Cassandra Robinson",
+                "Alias":"ZZ Cat",
+                "Social":
+                {
+                    "Discord":"ZZ Cat#0174",
+                    "GitHub":
+                    {
+                        "Username":"ZZ-Cat",
+                        "URL":"https://github.com/ZZ-Cat"
+                    },
+                    "Steam":
+                    {
+                        "Username":"ZZ Cat [CFH] [FC&N]",
+                        "ID":"STEAM_0:0:44701384",
+                        "ID64":"76561198049668496",
+                        "Profile":"https://steamcommunity.com/id/zz_cat"
+                    }
+                }
+            }
+        },
+        "Hash":"4271356853"
+    }
+}

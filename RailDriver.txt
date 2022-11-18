@@ -20,7 +20,7 @@
 @model models/beer/wiremod/gate_e2_nano.mdl
 @persist Trucks:array Speedo:table
 @persist [Direction Throttle Brake EmergencyBrake]:number
-@persist [CLI PlayerControls ThrottleMap BrakeMap]:table TrainDriver:entity
+@persist [OTALocal CLI PlayerControls ThrottleMap BrakeMap]:table TrainDriver:entity
 @persist PIDF:table
 @persist EmBrakeState EmBrakeThisSpeed EmBrakeLastSpeed EmBrakeObserverTickInterval EmBrakePCFaultTimeoutSet
 @persist Speed SpeedAbs SpeedMPH
@@ -45,6 +45,7 @@ if (first() | duped())
 
     try
     {
+        #include "e2shared/RailDriver/lib/ota/local"
         #include "e2shared/RailDriver/lib/smartEntityManagement"
         #include "e2shared/RailDriver/lib/sensors/speedometer"
         #include "e2shared/RailDriver/lib/controls/playerControls"
@@ -156,10 +157,18 @@ if (first() | duped())
             error("Failed to initialize PIDF controller.")
         }
 
+        # Initialize OTA.
+        OTALocal = otaLocalInit()
+        if (OTALocal:count() == 0)
+        {
+            error("Failed to initialize local Over The Air (OTA) Updates.")
+        }
+        otaLocalLoadVersionFile(OTALocal)
+
         # Show the RailDriver welcome message.
         if (cliPrintToChat(CLI, "info", "Welcome to RailDriver!\nType '.raildriver help' for a list of commands."))
         {
-            timer("Chat Print", 100)
+            timer("Chat Print", 2200)
         }
 
         timer("Debug", 100)
@@ -187,6 +196,32 @@ if (first() | duped())
     }
 }
 
+if (clk(otaLocalGetClockID(OTALocal)))
+{
+    try
+    {
+        otaLocalLoadFileHandler(OTALocal)
+    }
+
+    catch (Exception)
+    {
+        printColor(vec(255, 0, 0), "[RailDriver | File | Error]", vec(255, 255, 255), ": " + Exception)
+    }
+}
+
+if (fileClk())
+{
+    try
+    {
+        otaLocalFileLoadedHandler(OTALocal)
+    }
+
+    catch (Exception)
+    {
+        printColor(vec(255, 0, 0), "[RailDriver | File | Error]", vec(255, 255, 255), ": " + Exception)
+    }
+}
+
 if (chatClk(TrainDriver))
 {
     # The in-game chat is used to send commands to the E2.
@@ -209,6 +244,7 @@ if (chatClk(TrainDriver))
             Message += "about - " + cliGetHelp(CLI, "about") + "\n"
             Message += "controls - " + cliGetHelp(CLI, "controls") + "\n"
             Message += "restart - " + cliGetHelp(CLI, "restart") + "\n"
+            Message += "update - " + cliGetHelp(CLI, "update") + "\n"
 
             if (cliPrintToChat(CLI, "help", Message))
             {
@@ -220,13 +256,7 @@ if (chatClk(TrainDriver))
         {
             # The about command was updated.
             # Print the about message to the chat.
-            local Message = "Smart locomotive controller script for Garry's Mod train build servers.\n"
-            Message += "Version:      0.1.0\n"
-            Message += "Author:       Cassandra 'ZZ Cat' Robinson\n"
-            Message += "License:      GNU Affero General Public License v3.0\n"
-            Message += "Source Code:  https://github.com/ZZ-Cat/RailDriver \n"
-
-            if (cliPrintToChat(CLI, "about", Message))
+            if (cliPrintToChat(CLI, "about", otaLocalGetAboutMessage(OTALocal)))
             {
                 timer("Chat Print", 100)
             }
@@ -259,10 +289,105 @@ if (chatClk(TrainDriver))
         elseif (cliRestartIsUpdated(CLI))
         {
             # The restart command was updated.
-            # Restart the E2.
-            reset()
+            # Check if the locomotive is moving.
+            if (SpeedAbs > 0)
+            {
+                if (cliPrintToChat(CLI, "error", "Unable to restart RailDriver while the locomotive is moving."))
+                {
+                    timer("Chat Print", 100)
+                }
+            }
+
+            # Locomotive has stopped. It is now safe to restart RailDriver.
+            else
+            {
+                # Restart the E2.
+                if (cliPrintToChat(CLI, "restart", "Restarting..."))
+                {
+                    runOnChat(0)
+                    runOnTick(0)
+                    runOnKeys(TrainDriver, 0)
+                    stopAllTimers()
+                    timer("Chat Print", 100)
+                    timer("Restart", 1000)
+                }
+            }
+        }
+
+        elseif (cliUpdateIsUpdated(CLI))
+        {
+            # The update command was updated.
+            # Check if the locomotive is moving.
+            if (SpeedAbs > 0)
+            {
+                if (cliPrintToChat(CLI, "error", "Unable to update RailDriver while the locomotive is moving."))
+                {
+                    timer("Chat Print", 100)
+                }
+            }
+
+            # The locomotive has stopped. It is now safe to update RailDriver.
+            else
+            {
+                # Get the arguments for the update command.
+                local Arguments = cliGetArguments(CLI, "update")
+
+                # Check if the argument is 'local'.
+                if (Arguments[1, string] == "local")
+                {
+                    local Message = ""
+
+                    Message += "Updating...\n"
+
+                    # Update the E2 using the local version.
+                    if (otaLocalUploadRailDriver(OTALocal) == 1)
+                    {
+                        runOnChat(0)
+                        runOnTick(0)
+                        runOnKeys(TrainDriver, 0)
+                        local Timers = getTimers()
+                        for (I = 1, Timers:count())
+                        {
+                            if (Timers[I, string] == otaLocalGetClockID(OTALocal))
+                            {
+                                continue
+                            }
+                            else
+                            {
+                                stoptimer(Timers[I, string])
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Message += "Unable to update RailDriver.\n"
+                    }
+
+                    if (cliPrintToChat(CLI, "update", Message))
+                    {
+                        timer("Chat Print", 100)
+                    }
+                }
+
+                # Check if the argument is 'online'.
+                elseif (Arguments[1, string] == "online")
+                {
+                    # Update the E2 using the online version.
+                    if (cliPrintToChat(CLI, "warning", "Online updates are not yet implemented."))
+                    {
+                        timer("Chat Print", 100)
+                    }
+                }
+            }
         }
     }
+}
+
+if (clk("Restart"))
+{
+    # Restart the E2.
+    stopAllTimers()
+    reset()
 }
 
 if (clk("Chat Print"))
@@ -680,7 +805,18 @@ if (clk("Emergency Brake"))
             semDirectControlBrakes(Trucks, 0)
 
             # Disable RailDriver.
-            stopAllTimers()
+            local Timers = getTimers()
+            for (I = 1, Timers:count())
+            {
+                if (Timers[I, string] == speedometerGetClockId(Speedo))
+                {
+                    continue
+                }
+                else
+                {
+                    stoptimer(Timers[I, string])
+                }
+            }
             runOnKeys(TrainDriver, 0)
             runOnTick(0)
 
