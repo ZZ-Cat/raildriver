@@ -1,1 +1,4 @@
-*.txt linguist-language=lua
+*.code-workspace text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.txt text eol=lf linguist-language=lua
