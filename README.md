@@ -8,24 +8,28 @@ Cassandra "ZZ Cat" Robinson.
 
 ## Warning
 
-RailDriver is still undergoing active development & is not yet ready for prime time release.
+RailDriver is undergoing active development & is not yet ready for prime time release.
 If you choose to use RailDriver in its current state, do so at your own risk.
 Some features may be broken, bugged, untested, missing, or the script as a whole may resemble a pigeon flying by swinging its head around in circles.
 
 Fear not! I am constantly working on this project (aside from flying my helicopters & helping out with other heli-related projects) & I have every intention of making that stubborn pigeon fly by using its wings. No matter how much the basterd wants to insist on swinging its head around in circles to fly. =^/.~=
 
+If you have spotted any bugs, something isn't working the way it should, or you have any suggestions on what you want to see in RailDriver, don't hesitate to open an Issue.
+
 ## Description
 
 This is a little side-project of mine that I have been slowly, but surely whittling my way through over the last year & a half.
+Recently, it has evolved exponentially since I had internet installed at my place (after not having any for six years).
 
 My main target for this project is for those that want to just run their trains, & have none of the fuss what normally comes with the territory of running trains in GMTB servers.
 
 The control interface is greatly simplified, & you have everything you need to get going within minutes of showing up in your favorite GMTB server.
+All you need to do is spawn RailDriver's E2 chip on your locomotive's body & go!
 
 ## Installation
 
 Part 1 of 2 of Over-The-Air Updates is now [live](https://github.com/ZZ-Cat/RailDriver/pull/26)!
-Once you have placed RailDriver into your ```e2shared``` directory, you can use ```.raildriver update local``` to update RailDriver instead of using your toolgun.
+Once you have placed RailDriver into your ```e2shared``` directory, you can use ```.raildriver update local``` to update RailDriver instead of using Expression2's editor & your toolgun to keep RailDriver updated.
 
 ### Prerequisites
 
@@ -61,6 +65,17 @@ but this is known to cause stability & derailment issues.
 4. Your seat of choice frozen in place in the locomotive's cabin.
 5. Now, parent your seat to the Gate, & _then_ parent the gate to the Locomotive's body.
 
+RailDriver uses several Expression2 extensions that may be disabled by default.
+If this is the case, you need to enable the following extensions:
+
+- chatprint - This is used to alert you to any of RailDriver's errors.
+- file - This is used by Local OTA Updates.
+- http - When Online OTA Updates is implemented, this is how RailDriver will go about it.
+- propcore - For things like ```E:applyForce()```. Your locomotive will not go anywhere without it.
+- remoteupload - Local OTA Updates uses this to update RailDriver's E2 chip.
+- serialization - The Version File is encoded in .json format. RailDriver uses this to decode & encode the Version File.
+- vgui - Configurator will use this, when it is implemented in a future release.
+
 ### Download RailDriver
 
 1. Click the green code button & hit "Download ZIP".
@@ -78,7 +93,7 @@ Now that Local OTA Updates are live, you only need to do this once-only, as Rail
 This section takes place in your tool gun. So, make sure you have Expression2 selected.
 
 1. In your ```e2shared``` folder, double-click on the ```RailDriver``` folder, & double-click ```RailDriver.txt```.
-2. Aim your toolgun at your locomotive & spawn RailDriver's E2 chip (preferably in an inconspicuous spot).
+2. Aim your toolgun at your locomotive & spawn RailDriver's E2 chip in an inconspicuous spot.
 3. That's all there is to it.
 
 Once RailDriver has initialized, you will be greeted with ```Welcome to RailDriver!``` & ```Type '.raildriver help' for a list of commands.``` in Garry's Mod's in-game chat.
@@ -98,10 +113,33 @@ This is a convenience measure, as it provides peace-of-mind from would-be griefe
 - If you need to  update or restart RailDriver, stop your locomotive first.
 This will put RailDriver in a known state during the update & restart processes.
 
+### Notes about ops count & tick quotas
+
+RailDriver is reasonably computationally intensive for an Expression2 script.
+This is due to the fact that RailDriver uses a PIDF Control Loop to manage your locomotive's speed, throttle, braking, acceleration & deceleration. The control loop uses E2's ```tickClk()``` for execution, & the control loop is constantly running. Even when your locomotive has stopped.
+
+RailDriver's speedometer uses differential inputs that are sourced from your locomotive's bogeys & are converted into a single speed value. This value is then sent through a low-pass filter to reduce the amount of noise that is picked up by the bogeys.
+The control loop uses this speed value as its feedback to manage the locomotive's speed in a smooth & precise manner.
+
+There is a vast amount of checks-&-balances that are strategically placed throughout RailDriver's source code, that are constantly monitoring your locomotive's primary operations. This is to ensure RailDriver is running smoothly & reliably at all times.
+
+All of this equates to RailDriver's average ops count being around 1950~2000 ops. I strongly advise you either use ```wire_expression2_unlimited 1``` or you set your Expression2 soft & hard quotas accordingly.
+
+If you get a ```RailDriver Tick Quota Exceeded``` error, it is likely that your Tick Quota is too low.
+Increase your Tick Quota to at least 50,000 or higher by typing ```wire_expression2_quotatick 50000``` into Garry's Mod's console, followed by ```wire_expression2_reload```.
+
+I am also aware that not all multiplayer servers keep their versions of Expression2 up-to-date.
+If you're seeing a compilation error regarding the ```@strict``` directive or the ```try``` & ```catch``` statements, this is likely because the server that you're in is using a wickedly outdated version of Expression2 & the server owners haven't updated it yet. This is certainly the case for RailDriver's target server: The Flatgrass Construct & Northern Railroad.
+
+I do have a branch called FC&N-Optimizations which removes the ```@strict``` directive & the exception handlers.
+This branch sacrifices some reliability in favor of backward-compatibility.
+This branch is now grossly outdated, as I am continuously updating only the Main-Trunk, & I will eventually delete that branch altogether.
+If there is enough demand for it, I will do a version of RailDriver with the ```@strict``` directive & the exception handlers removed. I will consider this my LTS (Long-Term Support) version of RailDriver, where updates to this code will happen exponentially slower. Additionally, it won't be as feature rich or as computationally intensive as RailDriver.
+
 ## Software License
 
 As always, I believe in freedom & I want to pass that freedom onto you.
-Which is why I am proud to license RailDriver to you under the GNU AGPL v3.
+Which is why I am proud to license RailDriver to you under the [GNU Affero GPL v3](https://github.com/ZZ-Cat/RailDriver/blob/Main-Trunk/LICENSE.md).
 
 ## The Road so far
 
@@ -116,9 +154,10 @@ Here is a list of what's working in RailDriver, so far:
     - ```about``` - Displays information about RailDriver, whom the author is, what license RailDriver has,
     & where you can go to obtain RailDriver's source code (by rights, the link should point you back here).
     Also, it displays the current version of RailDriver.
-    - ```controls``` Wnat to know what your key bindings for driving your locomotive are? This is your port of call!
-    - ```help``` - Shows a list of commands that are vailable to you in the CLI.
-    - ```restart``` This restarts RailDriver. It's analogous to looking at an E2 & pressing your 'Reload' key.
+    This information is now sourced from the Version File.
+    - ```controls``` - Want to know what your key bindings for driving your locomotive are? This is your port of call!
+    - ```help``` - Shows a list of commands that are available to you in the CLI.
+    - ```restart``` - This restarts RailDriver. It's analogous to looking at an E2 & pressing your 'Reload' key.
     - ```update``` - Over-The-Air Updates.
       - Arguments
         - ```local``` - Updates RailDriver from your ```e2shared/RailDriver``` directory.
@@ -133,47 +172,52 @@ Here is a list of what's working in RailDriver, so far:
     a lot smoother, it also stops the locomotive from rolling backwards & running away (so-called
     a "Rollback Runaway").
 - Simplified Primary Controls!
-  - This is helped by & large by the PIDF Controller.
+  - This is helped by & large by the control loop.
   - Currently, you are driving your locomotive in a mode I call "Velocity Mode"
     (Don't worry, there are two new modes to come in later versions).
     Velocity Mode can be thought of as being analogous to your car's Cruise Control,
     where you set the speed of the train & the control loop will do whatever it can to keep
-    your train moving at that speed.
+    your train moving at that speed, regardless of the track conditions.
 - Smart Emergency Stop.
+  - This is activated by pressing your ```Emergency Brake``` key. By default, this is the spacebar.
   - This uses an observer to monitor the locomotive's speed, as it comes to a stop.
     It monitors the locomotive at 2 Hz, which makes it incredibly fast acting, when something goes awry.
     You guys will get a kick out of this. Here's the stages in which it operates:
     1. **"Stop the locomotive!"** - This is where you have commanded your locomotive to stop,
     & the control loop is stopping your entire train.
-    2. **"I hope it stops."** - This state is where the speed is being monitored & if the locomotive still
-    not stopping, tougher measures to stop the train will be taken.
+    2. **"I hope it stops."** - This state monitors your locomotive's speed & if the locomotive is still
+    not stopping, tougher measures will be taken.
     3. **"I wasn't asking!"** - At this point, the control loop isn't enough to stop the train.
-    So, the automatic brakes are fully applied to stop the train.
+    The automatic brakes are fully applied as a secondary attempt to stop the train.
     4. **"You should've listened!"** - This state determines if the train is still running away.
     If your train still isn't slowing down at this point, it's basically running away uncontrolled.
+    There's only one thing for it...
     5. **"You can't runaway, if you're frozen!"** - This state is something that you more-than-likely _don't_
     want to encounter. Your entire train is frozen & RailDriver will have shut everything down (save for the
     Command-Line Interface), & you will need to restart RailDriver & unfreeze your train.
     But first, assess what caused your train to runaway uncontrolled in the first place.
 - Speedometer
-  - Uses differential inputs, taken from both the front & rear trucks of the locomotive.
+  - Uses differential inputs in Source Units, taken from both the front & rear trucks of the locomotive.
   - A low-pass filter & a deadband is used to reduce the amount of sensor noise.
+  - The Speedometer is used for speed data acquisition for the control loop's feedback input.
 
 Next up is what I want to put in RailDriver, before I get the first Release Candidate out the door:
 
 - [ ] Over-The-Air Automatic Updates.
   - [x] Local Over-The-Air Updates are now live.
-  - [ ] Online Over-The-Air Updates.
+  - [ ] Online Over-The-Air Updates. This is where I am currently at.
   - I was right. This is taking me a while to put together. But, bear with me, as I am now making a start on the Online portion of OTA Updates. Once this goes live, I will announce RailDriver's first Release Candidate for v1.0.0.
 - I will also put together a Discord Server for RailDriver, so you guys can easily get in touch with me & we can turn RailDriver into a community-driven project. =^/,..,^=
 
 ...& Finally, this is what is yet to be implemented, but is on my TO-DO List, & will show up in later releases:
 
 - [ ] Automatic coupler approach.
-  - This will automatically slow your locomotive down to a safe speed when you are approaching your rolling stock, & when your locomotive is coupled to your rolling stock, it will automatically stop.
+  - This will automatically slow your locomotive down to a safe speed when you are approaching your rolling stock, & when your locomotive is coupled to your rolling stock, it will automatically stop your locomotive.
   I will make it so that all of this is independent of where your set speed is at (if your locomotive is already moving).
   Thus stopping you from ramming into your rolling stock at full speed.
 - [ ] A new wireless control link protocol that I have aptly named "DLCT".
+  - DLCT stands for Digital Locomotive Control & Telemetry.
+  - Eventually, I want to create my own ecosystem of E2s that use DLCT, starting with RailDriver.
   - This one in particular is gonna be exciting, because you won't need to wire anything by hand ever again.
 It will also have its own authentication (among other brilliant features) & I will make it _very_ robust & interference free. You're welcome. =^/.~=
 - [ ] Fix up Player Controls.
@@ -181,15 +225,16 @@ It will also have its own authentication (among other brilliant features) & I wi
   & there is no way to turn this off. I will fix this up by bringing in the ability to use Remote Control Mode.
   I don't know how I'm gonna do this just yet. But, I'll cross that bridge when I get there.
 - [ ] RailDriver Configurator.
-  - Yes. RailDriver will have its own configuration window that you will be able to open & customize RailDriver to your locomotive, tune its PIDs, assign your control keys etc.
+  - Yes. RailDriver will have its own configuration window that you will be able to open & customize RailDriver bespoke to your locomotive; you will be able to tune PIDs, tune filters, adjust your line speeds, assign your control keys etc.
+  - This will likely, by & large, draw heavy inspiration from the likes of BetaFlight Configurator & RotorFlight Configurator (Don't worry, I will give credit where credit is due).
 - [ ] Wireless Multiple Unit.
   - Once I have DLCT working, you will be able to couple multiple locomotives together & they will automatically configure themselves as a "Multiple Unit".
   I will also give you guys an option to mark which locomotive is the leading locomotive of the MU. At the same time, this will transparently set the other locomotives in your MU as trailing units.
 - [ ] Wireless Distributed Power.
-  - Very similar to an MU setup & I will make the process of gearing this up equally as simple & transparent.
+  - Very similar to a MU setup & I will make the process of gearing this up equally as simple & transparent.
   - Again, it will rely on DLCT for wireless transmission of control & telemetry data.
   - Once this is implemented, all you will need to do is tell RailDriver which locomotive is the one that you're driving (by simply hopping into your driver's seat) & RailDriver will do _all_ of the heavy lifting for you to set up your Distributed Power Units. All you need to do is hop into your driver's seat & go.
 - [ ] Automatic Derailment Detection with Emergency Stop.
   - This will be your lifesaver when you're on the rails. Especially when you're in a GMTB server.
   If for _any_ reason you derail, this will alert you & instantly engage Emergency Stop.
-  - Once I implement this, you will be able to instantly rerail the entire train without _any_ need to waste time in doing it manually.
+  - Once I implement this, you will be able to instantly rerail the entire train without _any_ need to waste time in doing it manually. Yes, this draws inspiration from Magnum MacKivler's own Fender Bender Defender.
