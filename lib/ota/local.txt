@@ -258,7 +258,17 @@ function void otaLocalUpdateVersionFile(Ota:table, RawData:string)
     local RawDataNoSum = ""
     for (I = 1, Lines:count())
     {
-        RawDataNoSum += Lines[I, string] + "\n"
+        # Don't add a newline to the last line.
+        if (I == Lines:count())
+        {
+            RawDataNoSum = RawDataNoSum + Lines[I, string]
+        }
+
+        # Add a newline to all other lines.
+        else
+        {
+            RawDataNoSum = RawDataNoSum + Lines[I, string] + "\n"
+        }
     }
 
     # Calculate the hash checksum.
@@ -287,7 +297,17 @@ function void otaLocalUpdateVersionFile(Ota:table, RawData:string)
     RawData = ""
     for (I = 1, Lines:count())
     {
-        RawData += Lines[I, string] + "\n"
+        # Don't add a newline to the last line.
+        if (I == Lines:count())
+        {
+            RawData = RawData + Lines[I, string]
+        }
+
+        # Add a newline to all other lines.
+        else
+        {
+            RawData = RawData + Lines[I, string] + "\n"
+        }
     }
 
     # Update the Version File.
@@ -340,7 +360,17 @@ function number otaLocalIsVersionFileValid(Ota:table, RawData:string)
     local RawDataNoSum = ""
     for (I = 1, Lines:count())
     {
-        RawDataNoSum += Lines[I, string] + "\n"
+        # Don't add a newline to the last line.
+        if (I == Lines:count())
+        {
+            RawDataNoSum = RawDataNoSum + Lines[I, string]
+        }
+
+        # Add a newline to all other lines.
+        else
+        {
+            RawDataNoSum = RawDataNoSum + Lines[I, string] + "\n"
+        }
     }
 
     # Calculate the hash checksum.
