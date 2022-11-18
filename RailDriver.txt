@@ -832,30 +832,8 @@ if (clk("Emergency Brake"))
             semFreezeTrain()
             semDirectControlBrakes(Trucks, 0)
 
-            # Disable RailDriver.
-            local Timers = getTimers()
-            for (I = 1, Timers:count())
-            {
-                if (Timers[I, string] == speedometerGetClockId(Speedo))
-                {
-                    continue
-                }
-                else
-                {
-                    stoptimer(Timers[I, string])
-                }
-            }
-            runOnKeys(TrainDriver, 0)
-            runOnTick(0)
-
             # Set the Emergency Brake state to 0.
             EmBrakeState = 0
-
-            # Unlock the RailDriver, so that it can be manually reset.
-            if (semE2IsLocked())
-            {
-                semUnlockE2()
-            }
 
             # Display an error message.
             error("The train has been frozen due to a non-recoverable fault.")
@@ -933,6 +911,29 @@ if (clk("Emergency Brake"))
 
     catch(Exception)
     {
+
+        # Disable RailDriver.
+        local Timers = getTimers()
+        for (I = 1, Timers:count())
+        {
+            if (Timers[I, string] == speedometerGetClockId(Speedo))
+            {
+                continue
+            }
+            else
+            {
+                stoptimer(Timers[I, string])
+            }
+        }
+        runOnKeys(TrainDriver, 0)
+        runOnTick(0)
+
+        # Unlock the RailDriver, so that it can be manually reset.
+        if (semE2IsLocked())
+        {
+            semUnlockE2()
+        }
+
         printColor(vec(255, 0, 0), "[RailDriver | EmBrake | Fatal Error]", vec(255, 255, 255), ": " + Exception)
     }
 }
