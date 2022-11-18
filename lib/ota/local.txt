@@ -179,18 +179,6 @@ function void otaLocalLoadFileHandler(Ota:table)
     }
 }
 
-# This function is used to internally update the Version File's hash.
-# This function needs to be rewritten, as its current state is now outdated.
-# @param Ota A handle to the OTA library.
-# @param RawData The raw data of the file.
-# @param Hash The new hash.
-# @return 1 if the hash was updated, 0 otherwise.
-function number otaLocalUpdateVersionFileHash(Ota:table, RawData:string, Hash:string)
-{
-    # Return false, for now.
-    return 0
-}
-
 # This function is used internally to check if the current player is a developer.
 # It should not be called directly by RailDriver.
 # @param Ota A handle to the OTA library.
@@ -226,6 +214,17 @@ function number otaLocalPlayerIsDeveloper(Ota:table, Data:table, Player:entity)
         }
     }
 
+    return 0
+}
+
+# This function is used to internally update the Version File's hash.
+# This function needs to be rewritten, as its current state is now outdated.
+# @param Ota A handle to the OTA library.
+# @param RawData The raw data of the file.
+# @return 1 if the hash was updated, 0 otherwise.
+function number otaLocalUpdateVersionFileHash(Ota:table, RawData:string)
+{
+    # Return false, for now.
     return 0
 }
 
