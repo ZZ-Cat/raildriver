@@ -16,8 +16,6 @@ Fear not! I am constantly working on this project (aside from flying my helicopt
 
 ## Description
 
-Do I need to categorize my readmes like this anymore? Seems a bit stuffy, to me. It's my GitHub, afterall. Anyways...
-
 This is a little side-project of mine that I have been slowly, but surely whittling my way through over the last year & a half.
 
 My main target for this project is for those that want to just run their trains, & have none of the fuss what normally comes with the territory of running trains in GMTB servers.
@@ -26,7 +24,8 @@ The control interface is greatly simplified, & you have everything you need to g
 
 ## Installation
 
-Until I get OTA Updates out the door, you're stuck with doing this The Old School Way, for now. =^/.~=
+Part 1 of 2 of Over-The-Air Updates is now [live](https://github.com/ZZ-Cat/RailDriver/pull/26)!
+Once you have placed RailDriver into your ```e2shared``` directory, you can use ```.raildriver update local``` to update RailDriver instead of using your toolgun.
 
 ### Prerequisites
 
@@ -55,7 +54,7 @@ If you don't have this, you need to do some prep-work:
 
 1. A locomotive body blank. I highly recommend starting off with an SD40.
 2. Your locomotive _must_ have a set of trucks _axis contrained_ to the body.
-The SD40 uses ```locobogey_3```.
+The SD40 uses ```locobogey3.mdl```.
 You _can_ also use Advanced Ballsocket constraints on the trucks in place of the axis constraint,
 but this is known to cause stability & derailment issues.
 3. A Wire Gate attached to your locomotive's body. **DO NOT PARENT IT YET!**
@@ -66,19 +65,23 @@ but this is known to cause stability & derailment issues.
 
 1. Click the green code button & hit "Download ZIP".
 2. Extract that to your directory. EG ```SteamLibrary\steamapps\common\GarrysMod\garrysmod\data\expression2```
-3. You need to put RailDriver into your Expression 2's ```e2shared``` folder in order for it to work correctly.
-When I implement OTA Updates, the ```e2shared``` folder will be a must for the OTA Updates to work.
+3. You _must_ put RailDriver into your Expression 2's ```e2shared``` folder in order for it to work correctly.
+Local OTA Updates are now live, & if RailDriver is anywhere _but_ your ```e2shared``` folder it _will not_ function & things will be broken.
+
+If you have already updated RailDriver since #26 has been merged, this is where you can use ```.raildriver update local``` in Garry's Mod's in-game chat to update RailDriver.
+If this is your first time installing RailDriver ever, follow the instructions in the section below.
 
 ### Fire up Garry's Mod
 
-Here, this block takes place in your tool gun. So, make sure you have Expression2 selected.
+Now that Local OTA Updates are live, you only need to do this once-only, as RailDriver's Local OTA Updates can be used in place of this.
+
+This section takes place in your tool gun. So, make sure you have Expression2 selected.
 
 1. In your ```e2shared``` folder, double-click on the ```RailDriver``` folder, & double-click ```RailDriver.txt```.
 2. Aim your toolgun at your locomotive & spawn RailDriver's E2 chip (preferably in an inconspicuous spot).
 3. That's all there is to it.
 
-You will be greeted with ```Welcome to RailDriver!``` & ```Type '.raildriver help' for a list of commands.``` in
-Garry's Mod's in-game chat.
+Once RailDriver has initialized, you will be greeted with ```Welcome to RailDriver!``` & ```Type '.raildriver help' for a list of commands.``` in Garry's Mod's in-game chat.
 
 ### When you use RailDriver
 
@@ -91,7 +94,9 @@ RailDriver has no physical I/Os.
 In later releases, I will start bringing in DLCT, which is a wireless protocol to communicate to other DLCT compatible E2s.
 - If you're in a multiplayer server, RailDriver's E2 _will_ seem like it has disappeared from your locomotive, once everything has initialized. Don't worry, your E2 hasn't gone anywhere. It's still there. This is normal behavior, because Smart Entity Management has now hidden your E2 & made it virtually inaccessible to other players.
 This is a convenience measure, as it provides peace-of-mind from would-be griefers that are smarter than your average troll.
-- If at any time you need to reboot/restart/reset RailDriver, type ```.raildriver restart``` into your chat.
+- If you need to reboot/restart/reset RailDriver, type ```.raildriver restart``` into your chat.
+- If you need to  update or restart RailDriver, stop your locomotive first.
+This will put RailDriver in a known state during the update & restart processes.
 
 ## Software License
 
@@ -114,6 +119,12 @@ Here is a list of what's working in RailDriver, so far:
     - ```controls``` Wnat to know what your key bindings for driving your locomotive are? This is your port of call!
     - ```help``` - Shows a list of commands that are vailable to you in the CLI.
     - ```restart``` This restarts RailDriver. It's analogous to looking at an E2 & pressing your 'Reload' key.
+    - ```update``` - Over-The-Air Updates.
+      - Arguments
+        - ```local``` - Updates RailDriver from your ```e2shared/RailDriver``` directory.
+        - ```online``` - Coming soon. When I implement Online Over-The-Air Updates, you will be able to use this command.
+- Over-The-Air Updates Part 1 of 2 - Local
+  - This uploads RailDriver's code directly to its E2 chip in-game from your ```e2shared/RailDriver``` directory.
 - PIDF Controller
   - All speed values going to the PIDF Controller are in Source Units.
   - Feedforward is derived from the Set Point.
@@ -151,27 +162,10 @@ Here is a list of what's working in RailDriver, so far:
 Next up is what I want to put in RailDriver, before I get the first Release Candidate out the door:
 
 - [ ] Over-The-Air Automatic Updates.
-  - This is more-than-likely going to take a while to put together,
-  because I'm giving you guys a two-for-one-deal, here. Both local updates & online updates.
-  - This is where the CLI comes in handy & (by extension) is why I wanted to write the CLI
-  _before_ I started work on the OTA updates.
-  - Local Updates - What I want to achieve here is, you do ```.raildriver update local``` & it will directly upload RailDriver's code from your game's directory to its own E2 in-game.
-  This is the same process that happens whenever you spawn in any E2 in-game.
-  I will also benefit from this one, too. Because it will help out with testing & developing RailDriver that bit faster,
-  because I'm not having to manually update its code all of the time.
-  - Online Updates - Here, you do ```.raildriver update online``` & it will automatically download a new update & install
-  it.
-  - You won't need to lift a finger here, other than using the CLI to tell RailDriver to update itself.
-  I do have an older repository here that demonstrates the possibility of OTA Updates, & this will more-than-likely be an
-  expansion of that.
-  - I will write in a notification system that lets you know that a new release has been made, & I will give you the choice
-  to download it (or not). I _refuse_ to make updates mandatory/compulsory.
-  With that being said, I _do_ recommend that you do update RailDriver at every Major (IE 1.x.x, 2.x.x, 3.x.x etc) Release,
-  as I will be maintaining compatibility with Wiremod (Expression 2 is a part of this), the FC&N Railroad server,
-  & Garry's Mod with only one-or-two major releases of RailDriver.
-  I _do_ reserve the right to discontinue older versions, as my focus is on the latest release.
-  When I do discontinue an older release, I will give you guys plenty of notice (I'm a nice gal like that) &
-  I will do an archive of older releases of RailDriver for your perusal.
+  - [x] Local Over-The-Air Updates are now live.
+  - [ ] Online Over-The-Air Updates.
+  - I was right. This is taking me a while to put together. But, bear with me, as I am now making a start on the Online portion of OTA Updates. Once this goes live, I will announce RailDriver's first Release Candidate for v1.0.0.
+- I will also put together a Discord Server for RailDriver, so you guys can easily get in touch with me & we can turn RailDriver into a community-driven project. =^/,..,^=
 
 ...& Finally, this is what is yet to be implemented, but is on my TO-DO List, & will show up in later releases:
 
