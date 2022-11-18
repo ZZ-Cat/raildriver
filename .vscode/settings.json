@@ -1,7 +1,5 @@
 {
+    "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
     "editor.defaultFormatter": "Vurv78.e2-ls",
-    "files.eol": "\n",
-    "[json]": {
-        "editor.defaultFormatter": "vscode.json-language-features"
-    }
+    "files.eol": "\n"
 }
