@@ -182,59 +182,13 @@ function void otaLocalLoadFileHandler(Ota:table)
 # This function is used to internally update the Version File's hash.
 # This function needs to be rewritten, as its current state is now outdated.
 # @param Ota A handle to the OTA library.
-# @param Data The entire file's contents.
+# @param RawData The raw data of the file.
 # @param Hash The new hash.
 # @return 1 if the hash was updated, 0 otherwise.
-function number otaLocalUpdateVersionFileHash(Ota:table, Data:table, Hash:number)
+function number otaLocalUpdateVersionFileHash(Ota:table, RawData:string, Hash:string)
 {
-
-    local T = table()
-    T["Hash", string] = Hash:toString()
-    Data["RailDriver", table] = Data["RailDriver", table]:add(T)
-
-    # Check if the hash exists.
-    if (Data:exists("RailDriver") == 1)
-    {
-        if (Data["RailDriver", table]:exists("Hash") != 1)
-        {
-            error("Missing checksum.")
-            return 0
-        }
-    }
-    else
-    {
-        error("Missing RailDriver section.")
-        return 0
-    }
-
-    # Check if the owner's SteamID exists.
-    local OwnerSteamData = Data["RailDriver", table]["Developers", table]["Owner", table]["Social", table]["Steam", table]:clone()
-    print("Owner Steam ID: " + Data["RailDriver", table]["Developers", table]["Owner", table]["Social", table]["Steam", table]["ID", string])
-    if (OwnerSteamData:exists("ID") != 1 | OwnerSteamData["ID", string] == "")
-    {
-        error("Missing owner's SteamID.")
-        return 0
-    }
-
-    # Encode Data to JSON.
-    local JSON = jsonEncode(Data, 1)
-    local JsonError = jsonError()
-    if (JsonError != "")
-    {
-        error("Failed to encode JSON: " + JsonError)
-        return 0
-    }
-
-    # Write JSON to file.
-    if (fileCanWrite() != 1)
-    {
-        error("Failed to write to file: " + Ota["Version File Path", string])
-        return 0
-    }
-
-    fileWrite(">" + Ota["Version File Path", string], JSON)
-
-    return 1
+    # Return false, for now.
+    return 0
 }
 
 # This function is used internally to check if the current player is a developer.
