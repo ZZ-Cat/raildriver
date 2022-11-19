@@ -240,6 +240,7 @@ if (RailDriverState == 1)
 
     catch (Exception)
     {
+        RailDriverState = 0
         if (OTALocal:count() > 0)
         {
             local Timers = getTimers()
@@ -269,7 +270,6 @@ if (RailDriverState == 1)
             cliUnregisterCommand(CLI, "controls")
             cliUnregisterCommand(CLI, "update")
         }
-        RailDriverState = 0
         if (OTALocal:count() > 0)
         {
             local Timers = getTimers()
