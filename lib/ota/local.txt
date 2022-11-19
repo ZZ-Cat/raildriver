@@ -254,11 +254,8 @@ function void otaLocalUpdateVersionFile(Ota:table, RawData:string)
         }
     }
 
-    # Check if the hash checksum from the file is valid.
-    if (HashFile == 0)
-    {
-        error("No checksum found in the Version File.")
-    }
+    # Check if the hash checksum from the file exists.
+    assert(HashFile != 0, "Hash checksum from Version File does not exist.")
 
     # Create a version of the file without the hash.
     local RawDataNoSum = ""
@@ -376,11 +373,8 @@ function number otaLocalIsVersionFileValid(Ota:table, RawData:string)
         }
     }
 
-    # Check if the hash checksum from the file is valid.
-    if (HashFile == 0)
-    {
-        error("Missing checksum in file: " + Ota["Version File Path", string])
-    }
+    # Check if the hash checksum from the file exists.
+    assert(HashFile != 0, "Missing checksum in file: " + Ota["Version File Path", string])
 
     # Create a version of the file without the hash.
     local RawDataNoSum = ""
