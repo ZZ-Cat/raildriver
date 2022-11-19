@@ -229,6 +229,7 @@ function void otaLocalUpdateVersionFile(Ota:table, RawData:string)
     local HashFile = 0
     local HashCalculated = 0
 
+    # Get the hash of the file.
     for (I = (Lines:count() - 4), Lines:count())
     {
         local Line = Lines[I, string]
@@ -239,8 +240,10 @@ function void otaLocalUpdateVersionFile(Ota:table, RawData:string)
         local LineName = LineParts[1, string]:sub(2, LineParts[1, string]:length() - 1)
         local LineValue = LineParts[2, string]:sub(2, LineParts[2, string]:length() - 1)
 
+        # Check if the line is the hash.
         if (LineName == "Hash")
         {
+            # Get the hash of the file & remove the comma that precedes it.
             if (Lines[I - 1, string]:find(","))
             {
                 HashFile = LineValue:toNumber()
@@ -257,6 +260,7 @@ function void otaLocalUpdateVersionFile(Ota:table, RawData:string)
         error("No checksum found in the Version File.")
     }
 
+    # Create a version of the file without the hash.
     local RawDataNoSum = ""
     for (I = 1, Lines:count())
     {
@@ -264,19 +268,33 @@ function void otaLocalUpdateVersionFile(Ota:table, RawData:string)
         if (I == Lines:count())
         {
             RawDataNoSum = RawDataNoSum + Lines[I, string]
+            break
         }
 
-        # Add a newline to all other lines.
         else
         {
-            RawDataNoSum = RawDataNoSum + Lines[I, string] + "\n"
+            # Remove all occurrences of "Hash" from the file &
+            # remove the comma that precedes it.
+            local LineTrimmed = Lines[I, string]:trim()
+            if (LineTrimmed:find("\"Hash\":") == 1)
+            {
+                Lines[I - 1, string] = Lines[I - 1, string]:replace(",", "")
+                Lines[I, string] = ""
+                DebugHashOcurrences = DebugHashOcurrences + 1
+            }
+
+            # Add a newline to all other lines.
+            else
+            {
+                RawDataNoSum = RawDataNoSum + Lines[I, string] + "\n"
+            }
         }
     }
 
-    # Calculate the hash checksum.
+    # Calculate the new hash checksum.
     HashCalculated = hash(RawDataNoSum)
 
-    # Add the calculated hash checksum to the RawData.
+    # Add the newly calculated hash checksum to the RawData.
     Lines = RawData:explode("\n")
     for (I = (Lines:count() - 4), Lines:count())
     {
@@ -358,6 +376,7 @@ function number otaLocalIsVersionFileValid(Ota:table, RawData:string)
         error("Missing checksum in file: " + Ota["Version File Path", string])
     }
 
+    # Create a version of the file without the hash.
     local RawDataNoSum = ""
     for (I = 1, Lines:count())
     {
@@ -365,12 +384,25 @@ function number otaLocalIsVersionFileValid(Ota:table, RawData:string)
         if (I == Lines:count())
         {
             RawDataNoSum = RawDataNoSum + Lines[I, string]
+            break
         }
 
-        # Add a newline to all other lines.
         else
         {
-            RawDataNoSum = RawDataNoSum + Lines[I, string] + "\n"
+            # Remove all occurrences of "Hash" from the file &
+            # remove the comma that precedes it.
+            local LineTrimmed = Lines[I, string]:trim()
+            if (LineTrimmed:find("\"Hash\":") == 1)
+            {
+                Lines[I - 1, string] = Lines[I - 1, string]:replace(",", "")
+                Lines[I, string] = ""
+            }
+
+            # Add a newline to all other lines.
+            else
+            {
+                RawDataNoSum = RawDataNoSum + Lines[I, string] + "\n"
+            }
         }
     }
 
