@@ -72,7 +72,6 @@ elseif (clk("Dupe Timer"))
 }
 elseif (first())
 {
-    # Print a message to the in-game chat & start RailDriver.
     printColor(vec(220, 255, 0), "[RailDriver]", vec(255, 255, 255), ": Initializing...")
     RailDriverState = 1
 }
