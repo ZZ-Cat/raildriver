@@ -260,6 +260,7 @@ function void otaLocalUpdateVersionFile(Ota:table, RawData:string)
 
     # Create a version of the file without the hash.
     local RawDataNoSum = ""
+    local HashOccurrences = 0
     for (I = 1, Lines:count())
     {
         # Don't add a newline to the last line.
@@ -278,7 +279,7 @@ function void otaLocalUpdateVersionFile(Ota:table, RawData:string)
             {
                 Lines[I - 1, string] = Lines[I - 1, string]:replace(",", "")
                 Lines[I, string] = ""
-                DebugHashOcurrences = DebugHashOcurrences + 1
+                HashOccurrences = HashOccurrences + 1
             }
 
             # Add a newline to all other lines.
@@ -288,6 +289,11 @@ function void otaLocalUpdateVersionFile(Ota:table, RawData:string)
             }
         }
     }
+
+    # Assert that there is exactly eight occurrences of "Hash" in the file.
+    # These are for RailDriver's main code & its libraries, & they are
+    # excluded from the Version File's hash checksum.
+    assert(HashOccurrences == 8, "Incorrect number of occurrences of \"Hash\" in Version File.")
 
     # Calculate the new hash checksum.
     HashCalculated = hash(RawDataNoSum)
@@ -377,6 +383,7 @@ function number otaLocalIsVersionFileValid(Ota:table, RawData:string)
 
     # Create a version of the file without the hash.
     local RawDataNoSum = ""
+    local HashOccurrences = 0
     for (I = 1, Lines:count())
     {
         # Don't add a newline to the last line.
@@ -395,6 +402,7 @@ function number otaLocalIsVersionFileValid(Ota:table, RawData:string)
             {
                 Lines[I - 1, string] = Lines[I - 1, string]:replace(",", "")
                 Lines[I, string] = ""
+                HashOccurrences = HashOccurrences + 1
             }
 
             # Add a newline to all other lines.
@@ -404,6 +412,11 @@ function number otaLocalIsVersionFileValid(Ota:table, RawData:string)
             }
         }
     }
+
+    # Assert that there is exactly eight occurrences of "Hash" in the file.
+    # These are for RailDriver's main code & its libraries, & they are
+    # excluded from the Version File's hash checksum.
+    assert(HashOccurrences == 8, "Invalid number of checksums in file: " + Ota["Version File Path", string])
 
     # Calculate the hash checksum.
     HashCalculated = hash(RawDataNoSum)
