@@ -24,10 +24,57 @@
 @persist PIDF:table
 @persist EmBrakeState EmBrakeThisSpeed EmBrakeLastSpeed EmBrakeObserverTickInterval EmBrakePCFaultTimeoutSet
 @persist Speed SpeedAbs SpeedMPH
+@persist DupeTickInterval DupeIsLoading DupeIsFinished RailDriverIsReady RailDriverIsInitialized RailDriverState
 @outputs Debugger:table
 @strict
 
-if (first() | duped())
+if (duped())
+{
+    DupeIsLoading = 1
+    DupeIsFinished = 0
+    DupeTickInterval = tickInterval() * 1000
+    RailDriverState = 0
+    timer("Dupe Timer", DupeTickInterval)
+}
+elseif (dupefinished())
+{
+    DupeIsLoading = 0
+    DupeIsFinished = 1
+    RailDriverState = 0
+}
+elseif (clk("Dupe Timer"))
+{
+    try
+    {
+        stoptimer("Dupe Timer")
+
+        if (DupeIsLoading & !DupeIsFinished)
+        {
+            timer("Dupe Timer", DupeTickInterval)
+        }
+        elseif (!DupeIsLoading & DupeIsFinished)
+        {
+            reset()
+        }
+        else
+        {
+            error("RailDriver failed to load.")
+        }
+    }
+
+    catch (Exception)
+    {
+        RailDriverState = 0
+        printColor(vec(255, 0, 0), "[RailDriver | ERROR]", vec(255, 255, 255), ": " + Exception)
+    }
+}
+elseif (first())
+{
+    printColor(vec(220, 255, 0), "[RailDriver]", vec(255, 255, 255), ": Initializing...")
+    RailDriverState = 1
+}
+
+if (RailDriverState == 1)
 {
     local PIDCoefficientKp = 1020
     local PIDCoefficientKi = 850
@@ -188,14 +235,18 @@ if (first() | duped())
         ]#
         semLockE2()
         assert(semE2IsLocked(), "Failed to lock E2.")
+        RailDriverState = 2
     }
 
     catch (Exception)
     {
+        RailDriverState = 0
         printColor(vec(255, 0, 0), "[RailDriver | Init | Error]", vec(255, 255, 255), ": " + Exception)
     }
 }
 
+elseif (RailDriverState == 2)
+{
 if (clk(otaLocalGetClockID(OTALocal)))
 {
     try
@@ -934,4 +985,5 @@ if (clk("Debug"))
     Debugger["PIDF D-Term", number] = pidGetDterm(PIDF)
 
     Debugger["PIDF Output", number] = pidGetOutput(PIDF)
+}
 }
