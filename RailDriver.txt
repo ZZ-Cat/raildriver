@@ -301,11 +301,11 @@ elseif (RailDriverState == 2)
                 Message += "Commands:\n"
                 Message += "All commands are prefixed with '.raildriver',\n"
                 Message += "and are case-insensitive.\n"
-                Message += cliCommandExists(CLI, cliCommandExists(CLI, "help") ? "help") ? "help - " + cliGetHelp(CLI, "help") + "\n" : "" : ""
-                Message += cliCommandExists(CLI, cliCommandExists(CLI, "about") ? "about") ? "about - " + cliGetHelp(CLI, "about") + "\n" : "" : ""
-                Message += cliCommandExists(CLI, cliCommandExists(CLI, "controls") ? "controls") ? "controls - " + cliGetHelp(CLI, "controls") + "\n" : "" : ""
-                Message += cliCommandExists(CLI, cliCommandExists(CLI, "restart") ? "restart") ? "restart - " + cliGetHelp(CLI, "restart") + "\n" : "" : ""
-                Message += cliCommandExists(CLI, cliCommandExists(CLI, "update") ? "update") ? "update - " + cliGetHelp(CLI, "update") + "\n" : "" : ""
+                Message += cliCommandExists(CLI, "help") ? "help - " + cliGetHelp(CLI, "help") + "\n" : ""
+                Message += cliCommandExists(CLI, "about") ? "about - " + cliGetHelp(CLI, "about") + "\n" : ""
+                Message += cliCommandExists(CLI, "controls") ? "controls - " + cliGetHelp(CLI, "controls") + "\n" : ""
+                Message += cliCommandExists(CLI, "restart") ? "restart - " + cliGetHelp(CLI, "restart") + "\n" : ""
+                Message += cliCommandExists(CLI, "update") ? "update - " + cliGetHelp(CLI, "update") + "\n" : ""
 
                 if (cliPrintToChat(CLI, "help", Message))
                 {
@@ -821,7 +821,7 @@ elseif (RailDriverState == 2)
                 }
 
                 # If the locomotive is not stopped, set the Emergency Brake state to 5.
-                elseif (EmBrakeThisSpeed >= EmBrakeLastSpeed)if (EmBrakeThisSpeed >= EmBrakeLastSpeed)
+                elseif (EmBrakeThisSpeed >= EmBrakeLastSpeed)
                 {
                     EmBrakeState = 5
                 }
