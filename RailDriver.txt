@@ -270,6 +270,35 @@ if (RailDriverState == 1)
             cliUnregisterCommand(CLI, "update")
         }
         RailDriverState = 0
+        if (OTALocal:count() > 0)
+        {
+            local Timers = getTimers()
+            for (I = 1, Timers:count())
+            {
+                if (Timers[I, string] == otaLocalGetClockID(OTALocal))
+                {
+                    continue
+                }
+                else
+                {
+                    stoptimer(Timers[I, string])
+                }
+            }
+        }
+
+        else
+        {
+            stopAllTimers()
+        }
+
+        SpeedAbs = 0
+        runOnKeys(TrainDriver, 0)
+        runOnTick(0)
+        if (CLI:count() > 0)
+        {
+            cliUnregisterCommand(CLI, "controls")
+            cliUnregisterCommand(CLI, "update")
+        }
         printColor(vec(255, 0, 0), "[RailDriver | Init | Error]", vec(255, 255, 255), ": " + Exception)
     }
 }
@@ -320,11 +349,11 @@ elseif (RailDriverState == 2)
                 Message += "Commands:\n"
                 Message += "All commands are prefixed with '.raildriver',\n"
                 Message += "and are case-insensitive.\n"
-                Message += cliCommandExists(CLI, "help") ? "help - " + cliGetHelp(CLI, "help") + "\n" : ""
-                Message += cliCommandExists(CLI, "about") ? "about - " + cliGetHelp(CLI, "about") + "\n" : ""
-                Message += cliCommandExists(CLI, "controls") ? "controls - " + cliGetHelp(CLI, "controls") + "\n" : ""
-                Message += cliCommandExists(CLI, "restart") ? "restart - " + cliGetHelp(CLI, "restart") + "\n" : ""
-                Message += cliCommandExists(CLI, "update") ? "update - " + cliGetHelp(CLI, "update") + "\n" : ""
+                Message += cliCommandExists(CLI, cliCommandExists(CLI, "help") ? "help") ? "help - " + cliGetHelp(CLI, "help") + "\n" : "" : ""
+                Message += cliCommandExists(CLI, cliCommandExists(CLI, "about") ? "about") ? "about - " + cliGetHelp(CLI, "about") + "\n" : "" : ""
+                Message += cliCommandExists(CLI, cliCommandExists(CLI, "controls") ? "controls") ? "controls - " + cliGetHelp(CLI, "controls") + "\n" : "" : ""
+                Message += cliCommandExists(CLI, cliCommandExists(CLI, "restart") ? "restart") ? "restart - " + cliGetHelp(CLI, "restart") + "\n" : "" : ""
+                Message += cliCommandExists(CLI, cliCommandExists(CLI, "update") ? "update") ? "update - " + cliGetHelp(CLI, "update") + "\n" : "" : ""
 
                 if (cliPrintToChat(CLI, "help", Message))
                 {
@@ -841,7 +870,7 @@ elseif (RailDriverState == 2)
                 }
 
                 # If the locomotive is not stopped, set the Emergency Brake state to 5.
-                elseif (EmBrakeThisSpeed >= EmBrakeLastSpeed)
+                elseif (EmBrakeThisSpeed >= EmBrakeLastSpeed)if (EmBrakeThisSpeed >= EmBrakeLastSpeed)
                 {
                     EmBrakeState = 5
                 }
@@ -990,7 +1019,34 @@ elseif (RailDriverState == 2)
             semUnlockE2()
         }
 
-            printColor(vec(255, 0, 0), "[RailDriver | EmBrake | Fatal Error]", vec(255, 255, 255), ": " + Exception)
+    
+        # Disable RailDriver.
+        local Timers = getTimers()
+        for (I = 1, Timers:count())
+        {
+            if (Timers[I, string] == speedometerGetClockId(Speedo))
+            {
+                continue
+            }
+            else
+            {
+                stoptimer(Timers[I, string])
+            }
+        }
+        runOnKeys(TrainDriver, 0)
+        runOnTick(0)
+
+        # Unregister CLI controls & update commands.
+        cliUnregisterCommand(CLI, "controls")
+        cliUnregisterCommand(CLI, "update")
+
+        # Unlock the RailDriver, so that it can be manually reset.
+        if (semE2IsLocked())
+        {
+            semUnlockE2()
+        }
+
+        printColor(vec(255, 0, 0), "[RailDriver | EmBrake | Fatal Error]", vec(255, 255, 255), ": " + Exception)
         }
     }
 
