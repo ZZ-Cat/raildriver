@@ -28,6 +28,8 @@
 @outputs Debugger:table
 @strict
 
+# Monitor Advanced Duplicator 2 for Dupe loading.
+# This resolves a bug (#30) where RailDriver would not initialize properly after a Dupe is loaded.
 if (duped())
 {
     DupeIsLoading = 1
@@ -74,6 +76,8 @@ elseif (first())
     RailDriverState = 1
 }
 
+# New RailDriver initialization sequence uses a state machine.
+# This ensures that RailDriver initializes properly, even after a Dupe is loaded.
 if (RailDriverState == 1)
 {
     local PIDCoefficientKp = 1020
@@ -248,6 +252,9 @@ if (RailDriverState == 1)
     }
 }
 
+# New RailDriver running state.
+# This state is entered after RailDriver has been initialized successfully.
+# If the initialization fails, RailDriver will not enter this state.
 elseif (RailDriverState == 2)
 {
     if (clk(otaLocalGetClockID(OTALocal)))
