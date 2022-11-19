@@ -280,64 +280,9 @@ if (RailDriverState == 1)
     catch (Exception)
     {
         RailDriverState = 0
-        if (OTALocal:count() > 0)
-        {
-            local Timers = getTimers()
-            for (I = 1, Timers:count())
-            {
-                if (Timers[I, string] == otaLocalGetClockID(OTALocal))
-                {
-                    continue
-                }
-                else
-                {
-                    stoptimer(Timers[I, string])
-                }
-            }
-        }
-
-        else
-        {
-            stopAllTimers()
-        }
-
-        SpeedAbs = 0
+        stopAllTimers()
         runOnKeys(TrainDriver, 0)
         runOnTick(0)
-        if (CLI:count() > 0)
-        {
-            cliUnregisterCommand(CLI, "controls")
-            cliUnregisterCommand(CLI, "update")
-        }
-        if (OTALocal:count() > 0)
-        {
-            local Timers = getTimers()
-            for (I = 1, Timers:count())
-            {
-                if (Timers[I, string] == otaLocalGetClockID(OTALocal))
-                {
-                    continue
-                }
-                else
-                {
-                    stoptimer(Timers[I, string])
-                }
-            }
-        }
-
-        else
-        {
-            stopAllTimers()
-        }
-
-        SpeedAbs = 0
-        runOnKeys(TrainDriver, 0)
-        runOnTick(0)
-        if (CLI:count() > 0)
-        {
-            cliUnregisterCommand(CLI, "controls")
-            cliUnregisterCommand(CLI, "update")
-        }
         printColor(vec(255, 0, 0), "[RailDriver | Init | Error]", vec(255, 255, 255), ": " + Exception)
     }
 }
@@ -453,7 +398,6 @@ elseif (RailDriverState == 2)
                     if (cliPrintToChat(CLI, "restart", "Restarting..."))
                     {
                         runOnChat(0)
-                        runOnTick(0)
                         runOnKeys(TrainDriver, 0)
                         stopAllTimers()
                         timer("Chat Print", 100)
