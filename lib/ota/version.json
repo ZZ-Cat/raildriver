@@ -15,7 +15,7 @@
             "File":"RailDriver.txt",
             "Path":"e2shared/RailDriver",
             "Version":"0.1.0",
-            "Hash":""
+            "Hash":"1956038296"
         },
         "Libraries":
         {
@@ -24,7 +24,7 @@
                 "File":"cli.txt",
                 "Path":"e2shared/RailDriver/lib",
                 "Version":"0.1.0",
-                "Hash":""
+                "Hash":"1369193795"
             },
             "Controls":
             {
@@ -33,7 +33,7 @@
                     "File":"playerControls.txt",
                     "Path":"e2shared/RailDriver/lib/controls",
                     "Version":"0.1.0",
-                    "Hash":""
+                    "Hash":"1875659339"
                 }
             },
             "Over-The-Air Updates":
@@ -43,7 +43,7 @@
                     "File":"local.txt",
                     "Path":"e2shared/RailDriver/lib/ota",
                     "Version":"0.1.0",
-                    "Hash":""
+                    "Hash":"456559644"
                 }
             },
             "PIDF Controller":
@@ -51,7 +51,7 @@
                 "File":"pidf.txt",
                 "Path":"e2shared/RailDriver/lib",
                 "Version":"0.1.0",
-                "Hash":""
+                "Hash":"728820735"
             },
             "Sensors":
             {
@@ -60,7 +60,7 @@
                     "File":"speedometer.txt",
                     "Path":"e2shared/RailDriver/lib/sensors",
                     "Version":"0.1.0",
-                    "Hash":""
+                    "Hash":"1920028152"
                 }
             },
             "Smart Entity Management":
@@ -68,14 +68,14 @@
                 "File":"smartEntityManagement.txt",
                 "Path":"e2shared/RailDriver/lib",
                 "Version":"0.1.0",
-                "Hash":""
+                "Hash":"2893475480"
             },
             "Timers":
             {
                 "File":"timers.txt",
                 "Path":"e2shared/RailDriver/lib",
                 "Version":"0.1.0",
-                "Hash":""
+                "Hash":"791226315"
             }
         },
         "Developers":
