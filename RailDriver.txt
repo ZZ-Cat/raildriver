@@ -400,9 +400,10 @@ elseif (RailDriverState == 2)
                         Message += "Updating...\n"
 
                         # Update the E2 using the local version.
+                        # Formerly 'otaLocalUploadRailDriver(OTALocal)'
                         if (otaLocalUploadRailDriver(OTALocal) == 1)
                         {
-                            runOnChat(0)
+                            #runOnChat(0)
                             runOnTick(0)
                             runOnKeys(TrainDriver, 0)
                             local Timers = getTimers()
