@@ -48,11 +48,17 @@ function table otaLocalInit()
     # Version file contents are stored here.
     Ota["RailDriver", table] = table()
 
+    # An array of files to upload.
+    Ota["Files", table] = table()
+    Ota["Files", table]["to upload", array] = array()
+    Ota["Files", table]["uploaded", array] = array()
+
     # Flags.
     Ota["Flags", table] = table()
     Ota["Flags", table]["File Upload Started", number] = 0
     Ota["Flags", table]["File Upload Complete", number] = 0
     Ota["Flags", table]["File Upload Failed", number] = 0
+    Ota["Flags", table]["Update Process Started", number] = 0
     Ota["Flags", table]["Version File is Valid", number] = 0
 
     return Ota
@@ -125,6 +131,98 @@ function number otaLocalUploadRailDriver(Ota:table)
     # Start uploading RailDriver.
     runOnFile(1)
     otaLocalStartClock(Ota, 300)
+    return 1
+}
+
+# This function starts the local OTA update process.
+# It should be called when the CLI command to update RailDriver using local files is used.
+# @param Ota A handle to the OTA library.
+# @return true if the update process was started, false otherwise.
+function number otaLocalUpdateRailDriver(Ota:table)
+{
+    # Check if the Version File is Valid.
+    if (Ota["Flags", table]["Version File is Valid", number] == 0 | Ota["Flags", table]["File Upload Failed", number] == 1)
+    {
+        return 0
+    }
+
+    # Check if the Update Process has already started.
+    if (Ota["Flags", table]["Update Process Started", number] == 1)
+    {
+        print("Update process has already started.")
+        return 0
+    }
+
+    # Clear the list of files.
+    Ota["Files", table]["to upload", array]:clear()
+    Ota["Files", table]["uploaded", array]:clear()
+
+    # Populate the list of files to upload with the paths to the files from the version file.
+    local RailDriver = Ota["RailDriver", table]
+    local Libraries = RailDriver["Libraries", table]
+    local Files = Ota["Files", table]["to upload", array]
+    local File = table()
+
+    # This is a messy way to do this, but it works.
+    # I will clean this up in a future update.
+    # --@ZZ-Cat 11-20-2022
+
+    # RailDriver's main file.
+    File["Path", string] = RailDriver["Main", table]["Path", string] + "/" + RailDriver["Main", table]["File", string]
+    assert(File["Path", string] != "", "RailDriver's main file path is empty.")
+    Files:pushString(File["Path", string])
+
+    # RailDriver's Command-Line Interface library.
+    File["Path", string] = Libraries["Command-Line Interface", table]["Path", string] + "/" + Libraries["Command-Line Interface", table]["File", string]
+    assert(File["Path", string] != "", "RailDriver's CLI library file path is empty.")
+    Files:pushString(File["Path", string])
+
+    # RailDriver's Player Controls library.
+    File["Path", string] = Libraries["Controls", table]["Player Controls", table]["Path", string] + "/" + Libraries["Controls", table]["Player Controls", table]["File", string]
+    assert(File["Path", string] != "", "RailDriver's Player Controls library file path is empty.")
+    Files:pushString(File["Path", string])
+
+    # RailDriver's Local OTA library.
+    File["Path", string] = Libraries["Over-The-Air Updates", table]["Local", table]["Path", string] + "/" + Libraries["Over-The-Air Updates", table]["Local", table]["File", string]
+    assert(File["Path", string] != "", "RailDriver's Local OTA library file path is empty.")
+    Files:pushString(File["Path", string])
+
+    # RailDriver's PIDF Controller library.
+    File["Path", string] = Libraries["PIDF Controller", table]["Path", string] + "/" + Libraries["PIDF Controller", table]["File", string]
+    assert(File["Path", string] != "", "RailDriver's PIDF Controller library file path is empty.")
+    Files:pushString(File["Path", string])
+
+    # RailDriver's Speedometer library.
+    File["Path", string] = Libraries["Sensors", table]["Speedometer", table]["Path", string] + "/" + Libraries["Sensors", table]["Speedometer", table]["File", string]
+    assert(File["Path", string] != "", "RailDriver's Speedometer library file path is empty.")
+    Files:pushString(File["Path", string])
+
+    # RailDriver's Smart Entity Management library.
+    File["Path", string] = Libraries["Smart Entity Management", table]["Path", string] + "/" + Libraries["Smart Entity Management", table]["File", string]
+    assert(File["Path", string] != "", "RailDriver's Smart Entity Management library file path is empty.")
+    Files:pushString(File["Path", string])
+
+    # RailDriver's Timers library.
+    File["Path", string] = Libraries["Timers", table]["Path", string] + "/" + Libraries["Timers", table]["File", string]
+    assert(File["Path", string] != "", "RailDriver's Timers library file path is empty.")
+    Files:pushString(File["Path", string])
+
+    # Assert that the list of files contains exactly 8 files.
+    assert(Files:count() == 8, "The list of files to upload contains " + Files:count() + " files, but it should contain 8 files.")
+
+    # Copy the Files to the Files to Upload list.
+    Ota["Files", table]["to upload", array] = Files:clone()
+
+    # Set the File Index to the end of the list of files to upload & start uploading the file at the end of the list.
+    local FileIndex = Ota["Files", table]["to upload", array]:count()
+    Ota["File Path to Load", string] = ">" + Ota["Files", table]["to upload", array][FileIndex, string]
+
+    # Set the Update Process Started flag.
+    Ota["Flags", table]["Update Process Started", number] = 1
+
+    # Start uploading RailDriver.
+    runOnFile(1)
+    otaLocalStartClock(Ota, 100)
     return 1
 }
 
@@ -492,6 +590,110 @@ function void otaLocalFileLoadedHandler(Ota:table)
                 error("RailDriver section is missing from version file.")
             }
         }
+        elseif (Ota["Flags", table]["Update Process Started", number] == 1 & FileName == ">" + Ota["Files", table]["to upload", array][Ota["Files", table]["to upload", array]:count(), string])
+        {
+            Ota["Flags", table]["File Upload Complete", number] = 1
+
+            # Read the file contents.
+            local FileContents = fileRead()
+
+            # Assert that the file is not empty.
+            assert(FileContents != "", "File is empty: " + FileName)
+
+            # Calculate the hash checksum.
+            local Hash = hash(FileContents)
+            local HashFile = 0
+
+            # This is a messy way to get the file's hash checksum from the version file.
+            # It's not the best way to do it, but it works.
+            # I will change this in a future update. In the meantime, I will leave it as is.
+            # --@ZZ-Cat 11-20-2022
+            if (FileName == ">" + Ota["RailDriver", table]["Main", table]["Path", string] + "/" + Ota["RailDriver", table]["Main", table]["File", string])
+            {
+                HashFile = Ota["RailDriver", table]["Main", table]["Hash", string]:toNumber()
+            }
+            elseif (FileName == ">" + Ota["RailDriver", table]["Libraries", table]["Command-Line Interface", table]["Path", string] + "/" + Ota["RailDriver", table]["Libraries", table]["Command-Line Interface", table]["File", string])
+            {
+                HashFile = Ota["RailDriver", table]["Libraries", table]["Command-Line Interface", table]["Hash", string]:toNumber()
+            }
+            elseif (FileName == ">" + Ota["RailDriver", table]["Libraries", table]["Controls", table]["Player Controls", table]["Path", string] + "/" + Ota["RailDriver", table]["Libraries", table]["Controls", table]["Player Controls", table]["File", string])
+            {
+                HashFile = Ota["RailDriver", table]["Libraries", table]["Controls", table]["Player Controls", table]["Hash", string]:toNumber()
+            }
+            elseif (FileName == ">" + Ota["RailDriver", table]["Libraries", table]["Over-The-Air Updates", table]["Local", table]["Path", string] + "/" + Ota["RailDriver", table]["Libraries", table]["Over-The-Air Updates", table]["Local", table]["File", string])
+            {
+                HashFile = Ota["RailDriver", table]["Libraries", table]["Over-The-Air Updates", table]["Local", table]["Hash", string]:toNumber()
+            }
+            elseif (FileName == ">" + Ota["RailDriver", table]["Libraries", table]["PIDF Controller", table]["Path", string] + "/" + Ota["RailDriver", table]["Libraries", table]["PIDF Controller", table]["File", string])
+            {
+                HashFile = Ota["RailDriver", table]["Libraries", table]["PIDF Controller", table]["Hash", string]:toNumber()
+            }
+            elseif (FileName == ">" + Ota["RailDriver", table]["Libraries", table]["Sensors", table]["Speedometer", table]["Path", string] + "/" + Ota["RailDriver", table]["Libraries", table]["Sensors", table]["Speedometer", table]["File", string])
+            {
+                HashFile = Ota["RailDriver", table]["Libraries", table]["Sensors", table]["Speedometer", table]["Hash", string]:toNumber()
+            }
+            elseif (FileName == ">" + Ota["RailDriver", table]["Libraries", table]["Smart Entity Management", table]["Path", string] + "/" + Ota["RailDriver", table]["Libraries", table]["Smart Entity Management", table]["File", string])
+            {
+                HashFile = Ota["RailDriver", table]["Libraries", table]["Smart Entity Management", table]["Hash", string]:toNumber()
+            }
+            elseif (FileName == ">" + Ota["RailDriver", table]["Libraries", table]["Timers", table]["Path", string] + "/" + Ota["RailDriver", table]["Libraries", table]["Timers", table]["File", string])
+            {
+                HashFile = Ota["RailDriver", table]["Libraries", table]["Timers", table]["Hash", string]:toNumber()
+            }
+
+            local UploadTick = 100
+
+            # Check if the player is a developer.
+            if (otaLocalPlayerIsDeveloper(Ota, Ota, owner()) == 1)
+            {
+                if (Hash != HashFile)
+                {
+                    UploadTick = 500
+                    # Debug.
+                    print("File uploaded: " + FileName:explode("/")[FileName:explode("/"):count(), string])
+                    print("File Hash: " + Hash)
+                    print("File Hash (from version file): " + HashFile)
+                }
+            }
+
+            else
+            {
+                # Assert that the file's hash checksum matches the hash checksum in the version file.
+                assert(Hash == HashFile, "File hash checksum does not match: " + FileName:explode("/")[FileName:explode("/"):count(), string])
+            }
+
+            # Remove the file from the list of files to upload.
+            local FileLoaded = ">" + Ota["Files", table]["to upload", array]:popString()
+
+            # Assert that the file that was just uploaded is the same file that was just loaded.
+            assert(FileLoaded == FileName, "File loaded does not match file uploaded: " + FileName:explode("/")[FileName:explode("/"):count(), string])
+
+            # Check if there are any more files to upload.
+            if (Ota["Files", table]["to upload", array]:count() == 0)
+            {
+                # Abort the update process, for now.
+                # --@ZZ-Cat 11-20-2022
+                Ota["Flags", table]["Update Process Started", number] = 0
+                print("Update aborted. Please wait while RailDriver restarts...")
+                runOnChat(0)
+                runOnTick(0)
+                runOnKeys(owner(), 0)
+                stopAllTimers()
+                timer("Restart", 2000)
+            }
+
+            # Start the next file upload.
+            else
+            {
+                Ota["Flags", table]["File Upload Complete", number] = 0
+
+                # Start the next file upload.
+                local FileIndex = Ota["Files", table]["to upload", array]:count()
+                Ota["File Path to Load", string] = ">" + Ota["Files", table]["to upload", array][FileIndex, string]
+                runOnFile(1)
+                otaLocalStartClock(Ota, UploadTick)
+            }
+        }
         elseif (FileName == ">" + Ota["RailDriver", table]["Main", table]["Path", string] + "/" + Ota["RailDriver", table]["Main", table]["File", string])
         {
             Ota["Flags", table]["File Upload Complete", number] = 1
@@ -516,21 +718,29 @@ function void otaLocalFileLoadedHandler(Ota:table)
     elseif (FileStatus == _FILE_UNKNOWN)
     {
         Ota["Flags", table]["File Upload Failed", number] = 1
+        Ota["Flags", table]["File Upload Complete", number] = 0
+        Ota["Flags", table]["Update Process Started", number] = 0
         error("Unknown error while loading file.")
     }
     elseif (FileStatus == _FILE_TIMEOUT)
     {
         Ota["Flags", table]["File Upload Failed", number] = 1
+        Ota["Flags", table]["File Upload Complete", number] = 0
+        Ota["Flags", table]["Update Process Started", number] = 0
         error("Loading file timed out.")
     }
     elseif (FileStatus == _FILE_404)
     {
         Ota["Flags", table]["File Upload Failed", number] = 1
+        Ota["Flags", table]["File Upload Complete", number] = 0
+        Ota["Flags", table]["Update Process Started", number] = 0
         error("File not found.")
     }
     elseif (FileStatus == _FILE_TRANSFER_ERROR)
     {
         Ota["Flags", table]["File Upload Failed", number] = 1
+        Ota["Flags", table]["File Upload Complete", number] = 0
+        Ota["Flags", table]["Update Process Started", number] = 0
         error("Failed to transfer file.")
     }
 }
