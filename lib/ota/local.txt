@@ -61,6 +61,7 @@ function table otaLocalInit()
     Ota["Flags", table]["File Upload Started", number] = 0
     Ota["Flags", table]["File Upload Complete", number] = 0
     Ota["Flags", table]["File Upload Failed", number] = 0
+    Ota["Flags", table]["RailDriver needs updating", number] = 0
     Ota["Flags", table]["Update Process Started", number] = 0
     Ota["Flags", table]["Version File is Valid", number] = 0
 
@@ -155,6 +156,9 @@ function number otaLocalUpdateRailDriver(Ota:table)
         print("Update process has already started.")
         return 0
     }
+
+    # Clear the RailDriver Needs Updating flag.
+    Ota["Flags", table]["RailDriver needs updating", number] = 0
 
     # Clear the list of files.
     Ota["Files", table]["to upload", array]:clear()
@@ -526,6 +530,101 @@ function number otaLocalIsVersionFileValid(Ota:table, RawData:string)
     return Ota["Flags", table]["Version File is Valid", number]
 }
 
+# This function is called internally to update the file's hash in the Version File.
+# @param Ota A handle to the OTA library.
+# @param FileName The name of the file to update.
+# @param FileHash The hash of the file to update.
+# @return 1 if the file's hash was updated, 0 otherwise.
+function number otaLocalUpdateFileHash(Ota:table, FileName:string, FileHash:number)
+{
+    assert(Ota["Flags", table]["Version File is Valid", number] == 1, "Version File is not valid.")
+    assert(Ota["Version File", table]:exists("Raw Data") == 1 & Ota["Version File", table]["Raw Data", string]:length() > 0, "Version File does not contain raw data.")
+
+    local RawData = Ota["Version File", table]["Raw Data", string]
+    local Lines = RawData:explode("\n")
+    local FileHashUpdated = 0
+
+    # Get the name of the file to update.
+    local FileNameParts = FileName:explode("/")
+    local FileNameToFind = FileNameParts[FileNameParts:count(), string]
+
+    for (I = 1, Lines:count())
+    {
+        local Line = Lines[I, string]
+        local LineTrimmed = Line:trim()
+        local LineParts = LineTrimmed:explode(":")
+
+        # Remove the quotes from both ends of the string.
+        local LineName = LineParts[1, string]:sub(2, LineParts[1, string]:length() - 1)
+        local LineValue = LineParts[2, string]:sub(2, LineParts[2, string]:length() - 2)
+
+        # Update the hash of the file.
+        # The hash is always on the third line after the file name.
+        if (LineName == "File" & LineValue == FileNameToFind)
+        {
+            local LineHash = Lines[I + 3, string]:trim()
+            local LineHashParts = LineHash:explode(":")
+
+            # Remove the quotes from both ends of the string.
+            local LineHashName = LineHashParts[1, string]:sub(2, LineHashParts[1, string]:length() - 1)
+            local LineHashValue = LineHashParts[2, string]:sub(2, LineHashParts[2, string]:length() - 1)
+
+            # Hash is always the third line after the file name.
+            assert(LineHashName == "Hash", "Invalid hash name.")
+            assert(LineHashValue:toNumber() > 0, "Invalid hash value.")
+
+            # Update the hash.
+            if (LineHashName == "Hash")
+            {
+                # Get the line spacing to preserve the indentation.
+                local LineSpaces = ""
+                for (J = 1, Lines[I + 3, string]:length())
+                {
+                    if (Lines[I + 3, string]:index(J) == " ")
+                    {
+                        LineSpaces += " "
+                    }
+
+                    else
+                    {
+                        break
+                    }
+                }
+
+                # Update the hash.
+                Lines[I + 3, string] = LineSpaces + "\"Hash\":\"" + FileHash:toString() + "\""
+                FileHashUpdated = 1
+                break
+            }
+        }
+    }
+
+    # Update the Raw Data.
+    RawData = ""
+    for (I = 1, Lines:count())
+    {
+        # Don't add a newline to the last line.
+        if (I == Lines:count())
+        {
+            RawData += Lines[I, string]
+            break
+        }
+
+        else
+        {
+            RawData += Lines[I, string] + "\n"
+        }
+    }
+
+    # Update the Version File.
+    assert(RawData:length() > 0, "Invalid raw data.")
+    Ota["Version File", table]["Raw Data", string] = RawData
+    assert(fileCanWrite() == 1, "Cannot write to the Version File.")
+    fileWrite(">" + Ota["Version File Path", string], RawData)
+
+    return FileHashUpdated
+}
+
 # This function is called to decide how an uploaded file should be handled.
 # @param Ota A handle to the OTA library.
 # @return void
@@ -645,25 +744,16 @@ function void otaLocalFileLoadedHandler(Ota:table)
                 HashFile = Ota["RailDriver", table]["Libraries", table]["Timers", table]["Hash", string]:toNumber()
             }
 
-            local UploadTick = 100
+            assert(Hash != 0, "Failed to calculate hash checksum for file: " + FileName)
+            assert(HashFile != 0, "Failed to get hash checksum for file: " + FileName)
 
-            # Check if the player is a developer.
-            if (otaLocalPlayerIsDeveloper(Ota, Ota, owner()) == 1)
+            if (Hash != HashFile)
             {
-                if (Hash != HashFile)
-                {
-                    UploadTick = 500
-                    # Debug.
-                    print("File uploaded: " + FileName:explode("/")[FileName:explode("/"):count(), string])
-                    print("File Hash: " + Hash)
-                    print("File Hash (from version file): " + HashFile)
-                }
-            }
+                # Update the file's hash in the version file.
+                assert(otaLocalUpdateFileHash(Ota, FileName, Hash) == 1, "Failed to update file hash in Version File.")
 
-            else
-            {
-                # Assert that the file's hash checksum matches the hash checksum in the version file.
-                assert(Hash == HashFile, "File hash checksum does not match: " + FileName:explode("/")[FileName:explode("/"):count(), string])
+                # Set the RailDriver Needs Updating flag.
+                Ota["Flags", table]["RailDriver Needs Updating", number] = 1
             }
 
             # Remove the file from the list of files to upload.
@@ -675,15 +765,36 @@ function void otaLocalFileLoadedHandler(Ota:table)
             # Check if there are any more files to upload.
             if (Ota["Files", table]["to upload", array]:count() == 0)
             {
-                # Abort the update process, for now.
-                # --@ZZ-Cat 11-20-2022
-                Ota["Flags", table]["Update Process Started", number] = 0
-                print("Update aborted. Please wait while RailDriver restarts...")
-                runOnChat(0)
-                runOnTick(0)
-                runOnKeys(owner(), 0)
-                stopAllTimers()
-                timer("Restart", 2000)
+                # Final loaded file should always be RailDriver's main file.
+                assert(FileName == ">" + Ota["RailDriver", table]["Main", table]["Path", string] + "/" + Ota["RailDriver", table]["Main", table]["File", string], "Final file loaded does not match RailDriver's main file.")
+
+                # Check if RailDriver needs updating.
+                if (Ota["Flags", table]["RailDriver Needs Updating", number] == 1)
+                {
+                    # Remove the '>' from the file name.
+                    FileName = FileName:sub(2, FileName:length())
+
+                    assert(FileName == Ota["RailDriver", table]["Main", table]["Path", string] + "/" + Ota["RailDriver", table]["Main", table]["File", string], "Final file loaded does not match RailDriver's main file.")
+
+                    # Update RailDriver.
+                    local RailDriver = Ota["RailDriver E2", entity]
+                    assert(RailDriver != noentity(), "RailDriver E2 entity is null.")
+                    RailDriver:remoteUpload(FileName)
+
+                }
+
+                # Abort the update process, because RailDriver is already up-to-date.
+                else
+                {
+                    # Abort the update process.
+                    Ota["Flags", table]["Update Process Started", number] = 0
+                    print("Update aborted.\nRailDriver is already up-to-date. Please wait while RailDriver restarts...")
+                    runOnChat(0)
+                    runOnTick(0)
+                    runOnKeys(owner(), 0)
+                    stopAllTimers()
+                    timer("Restart", 5000)
+                }
             }
 
             # Start the next file upload.
