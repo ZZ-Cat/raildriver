@@ -394,11 +394,6 @@ function void otaLocalUpdateVersionFileHash(Ota:table, RawData:string)
         }
     }
 
-    # Assert that there is exactly eight occurrences of "Hash" in the file.
-    # These are for RailDriver's main code & its libraries, & they are
-    # excluded from the Version File's hash checksum.
-    assert(HashOccurrences == 8, "Incorrect number of occurrences of \"Hash\" in Version File.")
-
     # Calculate the new hash checksum.
     HashCalculated = hash(RawDataNoSum)
 
@@ -512,11 +507,6 @@ function number otaLocalIsVersionFileValid(Ota:table, RawData:string)
             }
         }
     }
-
-    # Assert that there is exactly eight occurrences of "Hash" in the file.
-    # These are for RailDriver's main code & its libraries, & they are
-    # excluded from the Version File's hash checksum.
-    assert(HashOccurrences == 8, "Invalid number of checksums in file: " + Ota["Version File Path", string])
 
     # Calculate the hash checksum.
     HashCalculated = hash(RawDataNoSum)
