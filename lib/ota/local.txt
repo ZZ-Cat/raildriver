@@ -47,6 +47,8 @@ function table otaLocalInit()
 
     # Version file contents are stored here.
     Ota["RailDriver", table] = table()
+    Ota["Version File", table] = table()
+    Ota["Version File", table]["Raw Data", string] = ""
 
     # An array of files to upload.
     Ota["Files", table] = table()
@@ -584,6 +586,7 @@ function void otaLocalFileLoadedHandler(Ota:table)
             if (FileContentsTable:exists("RailDriver") == 1)
             {
                 Ota["RailDriver", table] = FileContentsTable["RailDriver", table]:clone()
+                Ota["Version File", table]["Raw Data", string] = FileContents
             }
             else
             {
