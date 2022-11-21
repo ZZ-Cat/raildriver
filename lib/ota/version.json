@@ -15,7 +15,7 @@
             "File":"RailDriver.txt",
             "Path":"e2shared/RailDriver",
             "Version":"0.1.0",
-            "Hash":"1956038296"
+            "Hash":"4033814463"
         },
         "Libraries":
         {
@@ -43,7 +43,7 @@
                     "File":"local.txt",
                     "Path":"e2shared/RailDriver/lib/ota",
                     "Version":"0.1.0",
-                    "Hash":"456559644"
+                    "Hash":"3201905989"
                 }
             },
             "PIDF Controller":
