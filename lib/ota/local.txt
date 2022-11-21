@@ -324,7 +324,7 @@ function number otaLocalPlayerIsDeveloper(Ota:table, Data:table, Player:entity)
 # @param Ota A handle to the OTA library.
 # @param RawData The raw data of the file.
 # @return void
-function void otaLocalUpdateVersionFile(Ota:table, RawData:string)
+function void otaLocalUpdateVersionFileHash(Ota:table, RawData:string)
 {
     local Lines = RawData:explode("\n")
     local HashFile = 0
@@ -564,8 +564,8 @@ function void otaLocalFileLoadedHandler(Ota:table)
             {
                 if (otaLocalPlayerIsDeveloper(Ota, FileContentsTable, owner()) == 1)
                 {
-                    # Update the version file.
-                    otaLocalUpdateVersionFile(Ota, FileContents)
+                    # Update the hash at the end of the Version File.
+                    otaLocalUpdateVersionFileHash(Ota, FileContents)
 
                     # Print a message to the player.
                     print("Version file updated. Please wait while RailDriver restarts...")
