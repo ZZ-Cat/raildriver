@@ -403,7 +403,7 @@ elseif (RailDriverState == 2)
 
                         # Update the E2 using the local version.
                         # Formerly 'otaLocalUploadRailDriver(OTALocal)'
-                        if (otaLocalUploadRailDriver(OTALocal) == 1)
+                        if (otaLocalUpdateRailDriver(OTALocal) == 1)
                         {
                             #runOnChat(0)
                             runOnTick(0)
