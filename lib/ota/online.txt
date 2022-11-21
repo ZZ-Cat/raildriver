@@ -25,3 +25,14 @@
 
     This library is used to check for updates to RailDriver and download them.
 ]#
+
+# This function initializes the Online OTA Updates library.
+# @return The handle to the Online OTA Updates library.
+function table otaOnlineInit()
+{
+    local Ota = table()
+
+    # TODO: Write initialization code here.
+
+    return Ota
+}

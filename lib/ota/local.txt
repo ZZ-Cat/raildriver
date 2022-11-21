@@ -194,6 +194,11 @@ function number otaLocalUpdateRailDriver(Ota:table)
     assert(File["Path", string] != "", "RailDriver's Local OTA library file path is empty.")
     Files:pushString(File["Path", string])
 
+    # RailDriver's Online OTA library.
+    File["Path", string] = Libraries["Over-The-Air Updates", table]["Online", table]["Path", string] + "/" + Libraries["Over-The-Air Updates", table]["Online", table]["File", string]
+    assert(File["Path", string] != "", "RailDriver's Online OTA library file path is empty.")
+    Files:pushString(File["Path", string])
+
     # RailDriver's PIDF Controller library.
     File["Path", string] = Libraries["PIDF Controller", table]["Path", string] + "/" + Libraries["PIDF Controller", table]["File", string]
     assert(File["Path", string] != "", "RailDriver's PIDF Controller library file path is empty.")
@@ -214,8 +219,8 @@ function number otaLocalUpdateRailDriver(Ota:table)
     assert(File["Path", string] != "", "RailDriver's Timers library file path is empty.")
     Files:pushString(File["Path", string])
 
-    # Assert that the list of files contains exactly 8 files.
-    assert(Files:count() == 8, "The list of files to upload contains " + Files:count() + " files, but it should contain 8 files.")
+    # Assert that the list of files contains exactly 9 files.
+    assert(Files:count() == 9, "The list of files to upload contains " + Files:count() + " files, but it should contain 8 files.")
 
     # Copy the Files to the Files to Upload list.
     Ota["Files", table]["to upload", array] = Files:clone()
@@ -716,6 +721,10 @@ function void otaLocalFileLoadedHandler(Ota:table)
             elseif (FileName == ">" + Ota["RailDriver", table]["Libraries", table]["Over-The-Air Updates", table]["Local", table]["Path", string] + "/" + Ota["RailDriver", table]["Libraries", table]["Over-The-Air Updates", table]["Local", table]["File", string])
             {
                 HashFile = Ota["RailDriver", table]["Libraries", table]["Over-The-Air Updates", table]["Local", table]["Hash", string]:toNumber()
+            }
+            elseif(FileName == ">" + Ota["RailDriver", table]["Libraries", table]["Over-The-Air Updates", table]["Online", table]["Path", string] + "/" + Ota["RailDriver", table]["Libraries", table]["Over-The-Air Updates", table]["Online", table]["File", string])
+            {
+                HashFile = Ota["RailDriver", table]["Libraries", table]["Over-The-Air Updates", table]["Online", table]["Hash", string]:toNumber()
             }
             elseif (FileName == ">" + Ota["RailDriver", table]["Libraries", table]["PIDF Controller", table]["Path", string] + "/" + Ota["RailDriver", table]["Libraries", table]["PIDF Controller", table]["File", string])
             {

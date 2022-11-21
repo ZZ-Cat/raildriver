@@ -21,7 +21,7 @@
 @persist Trucks:array Speedo:table NDOF:table
 # @persist Brake
 @persist [Direction Throttle EmergencyBrake]:number
-@persist [OTALocal CLI PlayerControls ThrottleMap BrakeMap]:table TrainDriver:entity
+@persist [OTALocal OTAOnline CLI PlayerControls ThrottleMap BrakeMap]:table TrainDriver:entity
 @persist PIDF:table
 @persist HillClimbDescentData:array
 @persist EmBrakeState EmBrakeThisSpeed EmBrakeLastSpeed EmBrakeObserverTickInterval EmBrakePCFaultTimeoutSet
@@ -103,6 +103,7 @@ if (RailDriverState == 1)
     try
     {
         #include "e2shared/RailDriver/lib/ota/local"
+        #include "e2shared/RailDriver/lib/ota/online"
         #include "e2shared/RailDriver/lib/smartEntityManagement"
         #include "e2shared/RailDriver/lib/sensors/ndof"
         #include "e2shared/RailDriver/lib/sensors/speedometer"
@@ -246,13 +247,17 @@ if (RailDriverState == 1)
             error("Failed to initialize PIDF controller.")
         }
 
-        # Initialize OTA.
+        # Initialize Local OTA Updates.
         OTALocal = otaLocalInit()
         if (OTALocal:count() == 0)
         {
             error("Failed to initialize local Over The Air (OTA) Updates.")
         }
         otaLocalLoadVersionFile(OTALocal)
+
+        # Initialize Online OTA Updates.
+        OTAOnline = otaOnlineInit()
+        assert(OTAOnline:count() == 0, "Failed to initialize online Over The Air (OTA) Updates.")
 
         # Show the RailDriver welcome message.
         if (cliPrintToChat(CLI, "info", "Welcome to RailDriver!\nType '.raildriver help' for a list of commands."))
