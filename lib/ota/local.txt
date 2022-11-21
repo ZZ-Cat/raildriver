@@ -41,6 +41,7 @@ function table otaLocalInit()
     Ota["Clock Delay", number] = 0
     Ota["Upload Attempts", number] = 0
     Ota["Upload Max Attempts", number] = 5
+    Ota["Upload Tick", number] = 300
 
     # The selected file to upload.
     Ota["File Path to Load", string] = ""
@@ -224,7 +225,7 @@ function number otaLocalUpdateRailDriver(Ota:table)
 
     # Start uploading RailDriver.
     runOnFile(1)
-    otaLocalStartClock(Ota, 100)
+    otaLocalStartClock(Ota, Ota["Upload Tick", number])
     return 1
 }
 
@@ -693,7 +694,7 @@ function void otaLocalFileLoadedHandler(Ota:table)
                 local FileIndex = Ota["Files", table]["to upload", array]:count()
                 Ota["File Path to Load", string] = ">" + Ota["Files", table]["to upload", array][FileIndex, string]
                 runOnFile(1)
-                otaLocalStartClock(Ota, UploadTick)
+                otaLocalStartClock(Ota, Ota["Upload Tick", number])
             }
         }
         elseif (FileName == ">" + Ota["RailDriver", table]["Main", table]["Path", string] + "/" + Ota["RailDriver", table]["Main", table]["File", string])
