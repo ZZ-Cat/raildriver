@@ -646,35 +646,39 @@ function number cliProcessMessage(Cli:table, Message:string)
         return 0
     }
 
-    # Check if the arguments are valid.
-    local ArgumentIsValid = 0
-    local InvalidArgument = ""
-    for (I = 1, Arguments:count())
+    # Check if the command has any arguments.
+    if (Arguments:count() > 0)
     {
-        # Check if the argument is valid.
-        for(J = 1, Cli["Commands", table][Command, table]["Arguments List", array]:count())
+        # Check if the arguments are valid.
+        local ArgumentIsValid = 0
+        local InvalidArgument = ""
+        for (I = 1, Arguments:count())
         {
-            if (Arguments[I, string] == Cli["Commands", table][Command, table]["Arguments List", array][J, string])
+            # Check if the argument is valid.
+            for(J = 1, Cli["Commands", table][Command, table]["Arguments List", array]:count())
             {
-                ArgumentIsValid = 1
+                if (Arguments[I, string] == Cli["Commands", table][Command, table]["Arguments List", array][J, string])
+                {
+                    ArgumentIsValid = 1
+                    break
+                }
+            }
+
+            # Get the invalid argument.
+            if (ArgumentIsValid == 0)
+            {
+                InvalidArgument = Arguments[I, string]
                 break
             }
         }
 
-        # Get the invalid argument.
+        # Check if the argument is valid.
         if (ArgumentIsValid == 0)
         {
-            InvalidArgument = Arguments[I, string]
-            break
+            # The argument is not valid.
+            printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Argument '" + InvalidArgument + "' is not valid for command '" + Command + "'.")
+            return 0
         }
-    }
-
-    # Check if the argument is valid.
-    if (ArgumentIsValid == 0)
-    {
-        # The argument is not valid.
-        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Argument '" + InvalidArgument + "' is not valid for command '" + Command + "'.")
-        return 0
     }
 
     # Update the command.
