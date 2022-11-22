@@ -67,10 +67,16 @@ function string otaOnlineGetVersionURL(OtaOnline:table, OtaLocal:table)
 
     # Remove "e2shared/RailDriver/" from the Path.
     local PathPartsToReplace = "e2shared/RailDriver/"
-    Path = Path:sub(PathPartsToReplace:length(), Path:length())
+    Path = Path:sub(PathPartsToReplace:length() + 1, Path:length())
 
     # Compile the URL.
     URL = BaseURL + Username + "/" + Repository + "/" + Branch + "/" + Path + "/" + File
+
+    # This should compile as:
+    # https://raw.githubusercontent.com/ZZ-Cat/RailDriver/Over-The-Air-Updates_Part-2-of-2_Online/lib/ota/version.json
+    # 
+    # Compiled URL:
+    # https://raw.githubusercontent.com/ZZ-Cat/RailDriver/Over-The-Air-Updates_Part-2-of-2_Online/lib/ota/version.json
 
     # Return the URL.
     return URL
