@@ -81,3 +81,12 @@ function string otaOnlineGetVersionURL(OtaOnline:table, OtaLocal:table)
     # Return the URL.
     return URL
 }
+
+# This function starts the online OTA update process.
+# @param Ota The handle to the Online OTA Updates library.
+# @param URL The URL to RailDriver's online Version File.
+# @return true if the online OTA update process started successfully, false otherwise.
+function number otaOnlineUpdateRailDriver(Ota:table, URL:string)
+{
+    return 1
+}
