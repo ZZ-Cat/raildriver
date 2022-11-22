@@ -36,3 +36,42 @@ function table otaOnlineInit()
 
     return Ota
 }
+
+# This function gets the URL to RailDriver's online Version File, using
+# data from RailDriver's local Version File.
+# @param OtaOnline The handle to the Online OTA Updates library.
+# @param OtaLocal The handle to the Local OTA Updates library.
+# @return The URL to RailDriver's online Version File.
+function string otaOnlineGetVersionURL(OtaOnline:table, OtaLocal:table)
+{
+    # Return an empty string if the local Version File is not valid.
+    if (OtaLocal["Flags", table]["Version File is Valid", number] != 1 | OtaLocal:count() == 0 | OtaLocal["RailDriver", table]:count() == 0)
+    {
+        return ""
+    }
+
+    # Compile the URL to RailDriver's online Version File.
+    local BaseURL = "https://raw.githubusercontent.com/"
+    local Username = ""
+    local Repository = ""
+    local Branch = ""
+    local Path = ""
+    local File = ""
+    local URL = ""
+
+    Username = OtaLocal["RailDriver", table]["Developers", table]["Owner", table]["Social", table]["GitHub", table]["Username", string]
+    Repository = OtaLocal["RailDriver", table]["Main", table]["File", string]:explode(".")[1, string]
+    Branch = "Over-The-Air-Updates_Part-2-of-2_Online"
+    Path = OtaLocal["RailDriver", table]["Libraries", table]["Over-The-Air Updates", table]["Online", table]["Path", string]
+    File = "version.json"
+
+    # Remove "e2shared/RailDriver/" from the Path.
+    local PathPartsToReplace = "e2shared/RailDriver/"
+    Path = Path:sub(PathPartsToReplace:length(), Path:length())
+
+    # Compile the URL.
+    URL = BaseURL + Username + "/" + Repository + "/" + Branch + "/" + Path + "/" + File
+
+    # Return the URL.
+    return URL
+}
