@@ -413,6 +413,7 @@ elseif (RailDriverState == 2)
                             #runOnChat(0)
                             runOnTick(0)
                             runOnKeys(TrainDriver, 0)
+                            timer("OTA Updates Watchdog", 10000)
                         }
                         else
                         {
@@ -437,6 +438,16 @@ elseif (RailDriverState == 2)
                     }
                 }
             }
+        }
+    }
+
+    if (clk("OTA Updates Watchdog"))
+    {
+        # Update failed.
+        if (cliPrintToChat(CLI, "error", "Unable to update RailDriver.\nOTA Updates Watchdog triggered.\nPlease wait while RailDriver restarts..."))
+        {
+            timer("Chat Print", 100)
+            timer("Restart", 5000)
         }
     }
 
