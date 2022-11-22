@@ -307,6 +307,9 @@ function table cliInit(CliPrefix:string)
     # Register the help command.
     Cli["Commands", table]["help", table] = table()
     Cli["Commands", table]["help", table]["Arguments", array] = array()
+    Cli["Commands", table]["update", table]["Arguments Count", number] = 0
+    Cli["Commands", table]["update", table]["Arguments List", array] = array()
+    Cli["Commands", table]["update", table]["Arguments List Count", number] = 0
     Cli["Commands", table]["help", table]["help", string] = "Displays this help message."
     Cli["Commands", table]["Flags", table]["help is updated", number] = 0
 
@@ -319,19 +322,29 @@ function table cliInit(CliPrefix:string)
     # Register the controls command.
     Cli["Commands", table]["controls", table] = table()
     Cli["Commands", table]["controls", table]["Arguments", array] = array()
+    Cli["Commands", table]["update", table]["Arguments Count", number] = 0
+    Cli["Commands", table]["update", table]["Arguments List", array] = array()
+    Cli["Commands", table]["update", table]["Arguments List Count", number] = 0
     Cli["Commands", table]["controls", table]["help", string] = "Displays a list of available player controls."
     Cli["Commands", table]["Flags", table]["controls is updated", number] = 0
 
     # Register the restart command.
     Cli["Commands", table]["restart", table] = table()
     Cli["Commands", table]["restart", table]["Arguments", array] = array()
+    Cli["Commands", table]["update", table]["Arguments Count", number] = 0
+    Cli["Commands", table]["update", table]["Arguments List", array] = array()
+    Cli["Commands", table]["update", table]["Arguments List Count", number] = 0
     Cli["Commands", table]["restart", table]["help", string] = "Restarts RailDriver."
     Cli["Commands", table]["Flags", table]["restart is updated", number] = 0
 
     # Register the update command with the argument "local".
     Cli["Commands", table]["update", table] = table()
     Cli["Commands", table]["update", table]["Arguments", array] = array()
-    Cli["Commands", table]["update", table]["Arguments", array]:pushString("local")
+    Cli["Commands", table]["update", table]["Arguments Count", number] = 1
+    Cli["Commands", table]["update", table]["Arguments List", array] = array()
+    Cli["Commands", table]["update", table]["Arguments List", array]:pushString("local")
+    Cli["Commands", table]["update", table]["Arguments List", array]:pushString("online")
+    Cli["Commands", table]["update", table]["Arguments List Count", number] = 2
     Cli["Commands", table]["update", table]["help", string] = "Uses Over-The-Air Updates to update RailDriver.\n  Arguments:\n    local - Updates RailDriver from your e2shared folder.\n    online - Coming soon."
     Cli["Commands", table]["Flags", table]["update is updated", number] = 0
 
@@ -618,6 +631,54 @@ function number cliProcessMessage(Cli:table, Message:string)
     }
 
     # Check if the command has any arguments.
+    if (Arguments:count() > 0 & Cli["Commands", table][Command, table]["Arguments Count", number] == 0)
+    {
+        # The command does not accept any arguments.
+        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Command '" + Command + "' does not accept any arguments.")
+        return 0
+    }
+
+    # Check if the command has the correct number of arguments.
+    if (Arguments:count() != Cli["Commands", table][Command, table]["Arguments Count", number])
+    {
+        # The command does not have the correct number of arguments.
+        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Command '" + Command + "' requires " + Cli["Commands", table][Command, table]["Arguments Count", number] + " argument(s).")
+        return 0
+    }
+
+    # Check if the arguments are valid.
+    local ArgumentIsValid = 0
+    local InvalidArgument = ""
+    for (I = 1, Arguments:count())
+    {
+        # Check if the argument is valid.
+        for(J = 1, Cli["Commands", table][Command, table]["Arguments List", array]:count())
+        {
+            if (Arguments[I, string] == Cli["Commands", table][Command, table]["Arguments List", array][J, string])
+            {
+                ArgumentIsValid = 1
+                break
+            }
+        }
+
+        # Get the invalid argument.
+        if (ArgumentIsValid == 0)
+        {
+            InvalidArgument = Arguments[I, string]
+            break
+        }
+    }
+
+    # Check if the argument is valid.
+    if (ArgumentIsValid == 0)
+    {
+        # The argument is not valid.
+        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Argument '" + InvalidArgument + "' is not valid for command '" + Command + "'.")
+        return 0
+    }
+
+    #[
+    # Check if the command has any arguments.
     if (Arguments:count() > 0 & Cli["Commands", table][Command, table]["Arguments", array]:count() == 0)
     {
         # The command does not accept any arguments.
@@ -644,6 +705,7 @@ function number cliProcessMessage(Cli:table, Message:string)
             return 0
         }
     }
+    ]#
 
     # Update the command.
     Cli["Commands", table][Command, table]["Arguments", array] = Arguments
