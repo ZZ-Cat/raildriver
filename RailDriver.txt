@@ -428,8 +428,9 @@ elseif (RailDriverState == 2)
                     # Check if the argument is 'online'.
                     elseif (Arguments[1, string] == "online")
                     {
+                        local URL = otaOnlineGetVersionURL(OTAOnline, OTALocal)
                         # Update the E2 using the online version.
-                        if (cliPrintToChat(CLI, "warning", "Online updates are not yet implemented."))
+                        if (cliPrintToChat(CLI, "debug", "URL: " + URL + "\nOnline updates are not yet implemented."))
                         {
                             timer("Chat Print", 100)
                         }
