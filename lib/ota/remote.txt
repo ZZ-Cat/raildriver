@@ -35,20 +35,22 @@ function table otaOnlineInit()
     Ota["Clock ID", string] = "RailDriver OTA Online Clock"
     Ota["Clock Delay", number] = 0
 
+    # The selected URL to download the update from.
+    Ota["URL to Get", string] = ""
+
     return Ota
 }
 
-# This function gets the URL to RailDriver's online Version File, using
-# data from RailDriver's local Version File.
+# This function compiles the URL to the online Version File & starts the online OTA update process.
 # @param OtaOnline The handle to the Online OTA Updates library.
 # @param OtaLocal The handle to the Local OTA Updates library.
-# @return The URL to RailDriver's online Version File.
-function string otaOnlineGetVersionURL(OtaOnline:table, OtaLocal:table)
+# @return true if the online OTA update process started successfully, false otherwise.
+function number otaOnlineUpdateRailDriver(OtaOnline:table, OtaLocal:table)
 {
     # Return an empty string if the local Version File is not valid.
     if (OtaLocal["Flags", table]["Version File is Valid", number] != 1 | OtaLocal:count() == 0 | OtaLocal["RailDriver", table]:count() == 0)
     {
-        return ""
+        return 0
     }
 
     # Compile the URL to RailDriver's online Version File.
@@ -71,24 +73,8 @@ function string otaOnlineGetVersionURL(OtaOnline:table, OtaLocal:table)
     Path = Path:sub(PathPartsToReplace:length() + 1, Path:length())
 
     # Compile the URL.
-    URL = BaseURL + Username + "/" + Repository + "/" + Branch + "/" + Path + "/" + File
+    OtaOnline["URL to Get", string] = BaseURL + Username + "/" + Repository + "/" + Branch + "/" + Path + "/" + File
 
-    # This should compile as:
-    # https://raw.githubusercontent.com/ZZ-Cat/RailDriver/Over-The-Air-Updates_Part-2-of-2_Online/lib/ota/version.json
-    # 
-    # Compiled URL:
-    # https://raw.githubusercontent.com/ZZ-Cat/RailDriver/Over-The-Air-Updates_Part-2-of-2_Online/lib/ota/version.json
-
-    # Return the URL.
-    return URL
-}
-
-# This function starts the online OTA update process.
-# @param Ota The handle to the Online OTA Updates library.
-# @param URL The URL to RailDriver's online Version File.
-# @return true if the online OTA update process started successfully, false otherwise.
-function number otaOnlineUpdateRailDriver(Ota:table, URL:string)
-{
     return 1
 }
 
