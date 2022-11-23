@@ -103,7 +103,7 @@ if (RailDriverState == 1)
     try
     {
         #include "e2shared/RailDriver/lib/ota/local"
-        #include "e2shared/RailDriver/lib/ota/online"
+        #include "e2shared/RailDriver/lib/ota/remote"
         #include "e2shared/RailDriver/lib/smartEntityManagement"
         #include "e2shared/RailDriver/lib/sensors/ndof"
         #include "e2shared/RailDriver/lib/sensors/speedometer"
@@ -257,7 +257,7 @@ if (RailDriverState == 1)
 
         # Initialize Online OTA Updates.
         OTAOnline = otaOnlineInit()
-        assert(OTAOnline:count() == 0, "Failed to initialize online Over The Air (OTA) Updates.")
+        assert(OTAOnline:count() != 0, "Failed to initialize online Over The Air (OTA) Updates.")
 
         # Show the RailDriver welcome message.
         if (cliPrintToChat(CLI, "info", "Welcome to RailDriver!\nType '.raildriver help' for a list of commands."))
