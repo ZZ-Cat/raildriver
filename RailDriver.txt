@@ -319,12 +319,6 @@ elseif (RailDriverState == 2)
         try
         {
             otaOnlineReceiveResponseHandler(OTAOnline)
-
-            # Debug.
-            if (cliPrintToChat(CLI, "debug", otaOnlineGetHttpData(OTAOnline)))
-            {
-                timer("Chat Print", 300)
-            }
         }
 
         catch (Exception)
@@ -501,9 +495,9 @@ elseif (RailDriverState == 2)
                     elseif (Arguments[1, string] == "online")
                     {
                         local Message = ""
-                        Message += "Online updates are not yet supported.\n"
-                        Message += "Instead, RailDriver is simulating an update.\n"
-                        #Message += "Waiting for OTA Updates Watchdog to timeout...\n"
+                        Message += "Online updates are a work in progress.\n"
+                        Message += "Please wait for the next update.\n"
+                        Message += "RailDriver is now waiting for the watchdog to expire...\n"
 
                         stopAllTimers()
 
