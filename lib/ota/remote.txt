@@ -49,10 +49,6 @@ function table otaOnlineInit()
     Ota["Flags", table]["HTTP Request Failed", number] = 0
     Ota["Flags", table]["Update Process Started", number] = 0
 
-    # Debug.
-    Ota["Debug", table] = table()
-    Ota["Debug", table]["HTTP Data", string] = ""
-
     return Ota
 }
 
@@ -203,9 +199,6 @@ function void otaOnlineReceiveResponseHandler(Ota:table)
             Ota["Flags", table]["HTTP Request Received", number] = 1
 
             local HttpData = httpData()
-
-            # Debug.
-            Ota["Debug", table]["HTTP Data", string] = HttpData
         }
         else
         {
@@ -220,12 +213,4 @@ function void otaOnlineReceiveResponseHandler(Ota:table)
         Ota["Flags", table]["Update Process Started", number] = 0
         error("Failed to receive HTTP request from:\n" + Ota["URL to Get", string])
     }
-}
-
-# This is a debug function that returns the raw HTTP data.
-# @param Ota The handle to the Online OTA Updates library.
-# @return string The raw HTTP data.
-function string otaOnlineGetHttpData(Ota:table)
-{
-    return Ota["Debug", table]["HTTP Data", string]
 }
