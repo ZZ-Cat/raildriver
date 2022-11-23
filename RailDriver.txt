@@ -301,6 +301,38 @@ if (RailDriverState == 1)
 # If the initialization fails, RailDriver will not enter this state.
 elseif (RailDriverState == 2)
 {
+    if (clk(otaOnlineGetClockID(OTAOnline)))
+    {
+        try
+        {
+            otaOnlineSendRequestHandler(OTAOnline)
+        }
+
+        catch (Exception)
+        {
+            printColor(vec(255, 0, 0), "[RailDriver | Http | Error]", vec(255, 255, 255), ": " + Exception)
+        }
+    }
+
+    if (httpClk())
+    {
+        try
+        {
+            otaOnlineReceiveResponseHandler(OTAOnline)
+
+            # Debug.
+            if (cliPrintToChat(CLI, "debug", otaOnlineGetHttpData(OTAOnline)))
+            {
+                timer("Chat Print", 300)
+            }
+        }
+
+        catch (Exception)
+        {
+            printColor(vec(255, 0, 0), "[RailDriver | Http | Error]", vec(255, 255, 255), ": " + Exception)
+        }
+    }
+
     if (clk(otaLocalGetClockID(OTALocal)))
     {
         try
@@ -471,7 +503,7 @@ elseif (RailDriverState == 2)
                         local Message = ""
                         Message += "Online updates are not yet supported.\n"
                         Message += "Instead, RailDriver is simulating an update.\n"
-                        Message += "Waiting for OTA Updates Watchdog to timeout...\n"
+                        #Message += "Waiting for OTA Updates Watchdog to timeout...\n"
 
                         stopAllTimers()
 

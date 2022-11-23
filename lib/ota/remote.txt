@@ -32,13 +32,63 @@ function table otaOnlineInit()
 {
     local Ota = table()
 
+    Ota["Version File URL", string] = ""
     Ota["Clock ID", string] = "RailDriver OTA Online Clock"
     Ota["Clock Delay", number] = 0
+    Ota["HTTP Request Attempts", number] = 0
+    Ota["HTTP Request Max Attempts", number] = 3
+    Ota["HTTP Request Tick", number] = 1000
 
     # The selected URL to download the update from.
     Ota["URL to Get", string] = ""
 
+    # Flags.
+    Ota["Flags", table] = table()
+    Ota["Flags", table]["HTTP Request Sent", number] = 0
+    Ota["Flags", table]["HTTP Request Received", number] = 0
+    Ota["Flags", table]["HTTP Request Failed", number] = 0
+    Ota["Flags", table]["Update Process Started", number] = 0
+
+    # Debug.
+    Ota["Debug", table] = table()
+    Ota["Debug", table]["HTTP Data", string] = ""
+
     return Ota
+}
+
+# This function starts the online OTA clock.
+# @param Ota The handle to the Online OTA Updates library.
+# @param Interval The interval at which to make http requests.
+# @return void
+function void otaOnlineStartClock(Ota:table, Interval:number)
+{
+    Ota["Clock Delay", number] = Interval
+    timer(Ota["Clock ID", string], Interval)
+}
+
+# This function stops the online OTA clock.
+# @param Ota The handle to the Online OTA Updates library.
+# @return void
+function void otaOnlineStopClock(Ota:table)
+{
+    stoptimer(Ota["Clock ID", string])
+}
+
+# This function restarts the online OTA clock with the last used interval.
+# @param Ota The handle to the Online OTA Updates library.
+# @return void
+function void otaOnlineRestartClock(Ota:table)
+{
+    otaOnlineStopClock(Ota)
+    otaOnlineStartClock(Ota, Ota["Clock Delay", number])
+}
+
+# This function returns the clock ID.
+# @param Ota The handle to the Online OTA Updates library.
+# @return string The clock ID.
+function string otaOnlineGetClockID(Ota:table)
+{
+    return Ota["Clock ID", string]
 }
 
 # This function compiles the URL to the online Version File & starts the online OTA update process.
@@ -73,10 +123,109 @@ function number otaOnlineUpdateRailDriver(OtaOnline:table, OtaLocal:table)
     Path = Path:sub(PathPartsToReplace:length() + 1, Path:length())
 
     # Compile the URL.
-    OtaOnline["URL to Get", string] = BaseURL + Username + "/" + Repository + "/" + Branch + "/" + Path + "/" + File
+    OtaOnline["Version File URL", string] = BaseURL + Username + "/" + Repository + "/" + Branch + "/" + Path + "/" + File
+    OtaOnline["URL to Get", string] = OtaOnline["Version File URL", string]
+
+    # Set the Update Process Started flag.
+    OtaOnline["Flags", table]["Update Process Started", number] = 1
+
+    # Start the online OTA update process.
+    runOnHTTP(1)
+    otaOnlineStartClock(OtaOnline, 500)
 
     return 1
 }
 
-function void otaOnlineRequestHandler(Ota:table)
-{}
+# This function is called to make an HTTP request.
+# @param Ota The handle to the Online OTA Updates library.
+# @return void
+function void otaOnlineSendRequestHandler(Ota:table)
+{
+    # Check if an HTTP request has been sent.
+    if (Ota["Flags", table]["HTTP Request Sent", number] == 0)
+    {
+        # Check if an HTTP request can be sent at this time.
+        if (httpCanRequest())
+        {
+            otaOnlineStopClock(Ota)
+            httpRequest(Ota["URL to Get", string])
+            Ota["HTTP Request Attempts", number] = 0
+            Ota["Flags", table]["HTTP Request Received", number] = 0
+            Ota["Flags", table]["HTTP Request Sent", number] = 1
+        }
+
+        # Handle the case where an HTTP request cannot be sent at this time.
+        else
+        {
+            # Get the number of HTTP request attempts.
+            otaOnlineStopClock(Ota)
+            Ota["HTTP Request Attempts", number] = Ota["HTTP Request Attempts", number] + 1
+
+            # Check if the HTTP request has been attempted too many times.
+            if (Ota["HTTP Request Attempts", number] >= Ota["HTTP Request Max Attempts", number])
+            {
+                Ota["HTTP Request Attempts", number] = 0
+                Ota["Flags", table]["HTTP Request Failed", number] = 1
+                Ota["Flags", table]["HTTP Request Sent", number] = 0
+                Ota["Flags", table]["HTTP Request Received", number] = 0
+                Ota["Flags", table]["Update Process Started", number] = 0
+                runOnHTTP(0)
+                error("Failed to send HTTP request to:\n" + Ota["URL to Get", string])
+            }
+
+            # Restart the online OTA clock.
+            else
+            {
+                otaOnlineStartClock(Ota, 3000)
+            }
+        }
+    }
+}
+
+# This function is called when an HTTP request is received.
+# @param Ota The handle to the Online OTA Updates library.
+# @return void
+function void otaOnlineReceiveResponseHandler(Ota:table)
+{
+    runOnHTTP(0)
+
+    Ota["Flags", table]["HTTP Request Sent", number] = 0
+
+    # Check if the HTTP request was successful.
+    if (httpSuccess() == 1)
+    {
+        Ota["Flags", table]["HTTP Request Failed", number] = 0
+
+        local RequestedURL = httpRequestUrl()
+
+        if (RequestedURL == Ota["Version File URL", string])
+        {
+            Ota["Flags", table]["HTTP Request Received", number] = 1
+
+            local HttpData = httpData()
+
+            # Debug.
+            Ota["Debug", table]["HTTP Data", string] = HttpData
+        }
+        else
+        {
+            Ota["Flags", table]["HTTP Request Received", number] = 0
+            Ota["Flags", table]["HTTP Request Failed", number] = 1
+            error("Received an HTTP response from an unexpected URL:\n" + RequestedURL)
+        }
+    }
+    else
+    {
+        Ota["Flags", table]["HTTP Request Failed", number] = 1
+        Ota["Flags", table]["Update Process Started", number] = 0
+        error("Failed to receive HTTP request from:\n" + Ota["URL to Get", string])
+    }
+}
+
+# This is a debug function that returns the raw HTTP data.
+# @param Ota The handle to the Online OTA Updates library.
+# @return string The raw HTTP data.
+function string otaOnlineGetHttpData(Ota:table)
+{
+    return Ota["Debug", table]["HTTP Data", string]
+}
