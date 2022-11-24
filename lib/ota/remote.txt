@@ -32,6 +32,7 @@ function table otaOnlineInit()
 {
     local Ota = table()
 
+    Ota["Online Updates Branch", string] = "Over-The-Air-Updates_Part-2-of-2_Online"
     Ota["Version File URL", string] = ""
     Ota["Clock ID", string] = "RailDriver OTA Online Clock"
     Ota["Clock Delay", number] = 0
@@ -110,7 +111,7 @@ function number otaOnlineUpdateRailDriver(OtaOnline:table, OtaLocal:table)
 
     Username = OtaLocal["RailDriver", table]["Developers", table]["Owner", table]["Social", table]["GitHub", table]["Username", string]
     Repository = OtaLocal["RailDriver", table]["Main", table]["File", string]:explode(".")[1, string]
-    Branch = "Over-The-Air-Updates_Part-2-of-2_Online"
+    Branch = OtaOnline["Online Updates Branch", string]
     Path = OtaLocal["RailDriver", table]["Libraries", table]["Over-The-Air Updates", table]["Online", table]["Path", string]
     File = "version.json"
 
