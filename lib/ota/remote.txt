@@ -200,6 +200,13 @@ function void otaOnlineReceiveResponseHandler(Ota:table)
             Ota["Flags", table]["HTTP Request Received", number] = 1
 
             local HttpData = httpData()
+
+            # Get the error code from the HTTP Data.
+            local ErrorCode = HttpData:explode(" ")[1, string]:sub(1, 3):toNumber()
+
+            # Assert that the error code is 0.
+            assert(ErrorCode == 0, "Failed to get the online Version File.\nError Code: " + ErrorCode + "\nError Message: " + HttpData:sub(5, HttpData:length()))
+
         }
         else
         {
@@ -212,6 +219,14 @@ function void otaOnlineReceiveResponseHandler(Ota:table)
     {
         Ota["Flags", table]["HTTP Request Failed", number] = 1
         Ota["Flags", table]["Update Process Started", number] = 0
-        error("Failed to receive HTTP request from:\n" + Ota["URL to Get", string])
+
+        # Get the HTTP error code.
+        local HttpData = httpData()
+
+        # Assert that there is data present in the HTTP response.
+        # No data means that there is no internet connection.
+        assert(HttpData != "", "You are not connected to the internet.")
+
+        error("Failed to receive HTTP request from:\n" + Ota["URL to Get", string] + "\nError Code: " + HttpData)
     }
 }
