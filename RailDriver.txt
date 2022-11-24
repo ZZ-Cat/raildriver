@@ -496,7 +496,7 @@ elseif (RailDriverState == 2)
                     {
                         local Message = ""
                         Message += "Online updates are a work in progress.\n"
-                        Message += "Please wait for the next update.\n"
+                        Message += "Please wait for version 1.0.0-RC1.\n"
                         Message += "RailDriver is now waiting for the watchdog to expire...\n"
 
                         stopAllTimers()
