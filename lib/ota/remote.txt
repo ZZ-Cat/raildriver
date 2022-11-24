@@ -49,6 +49,7 @@ function table otaOnlineInit()
     Ota["Flags", table]["HTTP Request Received", number] = 0
     Ota["Flags", table]["HTTP Request Failed", number] = 0
     Ota["Flags", table]["Update Process Started", number] = 0
+    Ota["Flags", table]["Version File is Valid", number] = 0
 
     return Ota
 }
@@ -133,6 +134,85 @@ function number otaOnlineUpdateRailDriver(OtaOnline:table, OtaLocal:table)
     return 1
 }
 
+# This function is used to check if the Online Version File is valid.
+# @param Ota The handle to the Online OTA Updates library.
+# @param RawData The raw HTTP data.
+# @return true if the Online Version File is valid, false otherwise.
+function number otaOnlineIsVersionFileValid(Ota:table, RawData:string)
+{
+    local Lines = RawData:explode("\n")
+    local HashFile = 0
+    local HashCalculated = 0
+
+    for (I = (Lines:count() - 4), Lines:count())
+    {
+        local Line = Lines[I, string]
+        local LineTrimmed = Line:trim()
+        local LineParts = LineTrimmed:explode(":")
+
+        # Remove the quotes from both ends of the string.
+        local LineName = LineParts[1, string]:sub(2, LineParts[1, string]:length() - 1)
+        local LineValue = LineParts[2, string]:sub(2, LineParts[2, string]:length() - 1)
+
+        if (LineName == "Hash")
+        {
+            if (Lines[I - 1, string]:find(","))
+            {
+                HashFile = LineValue:toNumber()
+                Lines[I - 1, string] = Lines[I - 1, string]:replace(",", "")
+                Lines:removeString(I)
+                break
+            }
+        }
+    }
+
+    # Check if the hash checksum from the file exists.
+    assert(HashFile != 0, "Missing checksum in the online Version File.")
+
+    # Create a version of the file without the hash.
+    local RawDataNoSum = ""
+    local HashOccurrences = 0
+    for (I = 1, Lines:count())
+    {
+        # Don't add a newline to the last line.
+        if (I == Lines:count())
+        {
+            RawDataNoSum = RawDataNoSum + Lines[I, string]
+            break
+        }
+
+        else
+        {
+            # Remove all occurrences of "Hash" from the file &
+            # remove the comma that precedes it.
+            local LineTrimmed = Lines[I, string]:trim()
+            if (LineTrimmed:find("\"Hash\":") == 1)
+            {
+                Lines[I - 1, string] = Lines[I - 1, string]:replace(",", "")
+                Lines[I, string] = ""
+                HashOccurrences = HashOccurrences + 1
+            }
+
+            # Add a newline to all other lines.
+            else
+            {
+                RawDataNoSum = RawDataNoSum + Lines[I, string] + "\n"
+            }
+        }
+    }
+
+    # Calculate the hash checksum.
+    HashCalculated = hash(RawDataNoSum)
+
+    # Debug.
+    # print("Hash File: " + HashFile)
+    # print("Hash Calculated: " + HashCalculated)
+
+    Ota["Flags", table]["Version File is Valid", number] = (HashFile == HashCalculated) ? 1 : 0
+
+    return Ota["Flags", table]["Version File is Valid", number]
+}
+
 # This function is called to make an HTTP request.
 # @param Ota The handle to the Online OTA Updates library.
 # @return void
@@ -207,6 +287,8 @@ function void otaOnlineReceiveResponseHandler(Ota:table)
         {
             Ota["Flags", table]["HTTP Request Received", number] = 1
 
+            # Assert that the online Version File is valid.
+            assert(otaOnlineIsVersionFileValid(Ota, HttpData) == 1, "The online Version File is invalid.")
         }
         else
         {
