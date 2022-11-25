@@ -155,6 +155,7 @@ if (first() | duped())
             handleInitError("Locomotive trucks are invalid.")
             exit()
         }
+        semDirectControlBrakes(Trucks, 0)
     }
 
     else
