@@ -289,6 +289,94 @@ function void otaOnlineReceiveResponseHandler(Ota:table)
 
             # Assert that the online Version File is valid.
             assert(otaOnlineIsVersionFileValid(Ota, HttpData) == 1, "The online Version File is invalid.")
+
+            #[
+                Notes from @ZZ-Cat on Scanning the Version Files for Updates:
+
+                How exactly am I going to go about this?
+                With the local Version File, I am scanning through the file & comparing the
+                checksums of each file to the checksums that are in the local Version File.
+                That is how I am determining if a file needs to be updated or not.
+
+                With the online Version File, it is a little bit different.
+                This is because I need to somehow compare the semantic version numbers of each
+                library (including RailDriver's main file) to the semantic version numbers in the
+                local Version File.
+                This becomes more complicated when I need to compare the checksums of each file
+                in the online Version File to the checksums in the local Version File.
+
+                I have two ways that I can accomplish this.
+                The first way is to compare the checksums first & then compare the semantic
+                version numbers.
+                The second way is to compare the semantic version numbers first & then compare
+                the checksums.
+
+                In the first way, I can easily use the checksums & the semantic version numbers
+                to catch any errors. For example, if the checksums don't match, then I know that
+                the file has been modified. Then, I can compare the semantic version numbers to
+                see if the file needs to be updated. If the semantic version numbers in the local
+                Version File are greater than the semantic version numbers in the online Version
+                File, then I can check if the player is a developer. If the player is not a developer,
+                then I can throw an error. If the player is a developer, I may want to throw a warning
+                to remind the developer to update the online Version File on GitHub.
+                Then, if the semantic version numbers in the local Version File are less than the
+                semantic version numbers in the online Version File, then one or more of RailDriver's
+                files need to be updated.
+                If the semantic version numbers in the local Version File are equal to the semantic
+                version numbers in the online Version File, then the file does not need to be updated.
+                
+                Additionally, I will not throw any errors or warnings here, regardless of whether or
+                not the player is a developer. This is because the player may have modified one or
+                more of RailDriver's files, to tune the script to their liking. In this case, the
+                semantic version numbers in the local Version File must remain unchanged. This is
+                to maintain the integrity of the local Version File, because it also contains the
+                license, attribution, & other vital information about RailDriver; which is important
+                for the player to keep intact. If the player modifies the semantic version numbers
+                in the local Version File, then not only are they corrupting the local Version File,
+                they are also violating the license & attribution requirements.
+
+                In the case where the player is a developer (such as yours truly), seeing errors
+                or warnings here is annoying.
+                This is because I am constantly working on RailDriver both on my local machine &
+                on GitHub. This means that I am constantly updating the online Version File on
+                GitHub, but I am not always updating the local Version File on my local machine.
+                I have automated this process as much as I can, but it is still annoying to see
+                errors & warnings here, when I know that I am working on RailDriver.
+
+                In the second way, I need to parse the semantic version numbers of both the local
+                Version File & the online Version File before I can compare the checksums.
+                Then, I can compare the checksums to see if the file needs to be updated.
+                Doing it this way adds more computational overhead to RailDriver, due to the fact
+                that the semantic version numbers are being parsed on every file in both the local
+                Version File & the online Version File.
+                Another downside to this method is that I cannot catch errors quite so easily.
+                Or, even if I can, this will add to the computational overhead brought on by parsing
+                the semantic version numbers. If I am not careful, this can cause 'Tick Quota Exceeded'
+                errors to occur, & RailDriver will crash.
+
+                I have reason to believe that the first way is the better way to go about this,
+                because it is more efficient & it is a more reliable way to catch errors.
+                However, right now, I am undecided on which way I need to go about this.
+                
+                I will need to do some testing to see which way is better.
+                I will create another branch off of this branch to test the first way.
+                Then, I will create another branch off of this branch to test the second way.
+                Each branch will be named 'Version-File-Scanning-Method-1' & 'Version-File-Scanning-Method-2',
+                respectively. They will also have slightly different semantic version numbers, so that
+                I can test the update process independently of the other branch.
+                Both branches will have their own respective Pull Requests on GitHub, & I will merge
+                the branch that I conclude is the better method into this branch.
+
+                This does mean that Version 1.0.0-RC1 will be delayed. However, I have no set date for
+                the release of Version 1.0.0-RC1, so this is not a big deal.
+                With that being said, I will resume working on Version 1.0.0-RC1 after I have finished
+                testing the two different methods of scanning the Version Files for updates.
+
+                This branch is the last branch that I will be working on before I release Version 1.0.0-RC1,
+                & I will not be working on any other branches until I have finished testing the two
+                different methods of scanning the Version Files for updates.
+                -- @ZZ-Cat 2022-11-14
+            ]#
         }
         else
         {
