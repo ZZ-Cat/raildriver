@@ -147,7 +147,7 @@ function array semFindTrucks()
 {
     local E = entity()
     local P = E:parent()
-    local CE = P:getConnectedEntities("axis")
+    local CE = P:getConnectedEntities(array("axis", "AdvBallsocket"))
 
     if (!CE[1, entity] | !CE[1, entity]:isValid())
     {
