@@ -128,18 +128,21 @@ All of this equates to RailDriver's average ops count being around 1950~2000 ops
 If you get a ```RailDriver Tick Quota Exceeded``` error, it is likely that your Tick Quota is too low.
 Increase your Tick Quota to at least 50,000 or higher by typing ```wire_expression2_quotatick 50000``` into Garry's Mod's console, followed by ```wire_expression2_reload```.
 
-I am also aware that not all multiplayer servers keep their versions of Expression2 up-to-date.
-If you're seeing a compilation error regarding the ```@strict``` directive or the ```try``` & ```catch``` statements, this is likely because the server that you're in is using a wickedly outdated version of Expression2 & the server owners haven't updated it yet. This is certainly the case for RailDriver's target server: The Flatgrass Construct & Northern Railroad.
+## RailDriver-LTS
 
-I do have a branch called FC&N-Optimizations which removes the ```@strict``` directive & the exception handlers.
-This branch sacrifices some reliability in favor of backward-compatibility.
-This branch is now grossly outdated, as I am continuously updating only the Main-Trunk, & I will eventually delete that branch altogether.
-If there is enough demand for it, I will do a version of RailDriver with the ```@strict``` directive & the exception handlers removed. I will consider this my LTS (Long-Term Support) version of RailDriver, where updates to this code will happen exponentially slower. Additionally, it won't be as feature rich or as computationally intensive as RailDriver.
+RailDriver now has a version with [Long-Term Support](https://github.com/ZZ-Cat/RailDriver/tree/RailDriver-LTS).
+
+I am aware that not all multiplayer servers keep their versions of Expression2 up-to-date with the latest releases.
+If you're seeing a compilation error regarding the ```@strict``` directive & the ```try``` & ```catch``` statements, or the ```httpRequest()``` functions, this is because the server that you're in is using a wickedly outdated version of Expression2 & the server owners haven't updated it in a _very_ long time. This is certainly the case for RailDriver's target server: [The Flatgrass Construct & Northern Railroad](https://steamcommunity.com/groups/Flatgrass_Construct_Railroad).
+
+To work around this issue, I have created a branch called [RailDriver-LTS](https://github.com/ZZ-Cat/RailDriver/tree/RailDriver-LTS). It is a version of RailDriver with long-term support, where It trades a certain level of reliability for maintaining backward-compatibility with Garry's Mod train build servers that would otherwise render RailDriver completely incompatible.
+
+Updates to RailDriver-LTS are exponentially less frequent when compared to the latest updates of its Main-Trunk counterpart, & (by extension) it is nowhere near as feature-rich either. This is because many of RailDriver's features rely on the very latest releases of Expression2. Thus, these features are intentionally omitted from RailDriver-LTS for compatiblity reasons.
 
 ## Software License
 
 As always, I believe in freedom & I want to pass that freedom onto you.
-Which is why I am proud to license RailDriver to you under the [GNU Affero GPL v3](https://github.com/ZZ-Cat/RailDriver/blob/Main-Trunk/LICENSE.md).
+Which is why I am proud to license RailDriver & RailDriver-LTS to you under the [GNU Affero GPL v3](https://github.com/ZZ-Cat/RailDriver/blob/Main-Trunk/LICENSE.md).
 
 ## The Road so far
 
