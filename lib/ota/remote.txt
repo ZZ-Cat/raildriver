@@ -357,7 +357,7 @@ function void otaOnlineReceiveResponseHandler(Ota:table)
                 I have reason to believe that the first way is the better way to go about this,
                 because it is more efficient & it is a more reliable way to catch errors.
                 However, right now, I am undecided on which way I need to go about this.
-                
+
                 I will need to do some testing to see which way is better.
                 I will create another branch off of this branch to test the first way.
                 Then, I will create another branch off of this branch to test the second way.
