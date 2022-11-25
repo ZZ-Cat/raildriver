@@ -1,7 +1,7 @@
 #[
-    This script header is a part of the RailDriver project.
+    This script header is a part of RailDriver-LTS.
 
-    RailDriver. Smart Locomotive Control script for Garry's Mod Train Build Servers.
+    RailDriver-LTS. RailDriver with Long-Term Support.
     Copyright © 2022, Cassandra "ZZ Cat" Robinson. All rights reserved.
 
     This E2 script is free software: you can redistribute it and/or modify
