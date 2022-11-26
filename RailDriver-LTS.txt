@@ -41,7 +41,7 @@ if (first() | duped())
     local PIDItermDecayHysteresis = 1
 
     local PIDItermLimit = 90
-    local PIDOutputLimit = 100
+    local PIDOutputLimit = 150
 
     local SpeedometerFilterCutoffFrequency = 1
     local SpeedometerDeadband = 0.1
