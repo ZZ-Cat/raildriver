@@ -124,8 +124,16 @@ function number pidSetItermLimits(S:table, Min, Max)
 
     else
     {
-        S["I-Term Limit Min", number] = Min
-        S["I-Term Limit Max", number] = Max
+        local E = entity():parent()
+        local BodyMass = 1
+
+        if (E:isValid() & E:isValidPhysics())
+        {
+            BodyMass = E:mass()
+        }
+
+        S["I-Term Limit Min", number] = Min * (BodyMass / 40)
+        S["I-Term Limit Max", number] = Max * (BodyMass / 40)
 
         if (S["Use I-Term Limit", number] != 0)
         {
@@ -145,8 +153,16 @@ function number pidSetOutputLimits(S:table, Floor, Ceiling)
 
     else
     {
-        S["CV Floor", number] = Floor
-        S["CV Ceiling", number] = Ceiling
+        local E = entity():parent()
+        local BodyMass = 1
+
+        if (E:isValid() & E:isValidPhysics())
+        {
+            BodyMass = E:mass()
+        }
+
+        S["CV Floor", number] = Floor * (BodyMass / 40)
+        S["CV Ceiling", number] = Ceiling * (BodyMass / 40)
 
         if (S["Mode", string] != "automatic")
         {
