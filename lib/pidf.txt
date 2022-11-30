@@ -545,21 +545,8 @@ function number pidCalculate(S:table)
             S["I-Term", number] = clamp(S["I-Term", number], S["I-Term Limit Min", number], S["I-Term Limit Max", number])
         }
 
-        # Calculate Proportional on Error, if specified.
-        if (S["Proportional Mode", number] == 0)
-        {
-            S["P-Term", number] = S["Internal P Gain", number] * Error
-            S["CV Sum", number] = S["P-Term", number]
-        }
-
-        else
-        {
-            S["CV Sum", number] = 0
-        }
-
         # Calculate D-Term.
-        S["D-Term", number] = S["I-Term", number] - S["Internal D Gain", number] * PVdelta
-        S["CV Sum", number] = S["CV Sum", number] + S["D-Term", number]
+        S["D-Term", number] = S["Internal D Gain", number] * (PVdelta / TimeDelta)
 
         # Apply feedforward to the Control Variable Summing Bus.
         # NB: Feedforward is calculated elsewhere.
