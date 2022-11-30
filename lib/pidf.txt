@@ -529,7 +529,7 @@ function number pidCalculate(S:table)
 
         # Calculate I-Term.
         local PVdelta = S["Process Variable", number] - S["Last Process Variable", number]
-        S["I-Term", number] = S["I-Term", number] + (S["Internal I Gain", number] * Error)
+        S["I-Term", number] = S["I-Term", number] + (S["Internal I Gain", number] * ITermError)
 
         # Calculate Proportional on Measurement, if specified.
         if (S["Proportional Mode", number] == 1)
