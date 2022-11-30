@@ -27,7 +27,7 @@ function table pidCreateInstance()
     S:clear()
 
     # Default properties:
-    S["Sample Time", number] = ticksToMillis(1)
+    S["Sample Time", number] = ticksToMillis(10)
     S["Range", number] = 75000
     S["Scale", number] = 1
     S["Proportional", number] = 0
