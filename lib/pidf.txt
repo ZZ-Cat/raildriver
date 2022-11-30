@@ -531,12 +531,58 @@ function number pidCalculate(S:table)
         local PVdelta = S["Process Variable", number] - S["Last Process Variable", number]
         S["I-Term", number] = S["I-Term", number] + (S["Internal I Gain", number] * ITermError)
 
-        # Calculate Proportional on Measurement, if specified.
-        if (S["Proportional Mode", number] == 1)
-        {
-            S["P-Term", number] = S["Internal P Gain", number] * PVdelta
-            S["I-Term", number] = S["I-Term", number] - S["P-Term", number]
-        }
+        #[
+            Notes from ZZ Cat:
+            RailDriver's PID controller is a bit different from most other PID controllers.
+            First off, RailDriver's PID controller is a PIDF controller, which means that it has a Feedforward component
+            to supplement the rest of the controller.
+            The Feedforward component is a sum of the following:
+                > Throttle Position - This is the throttle lever position.
+                > Brake Position - This is the brake lever position.
+                > Hill Climb & Hill Descent - This is the hill climb & hill descent components.
+                    It is based on the current speed of the locomotive, the current gradient of the track, & the current
+                    direction of travel.
+                    The hill climb & hill descent components are only active when the locomotive is moving & the gradient is
+                    greater than 0.5%.
+                > Cornering - This is the cornering component.
+                    It is based on the current speed of the locomotive & the locomotive's rate of turn.
+                    The cornering component is only active when the locomotive is moving
+                    & the rate of turn is greater than 0.5°/s.
+                > Acceleration - This is the acceleration component.
+                    It is based on the locomotive's rate of acceleration.
+                    The acceleration component is only active when the locomotive is moving & the rate of acceleration is
+                    greater than 0.5 m/s².
+            Each of these components are multiplied by their respective gain values & then summed together, & then multiplied
+            by a final gain value. The final gain value is a percentage of the total output of the PIDF controller - IE the
+            control variable.
+
+            RailDriver's PID controller has two methods of calculating the P-Term.
+            The first method is the traditional method, which is based on the error between the set point & the
+            process variable. This is called Proportional on Error.
+            The second method is based on the process variable delta & the I-Term. This is called Proportional on
+            Measurement.
+            Proportional on Error reacts faster to changes in the process variable, but it is more susceptible to
+            oscillation. Thus, it is less accurate & less stable.
+            Proportional on Measurement reacts slower to changes in the process variable, but it is less susceptible to
+            oscillation. Thus, it is more accurate & stable.
+            RailDriver's PID controller uses a weighted average of the two methods to calculate the P-Term.
+            The weighting is based on the I-Term & the I-Term's rate of change. Proportional on Error is used when the
+            I-Term is high & the I-Term's rate of change is high. Proportional on Measurement is used when the I-Term is
+            low & the I-Term's rate of change is low.
+
+            RailDriver's PID controller has an I-Term decay.
+            The I-Term decay is used to gradually reduce the I-Term to zero when the locomotive is slowing down to a stop.
+            This prevents the locomotive from overshooting its target speed when it is slowing down to a stop.
+            The I-Term decay is based on the I-Term & the I-Term decay rate. The I-Term decay is only active when the
+            set point is zero & the process variable is less than the I-Term decay threshold.
+
+            RailDriver's PID controller has a slew rate limiter.
+            The slew rate limiter is used to limit the rate of change of the control variable.
+            The slew rate limiter is based on the control variable delta & the time delta.
+            This is to help prevent the locomotive from jerking around & to help control the locomotive's acceleration &
+            deceleration. The slew rate limiter is only active when the locomotive is moving & the control variable delta is
+            greater than 0.5%.
+        ]#
 
         # Calculate & apply I-Term Limit.
         # This limits the buildup of Integral, to help stave off windup.
