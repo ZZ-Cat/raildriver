@@ -161,12 +161,12 @@ function number pidSetOutputLimits(S:table, Floor, Ceiling)
 
 function number pidSetProportionalMode(S:table, PMode:string)
 {
-    PMode:lower()
+    PMode = PMode:lower()
     switch (PMode)
     {
         case "error",
         case "proportional on error",
-            S["Proportional Mode", number] = 0
+            S["Use Proportional on Error", number] = 1
             return 1
         break
 
@@ -174,7 +174,7 @@ function number pidSetProportionalMode(S:table, PMode:string)
         case "measurement",
         case "proportional on measurement",
         case "proportional on measure",
-            S["Proportional Mode", number] = 1
+            S["Use Proportional on Error", number] = 0
             return 1
         break
 
@@ -187,7 +187,7 @@ function number pidSetProportionalMode(S:table, PMode:string)
 function number pidSetCoefficients(S:table, Gains:string, Value)
 {
     local MillisToSeconds = S["Sample Time", number] / 1000
-    Gains:lower()
+    Gains = Gains:lower()
     switch (Gains)
     {
         case "kp",
@@ -348,7 +348,7 @@ function number pidInitialize(S:table)
 
 function number pidSetMode(S:table, M:string)
 {
-    M:lower()
+    M = M:lower()
     switch(M)
     {
         case "manual",
@@ -376,7 +376,7 @@ function void pidSetFeedforward(S:table, FFname:string, Value)
 {
     local FeedForwardSum = 0
 
-    FFname:lower()
+    FFname = FFname:lower()
     switch (FFname)
     {
         case "acceleration",
