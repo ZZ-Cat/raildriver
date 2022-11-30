@@ -548,9 +548,8 @@ function number pidCalculate(S:table)
         # Calculate D-Term.
         S["D-Term", number] = S["Internal D Gain", number] * (PVdelta / TimeDelta)
 
-        # Apply feedforward to the Control Variable Summing Bus.
-        # NB: Feedforward is calculated elsewhere.
-        S["CV Sum", number] = S["CV Sum", number] + S["FF Sum", number]
+        # Calculate Control Variable.
+        S["CV Sum", number] = S["P-Term", number] + S["I-Term", number] + S["D-Term", number] + S["FF Sum", number]
 
         # Apply a limit to the Control Variable.
         S["CV Sum", number] = clamp(S["CV Sum", number], S["CV Floor", number], S["CV Ceiling", number])
