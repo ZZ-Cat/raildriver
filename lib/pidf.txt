@@ -34,7 +34,7 @@ function table pidCreateInstance()
     S["Integral", number] = 0
     S["Derivative", number] = 0
     S["Feed Forward", number] = 0
-    S["Proportional Mode", number] = 0
+    S["Use Proportional on Error", number] = 1
     S["Direction", number] = 1
     S["Mode", number] = 1
 
