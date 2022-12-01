@@ -186,7 +186,7 @@ if (RailDriverState == 1)
 
         # Initialize the PIDF controller.
         PIDF = pidCreateInstance()
-        if (PIDF:count() == 55)
+        if (PIDF:count() == 54)
         {
             # Set the initial PIDF Controller's parameters.
             pidSetPIDcoefficients(PIDF, PIDCoefficientKp, PIDCoefficientKi, PIDCoefficientKd)
