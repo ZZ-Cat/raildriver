@@ -27,13 +27,14 @@ function table pidCreateInstance()
     S:clear()
 
     # Default properties:
-    S["Sample Time", number] = ticksToMillis(10)
+    S["Sample Time", number] = ticksToMillis(1)
     S["Range", number] = 75000
     S["Scale", number] = 1
     S["Proportional", number] = 0
     S["Integral", number] = 0
     S["Derivative", number] = 0
     S["Feed Forward", number] = 0
+    S["Proportional Mode", number] = 0
     S["Direction", number] = 1
     S["Mode", number] = 1
 
@@ -53,7 +54,7 @@ function table pidCreateInstance()
     S["I-Term Decay Hysteresis", number] = (1/100)*S["I-Term Decay Threshold", number]
 
     # Default I-Term Relax properties:
-    S["Use I-Term Relax", number] = 1
+    S["Use I-Term Relax", number] = 0
     S["I-Term Relax Threshold", number] = 40.0
     S["I-Term Relax Type", string] = "Set Point"
 
@@ -158,10 +159,35 @@ function number pidSetOutputLimits(S:table, Floor, Ceiling)
     }
 }
 
+function number pidSetProportionalMode(S:table, PMode:string)
+{
+    PMode:lower()
+    switch (PMode)
+    {
+        case "error",
+        case "proportional on error",
+            S["Proportional Mode", number] = 0
+            return 1
+        break
+
+        case "measure",
+        case "measurement",
+        case "proportional on measurement",
+        case "proportional on measure",
+            S["Proportional Mode", number] = 1
+            return 1
+        break
+
+        default,
+            return 0
+        break
+    }
+}
+
 function number pidSetCoefficients(S:table, Gains:string, Value)
 {
     local MillisToSeconds = S["Sample Time", number] / 1000
-    Gains = Gains:lower()
+    Gains:lower()
     switch (Gains)
     {
         case "kp",
@@ -322,7 +348,7 @@ function number pidInitialize(S:table)
 
 function number pidSetMode(S:table, M:string)
 {
-    M = M:lower()
+    M:lower()
     switch(M)
     {
         case "manual",
@@ -350,7 +376,7 @@ function void pidSetFeedforward(S:table, FFname:string, Value)
 {
     local FeedForwardSum = 0
 
-    FFname = FFname:lower()
+    FFname:lower()
     switch (FFname)
     {
         case "acceleration",
@@ -497,90 +523,20 @@ function number pidCalculate(S:table)
         # Calculate I Term Relax
         if (S["Use I-Term Relax", number] != 0)
         {
-            # Calculate I Term Error Rate.
-            local ItermErrorRate = (ITermError - S["Last Error", number]) / TimeDelta
-
-            # Calculate I Term Relax.
-            ItermErrorRate = pidSetItermRelax(S, S["I-Term", number], ItermErrorRate, S["Process Variable", number], S["Set Point", number])
-
-            # Calculate I Term.
-            S["I-Term", number] = S["I-Term", number] + (ItermErrorRate * TimeDelta)
+            ITermError = pidSetItermRelax(S, S["I-Term", number], ITermError, S["Process Variable", number], S["Set Point", number])
+            Error = ITermError
         }
 
         # Calculate I-Term.
         local PVdelta = S["Process Variable", number] - S["Last Process Variable", number]
-        S["I-Term", number] = S["I-Term", number] + (S["Internal I Gain", number] * ITermError)
+        S["I-Term", number] = S["I-Term", number] + (S["Internal I Gain", number] * Error)
 
-        #[
-            Notes from ZZ Cat:
-            RailDriver's PID controller is a bit different from most other PID controllers.
-            First off, RailDriver's PID controller is a PIDF controller, which means that it has a Feedforward component
-            to supplement the rest of the controller.
-            The Feedforward component is a sum of the following:
-                > Throttle Position - This is the throttle lever position.
-                > Brake Position - This is the brake lever position.
-                > Hill Climb & Hill Descent - This is the hill climb & hill descent components.
-                    It is based on the current speed of the locomotive, the current gradient of the track, & the current
-                    direction of travel.
-                    The hill climb & hill descent components are only active when the locomotive is moving & the gradient is
-                    greater than 0.5%.
-                > Cornering - This is the cornering component.
-                    It is based on the current speed of the locomotive & the locomotive's rate of turn.
-                    The cornering component is only active when the locomotive is moving
-                    & the rate of turn is greater than 0.5°/s.
-                > Acceleration - This is the acceleration component.
-                    It is based on the locomotive's rate of acceleration.
-                    The acceleration component is only active when the locomotive is moving & the rate of acceleration is
-                    greater than 0.5 m/s².
-            Each of these components are multiplied by their respective gain values & then summed together, & then multiplied
-            by a final gain value. The final gain value is a percentage of the total output of the PIDF controller - IE the
-            control variable.
-
-            RailDriver's PID controller has two methods of calculating the P-Term.
-            The first method is the traditional method, which is based on the error between the set point & the
-            process variable. This is called Proportional on Error.
-            The second method is based on the process variable delta & the I-Term. This is called Proportional on
-            Measurement.
-            Proportional on Error reacts faster to changes in the process variable, but it is more susceptible to
-            oscillation. Thus, it is less accurate & less stable.
-            Proportional on Measurement reacts slower to changes in the process variable, but it is less susceptible to
-            oscillation. Thus, it is more accurate & stable.
-            RailDriver's PID controller uses a weighted average of the two methods to calculate the P-Term.
-            The weighting is based on the I-Term & the I-Term's rate of change. Proportional on Error is used when the
-            I-Term is high & the I-Term's rate of change is high. Proportional on Measurement is used when the I-Term is
-            low & the I-Term's rate of change is low.
-
-            RailDriver's PID controller has an I-Term decay.
-            The I-Term decay is used to gradually reduce the I-Term to zero when the locomotive is slowing down to a stop.
-            This prevents the locomotive from overshooting its target speed when it is slowing down to a stop.
-            The I-Term decay is based on the I-Term & the I-Term decay rate. The I-Term decay is only active when the
-            set point is zero & the process variable is less than the I-Term decay threshold.
-
-            RailDriver's PID controller has a slew rate limiter.
-            The slew rate limiter is used to limit the rate of change of the control variable.
-            The slew rate limiter is based on the control variable delta & the time delta.
-            This is to help prevent the locomotive from jerking around & to help control the locomotive's acceleration &
-            deceleration. The slew rate limiter is only active when the locomotive is moving & the control variable delta is
-            greater than 0.5%.
-        ]#
-
-        # Calculate the I-Term's rate of change.
-        local ITermDelta = S["I-Term", number] - S["Last I-Term", number]
-
-        # Calculate the Proportional on Error component.
-        local PTermError = S["Internal P Gain", number] * Error
-
-        # Calculate the Proportional on Measurement component.
-        local PTermMeasurement = S["Internal P Gain", number] * PVdelta
-
-        # Use a weighted average of the two methods to calculate the P-Term using the I-Term & the I-Term's rate of change.
-        # The weighting is based on the I-Term & the I-Term's rate of change.
-        # Proportional on Error is used when the I-Term is high & the I-Term's rate of change is high.
-        # Proportional on Measurement is used when the I-Term is low & the I-Term's rate of change is low.
-        local ITermWeightPonE = abs((S["I-Term", number] / S["I-Term Limit Max", number]) * (ITermDelta / S["I-Term Limit Max", number]))
-        local ITermWeightPonM = 1 - ITermWeightPonE
-        S["P-Term", number] = (PTermError * ITermWeightPonE) + (PTermMeasurement * ITermWeightPonM)
-        S["I-Term", number] = S["I-Term", number] - (PTermMeasurement * ITermWeightPonM)
+        # Calculate Proportional on Measurement, if specified.
+        if (S["Proportional Mode", number] == 1)
+        {
+            S["P-Term", number] = S["Internal P Gain", number] * PVdelta
+            S["I-Term", number] = S["I-Term", number] - S["P-Term", number]
+        }
 
         # Calculate & apply I-Term Limit.
         # This limits the buildup of Integral, to help stave off windup.
@@ -589,19 +545,31 @@ function number pidCalculate(S:table)
             S["I-Term", number] = clamp(S["I-Term", number], S["I-Term Limit Min", number], S["I-Term Limit Max", number])
         }
 
-        # Calculate D-Term.
-        S["D-Term", number] = S["Internal D Gain", number] * (PVdelta / TimeDelta)
+        # Calculate Proportional on Error, if specified.
+        if (S["Proportional Mode", number] == 0)
+        {
+            S["P-Term", number] = S["Internal P Gain", number] * Error
+            S["CV Sum", number] = S["P-Term", number]
+        }
 
-        # Calculate Control Variable.
-        S["CV Sum", number] = S["P-Term", number] + S["I-Term", number] + S["D-Term", number] + S["FF Sum", number]
+        else
+        {
+            S["CV Sum", number] = 0
+        }
+
+        # Calculate D-Term.
+        S["D-Term", number] = S["I-Term", number] - S["Internal D Gain", number] * PVdelta
+        S["CV Sum", number] = S["CV Sum", number] + S["D-Term", number]
+
+        # Apply feedforward to the Control Variable Summing Bus.
+        # NB: Feedforward is calculated elsewhere.
+        S["CV Sum", number] = S["CV Sum", number] + S["FF Sum", number]
 
         # Apply a limit to the Control Variable.
         S["CV Sum", number] = clamp(S["CV Sum", number], S["CV Floor", number], S["CV Ceiling", number])
         S["Control Variable", number] = S["CV Sum", number]
 
         # Store a couple of variables for use in the next execution.
-        S["Last Error", number] = Error
-        S["Last I-Term", number] = S["I-Term", number]
         S["Last Process Variable", number] = S["Process Variable", number]
         S["Last Time", number] = Now
 

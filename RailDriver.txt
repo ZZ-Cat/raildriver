@@ -78,7 +78,7 @@ if (RailDriverState == 1)
 {
     local PIDCoefficientKp = 1020
     local PIDCoefficientKi = 850
-    local PIDCoefficientKd = 250
+    local PIDCoefficientKd = 10
 
     local PIDItermDecayRate = 0.5
     local PIDItermDecayThreshold = 3.0 * 17.6
@@ -186,7 +186,7 @@ if (RailDriverState == 1)
 
         # Initialize the PIDF controller.
         PIDF = pidCreateInstance()
-        if (PIDF:count() == 54)
+        if (PIDF:count() == 55)
         {
             # Set the initial PIDF Controller's parameters.
             pidSetPIDcoefficients(PIDF, PIDCoefficientKp, PIDCoefficientKi, PIDCoefficientKd)
@@ -194,6 +194,7 @@ if (RailDriverState == 1)
             pidSetItermDecay(PIDF, PIDItermDecayRate, PIDItermDecayThreshold, PIDItermDecayHysteresis)
             pidSetItermLimits(PIDF, -PIDItermLimit, PIDItermLimit)
             pidSetOutputLimits(PIDF, -PIDOutputLimit, PIDOutputLimit)
+            pidSetProportionalMode(PIDF, "Proportional on Measurement")
             pidSetMode(PIDF, "Automatic")
             runOnTick(1)
         }
