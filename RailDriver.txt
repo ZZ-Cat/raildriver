@@ -194,7 +194,6 @@ if (RailDriverState == 1)
             pidSetItermDecay(PIDF, PIDItermDecayRate, PIDItermDecayThreshold, PIDItermDecayHysteresis)
             pidSetItermLimits(PIDF, -PIDItermLimit, PIDItermLimit)
             pidSetOutputLimits(PIDF, -PIDOutputLimit, PIDOutputLimit)
-            pidSetProportionalMode(PIDF, "Proportional on Measurement")
             pidSetMode(PIDF, "Automatic")
             runOnTick(1)
         }

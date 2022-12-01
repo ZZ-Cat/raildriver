@@ -34,7 +34,6 @@ function table pidCreateInstance()
     S["Integral", number] = 0
     S["Derivative", number] = 0
     S["Feed Forward", number] = 0
-    S["Use Proportional on Error", number] = 1
     S["Direction", number] = 1
     S["Mode", number] = 1
 
@@ -156,31 +155,6 @@ function number pidSetOutputLimits(S:table, Floor, Ceiling)
         S["CV Sum", number] = clamp(S["CV Sum", number], Floor, Ceiling)
         S["Control Variable", number] = S["CV Sum", number]
         return 1
-    }
-}
-
-function number pidSetProportionalMode(S:table, PMode:string)
-{
-    PMode = PMode:lower()
-    switch (PMode)
-    {
-        case "error",
-        case "proportional on error",
-            S["Use Proportional on Error", number] = 1
-            return 1
-        break
-
-        case "measure",
-        case "measurement",
-        case "proportional on measurement",
-        case "proportional on measure",
-            S["Use Proportional on Error", number] = 0
-            return 1
-        break
-
-        default,
-            return 0
-        break
     }
 }
 
@@ -584,6 +558,24 @@ function number pidCalculate(S:table)
             greater than 0.5%.
         ]#
 
+        # Calculate the I-Term's rate of change.
+        local ITermDelta = S["I-Term", number] - S["Last I-Term", number]
+
+        # Calculate the Proportional on Error component.
+        local PTermError = S["Internal P Gain", number] * Error
+
+        # Calculate the Proportional on Measurement component.
+        local PTermMeasurement = S["Internal P Gain", number] * PVdelta
+
+        # Use a weighted average of the two methods to calculate the P-Term using the I-Term & the I-Term's rate of change.
+        # The weighting is based on the I-Term & the I-Term's rate of change.
+        # Proportional on Error is used when the I-Term is high & the I-Term's rate of change is high.
+        # Proportional on Measurement is used when the I-Term is low & the I-Term's rate of change is low.
+        local ITermWeightPonE = abs((S["I-Term", number] / S["I-Term Limit Max", number]) * (ITermDelta / S["I-Term Limit Max", number]))
+        local ITermWeightPonM = 1 - ITermWeightPonE
+        S["P-Term", number] = (PTermError * ITermWeightPonE) + (PTermMeasurement * ITermWeightPonM)
+        S["I-Term", number] = S["I-Term", number] - (PTermMeasurement * ITermWeightPonM)
+
         # Calculate & apply I-Term Limit.
         # This limits the buildup of Integral, to help stave off windup.
         if (S["Use I-Term Limit", number] != 0)
@@ -602,6 +594,7 @@ function number pidCalculate(S:table)
         S["Control Variable", number] = S["CV Sum", number]
 
         # Store a couple of variables for use in the next execution.
+        S["Last I-Term", number] = S["I-Term", number]
         S["Last Process Variable", number] = S["Process Variable", number]
         S["Last Time", number] = Now
 
