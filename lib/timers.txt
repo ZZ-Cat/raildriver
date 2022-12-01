@@ -22,7 +22,7 @@
 
 function number micros()
 {
-    return realtime() * 1000000
+    return curtime() * 1000000
 }
 
 function number millis()
