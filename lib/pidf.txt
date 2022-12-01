@@ -53,7 +53,7 @@ function table pidCreateInstance()
     S["I-Term Decay Hysteresis", number] = (1/100)*S["I-Term Decay Threshold", number]
 
     # Default I-Term Relax properties:
-    S["Use I-Term Relax", number] = 0
+    S["Use I-Term Relax", number] = 1
     S["I-Term Relax Threshold", number] = 40.0
     S["I-Term Relax Type", string] = "Set Point"
 
@@ -497,8 +497,14 @@ function number pidCalculate(S:table)
         # Calculate I Term Relax
         if (S["Use I-Term Relax", number] != 0)
         {
-            ITermError = pidSetItermRelax(S, S["I-Term", number], ITermError, S["Process Variable", number], S["Set Point", number])
-            Error = ITermError
+            # Calculate I Term Error Rate.
+            local ItermErrorRate = (ITermError - S["Last Error", number]) / TimeDelta
+
+            # Calculate I Term Relax.
+            ItermErrorRate = pidSetItermRelax(S, S["I-Term", number], ItermErrorRate, S["Process Variable", number], S["Set Point", number])
+
+            # Calculate I Term.
+            S["I-Term", number] = S["I-Term", number] + (ItermErrorRate * TimeDelta)
         }
 
         # Calculate I-Term.
@@ -594,6 +600,7 @@ function number pidCalculate(S:table)
         S["Control Variable", number] = S["CV Sum", number]
 
         # Store a couple of variables for use in the next execution.
+        S["Last Error", number] = Error
         S["Last I-Term", number] = S["I-Term", number]
         S["Last Process Variable", number] = S["Process Variable", number]
         S["Last Time", number] = Now
