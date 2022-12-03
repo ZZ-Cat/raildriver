@@ -1,0 +1,331 @@
+#[
+    This Expression2 script demonstrates a better way of making your E2 scripts work with the Advanced Duplicator 2 tool.
+    There are also some examples of how to manage multiple tasks in a single E2, using cooperative multitasking.
+
+    You can uncomment any one of the examples below, to see how they work.
+]#
+
+@name Advanced Duplicator 2 Support
+@model models/beer/wiremod/gate_e2_nano.mdl
+
+# Two popular methods of adding compatibility with the Advanced Duplicator 2 tool is to use the following code:
+#[
+if (first() | duped())
+{
+    # Your code here
+}
+]#
+
+#[
+# or, this code:
+if (first() | dupefinished())
+{
+    # Your code here
+}
+]#
+
+#[
+    This code is not recommended, as it will cause your E2 to initialize twice when it is pasted.
+    The second example becomes even more problematic when you start introducing libraries into your E2.
+]#
+#[
+@persist MyLibrary:table
+if (first() | dupefinished())
+{
+    # Include your libraries here
+    #include "e2shared/RailDriver/resources/my_library"
+
+    # Initialize your libraries here
+    MyLibrary = MyLibraryInit()
+    if (MyLibrary:count() == 0)
+    {
+        error("My Library failed to initialize!")
+    }
+}
+
+# Run your code here
+MyLibrary:doSomething()
+]#
+
+#[
+    In the example above, when you paste your E2, you will see an error message saying
+    "MyLibrary:doSomething() is undefined at runtime".
+    This is because the ```first()``` function does not return true when the E2 is pasted, & ```dupefinished()``` only
+    returns true after the E2 has been pasted. Thus leaving the library uninitialized & ```MyLibrary:doSomething()``` undefined.
+
+    A better way is to use a state machine that will only run your code *after* your E2 has been pasted.
+    This basically holds your E2 in a dormant state while your dupe is being loaded.
+    Once Advanced Duplicator 2 has finished loading your dupe, it will set the state to 1, & your code will run like normal.
+
+    I have this code set up in RailDriver, & it works great.
+    The example below is a simplified version of the code I use in RailDriver.
+    Feel free to use it in your E2s.
+]#
+
+#[
+@persist [DupeState DupeTimer MainState]:number
+
+if (duped())
+{
+    # DupeState 1: E2 is being pasted. Hold the E2 in a dormant state until the dupe has finished loading.
+    DupeState = 1
+    DupeTimer = tickInterval() * 1000
+    MainState = 0
+    timer("Init Timer", DupeTimer)
+}
+elseif (dupefinished())
+{
+    # DupeState 2: Dupe has finished loading. Set the state to 2, & wait for the Init Timer to expire.
+    DupeState = 2
+    MainState = 0
+}
+elseif (clk("Init Timer"))
+{
+    # DupeState 3: Init Timer has expired.
+    stoptimer("Init Timer")
+
+    # Check what state the E2 is in.
+    if (DupeState == 1)
+    {
+        # Dupe is still loading. Reset the Init Timer & wait for the dupe to finish loading.
+        timer("Init Timer", DupeTimer)
+    }
+    elseif (DupeState == 2)
+    {
+        # Dupe has finished loading. Reset your E2.
+        reset()
+    }
+    else
+    {
+        # Something went wrong.
+        error("Failed to initialize Advanced Duplicator 2 support!")
+    }
+}
+elseif (first())
+{
+    # Set MainState to 1 to run your code.
+    print("Initializing your E2...")
+    MainState = 1
+}
+
+if (MainState == 1)
+{
+    # Run your initialization code here.
+    # You can safely include libraries & initialize them here as well.
+    print("Your E2 has been initialized!")
+
+    # Set MainState to 2 at the end of your initialization code, once everything has successfully initialized.
+    MainState = 2
+}
+elseif (MainState == 2)
+{
+    # Run your main code here.
+}
+]#
+
+#[
+    There are some optional extras that you can use to extend the functionality of this code.
+    The first one is you can add another persistent variable to count the number of times the Init Timer has expired.
+    This can be useful if you want to add a timeout to your E2, so that it doesn't get stuck in a loop if something
+    goes wrong.
+
+    The second one is you can control the MainState variable to help with prioritizing your code.
+    Say you have two or more tasks that are very computationally expensive, & you want to make sure that they don't cause your
+    E2 to shut down due to exceeding the tick quota or hard quota limits, you can use the MainState variable to
+    stagger the execution of your code.
+]#
+
+#[
+@persist [DupeState DupeTimer DupeTimeout MainState]:number
+
+if (duped())
+{
+    # DupeState 1: E2 is being pasted. Hold the E2 in a dormant state until the dupe has finished loading.
+    DupeState = 1
+    DupeTimer = tickInterval() * 1000
+    DupeTimeout = 0
+    MainState = 0
+    timer("Init Timer", DupeTimer)
+}
+elseif (dupefinished())
+{
+    # DupeState 2: Dupe has finished loading. Set the state to 2, & wait for the Init Timer to expire.
+    DupeState = 2
+    MainState = 0
+}
+elseif (clk("Init Timer"))
+{
+    # DupeState 3: Init Timer has expired.
+    stoptimer("Init Timer")
+
+    # Check if the dupe timeout has been reached.
+    if (DupeTimeout >= 200)
+    {
+        # Dupe timeout has been reached. Something went wrong.
+        error("Failed to initialize Advanced Duplicator 2 support!")
+    }
+
+    # Check what state the E2 is in.
+    if (DupeState == 1)
+    {
+        # Dupe is still loading. Reset the Init Timer & wait for the dupe to finish loading.
+        DupeTimeout++
+        timer("Init Timer", DupeTimer)
+    }
+    elseif (DupeState == 2)
+    {
+        # Dupe has finished loading. Reset your E2.
+        reset()
+    }
+    else
+    {
+        # Something went wrong.
+        error("Failed to initialize Advanced Duplicator 2 support!")
+    }
+}
+elseif (first())
+{
+    # Set MainState to 1 to run your code.
+    print("Initializing your E2...")
+    MainState = 1
+}
+
+if (MainState == 1)
+{
+    # Run your initialization code here.
+    # You can safely include libraries & initialize them here as well.
+    print("Your E2 has been initialized!")
+
+    # Set MainState to 2 at the end of your initialization code, once everything has successfully initialized.
+    MainState = 2
+}
+elseif (MainState == 2)
+{
+    # Simulate a very computationally expensive task.
+    # This will cause your E2 to shut down due to exceeding the tick quota.
+    while (1)
+    {
+        # This will cause your E2 to shut down due to exceeding the tick quota.
+    }
+}
+]#
+
+#[
+    In the example above, the E2 will shut down due to exceeding the tick quota.
+    Additionally, I provided a timeout when the E2 is being pasted.
+
+    In the example below, I am using the MainState variable to stagger the execution of my code.
+]#
+
+#[
+@persist [DupeState DupeTimer DupeTimeout MainState]:number
+
+if (duped())
+{
+    # DupeState 1: E2 is being pasted. Hold the E2 in a dormant state until the dupe has finished loading.
+    DupeState = 1
+    DupeTimer = tickInterval() * 1000
+    DupeTimeout = 0
+    MainState = 0
+    timer("Init Timer", DupeTimer)
+}
+elseif (dupefinished())
+{
+    # DupeState 2: Dupe has finished loading. Set the state to 2, & wait for the Init Timer to expire.
+    DupeState = 2
+    MainState = 0
+}
+elseif (clk("Init Timer"))
+{
+    # DupeState 3: Init Timer has expired.
+    stoptimer("Init Timer")
+
+    # Check if the dupe timeout has been reached.
+    if (DupeTimeout >= 200)
+    {
+        # Dupe timeout has been reached. Something went wrong.
+        error("Failed to initialize Advanced Duplicator 2 support!")
+    }
+
+    # Check what state the E2 is in.
+    if (DupeState == 1)
+    {
+        # Dupe is still loading. Reset the Init Timer & wait for the dupe to finish loading.
+        DupeTimeout++
+        timer("Init Timer", DupeTimer)
+    }
+    elseif (DupeState == 2)
+    {
+        # Dupe has finished loading. Reset your E2.
+        reset()
+    }
+    else
+    {
+        # Something went wrong.
+        error("Failed to initialize Advanced Duplicator 2 support!")
+    }
+}
+elseif (first())
+{
+    # Set MainState to 1 to run your code.
+    print("Initializing your E2...")
+    MainState = 1
+}
+
+if (MainState == 1)
+{
+    # Run your initialization code here.
+    # You can safely include libraries & initialize them here as well.
+    print("Your E2 has been initialized!")
+
+    # Set MainState to 2 at the end of your initialization code, once everything has successfully initialized.
+    MainState = 2
+}
+elseif (MainState == 2)
+{
+    # Simulate a very computationally expensive task.
+    while(perf(75))
+    {
+        # Here, I am using the perf() function to make sure that the E2 doesn't exceed the tick quota.
+    }
+
+    # Set MainState to 3 to run your next task.
+    MainState = 3
+}
+elseif (MainState == 3)
+{
+    # Simulate another very computationally expensive task.
+    while(perf(75))
+    {
+        # Here, I am using the perf() function to make sure that the E2 doesn't exceed the tick quota.
+    }
+
+    # Set MainState to 4 to run your next task.
+    MainState = 4
+}
+elseif (MainState == 4)
+{
+    # Simulate another very computationally expensive task.
+    while(perf(75))
+    {
+        # Here, I am using the perf() function to make sure that the E2 doesn't exceed the tick quota.
+    }
+
+    # Set MainState back to 2 to run your first task again.
+    MainState = 2
+}
+]#
+
+#[
+    As you can see, my computationally expensive tasks are being staggered & spread out over multiple tasks.
+    This will allow my E2 to accomplish all of its tasks without shutting down due to exceeding its limits.
+
+    What I have demonstrated above is a very basic example of what is known as "Cooperative Multitasking".
+    This is a very useful technique that can be used to make your E2s more efficient.
+    Especially if your E2 is performing computationally expensive tasks, but you still want it to be able to run other tasks
+    that don't require as much processing power.
+
+    I hope this helps you to make your E2s more efficient.
+    Happy coding! =^/.~=
+    -- Cassandra "ZZ Cat" Robinson
+]#
