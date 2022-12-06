@@ -283,6 +283,9 @@ if (RailDriverState == 1)
 
     RailDriverState = 2
 
+    # Show the RailDriver-LTS welcome message.
+    print("Welcome to RailDriver-LTS!")
+
     timer("Debug", 100)
 }
 
