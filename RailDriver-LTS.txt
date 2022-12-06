@@ -34,14 +34,14 @@ if (first() | duped())
 {
     local PIDCoefficientKp = 1020
     local PIDCoefficientKi = 850
-    local PIDCoefficientKd = 10
+    local PIDCoefficientKd = 250
 
     local PIDItermDecayRate = 0.5
     local PIDItermDecayThreshold = 3.0 * 17.6
     local PIDItermDecayHysteresis = 1
 
-    local PIDItermLimit = 75000
-    local PIDOutputLimit = 75000
+    local PIDItermLimit = 90000
+    local PIDOutputLimit = 100000
 
     local SpeedometerFilterCutoffFrequency = 1
     local SpeedometerDeadband = 0.1
@@ -221,7 +221,7 @@ if (first() | duped())
 
     # Initialize the PIDF controller.
     PIDF = pidCreateInstance()
-    if (PIDF:count() == 55)
+    if (PIDF:count() == 54)
     {
         # Set the initial PIDF Controller's parameters.
         pidSetPIDcoefficients(PIDF, PIDCoefficientKp, PIDCoefficientKi, PIDCoefficientKd)
@@ -229,7 +229,6 @@ if (first() | duped())
         pidSetItermDecay(PIDF, PIDItermDecayRate, PIDItermDecayThreshold, PIDItermDecayHysteresis)
         pidSetItermLimits(PIDF, -PIDItermLimit, PIDItermLimit)
         pidSetOutputLimits(PIDF, -PIDOutputLimit, PIDOutputLimit)
-        pidSetProportionalMode(PIDF, "Proportional on Measurement")
         pidSetMode(PIDF, "Automatic")
         runOnTick(1)
     }
