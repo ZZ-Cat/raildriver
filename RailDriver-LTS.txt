@@ -16,7 +16,7 @@
     along with this E2 script.  If not, see <https://www.gnu.org/licenses/>.
 ]#
 
-@name RailDriver
+@name RailDriver-LTS
 @model models/beer/wiremod/gate_e2_nano.mdl
 @persist Trucks:array Speedo:table
 @persist [Direction Throttle Brake EmergencyBrake]:number
