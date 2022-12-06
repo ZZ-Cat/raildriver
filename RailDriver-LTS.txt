@@ -165,26 +165,6 @@ if (RailDriverState == 1)
     # Initialize Smart Entity Management.
     if (semInit())
     {
-        #[
-            Lock the E2, so that it can't be deleted or edited by anyone
-            except you.
-
-            This is not a security measure, as the E2 can still be
-            deleted or edited by you. It is only a convenience measure,
-            to prevent other users from accidentally or maliciously
-            deleting or editing the E2, which would cause RailDriver to
-            stop working.
-
-            You can still update the E2 by using the "Update" button in
-            the Remote Upload menu of the Expression 2 Tool Gun.
-        ]#
-        semLockE2()
-        if (!semE2IsLocked())
-        {
-            handleInitError("Failed to lock E2.")
-            exit()
-        }
-
         if (!semParentToLocomotive())
         {
             handleInitError("Failed to parent E2 to locomotive.")
@@ -281,6 +261,25 @@ if (RailDriverState == 1)
         exit()
     }
 
+    #[
+        Lock the E2, so that it can't be deleted or edited by anyone
+        except you.
+
+        This is not a security measure, as the E2 can still be
+        deleted or edited by you. It is only a convenience measure,
+        to prevent other users from accidentally or maliciously
+        deleting or editing the E2, which would cause RailDriver to
+        stop working.
+
+        You can still update the E2 by using the "Update" button in
+        the Remote Upload menu of the Expression 2 Tool Gun.
+    ]#
+    semLockE2()
+    if (!semE2IsLocked())
+    {
+        handleInitError("Failed to lock E2.")
+        exit()
+    }
 
     RailDriverState = 2
 
