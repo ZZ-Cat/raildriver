@@ -221,7 +221,7 @@ if (first() | duped())
 
     # Initialize the PIDF controller.
     PIDF = pidCreateInstance()
-    if (PIDF:count() == 55)
+    if (PIDF:count() == 54)
     {
         # Set the initial PIDF Controller's parameters.
         pidSetPIDcoefficients(PIDF, PIDCoefficientKp, PIDCoefficientKi, PIDCoefficientKd)
@@ -229,7 +229,6 @@ if (first() | duped())
         pidSetItermDecay(PIDF, PIDItermDecayRate, PIDItermDecayThreshold, PIDItermDecayHysteresis)
         pidSetItermLimits(PIDF, -PIDItermLimit, PIDItermLimit)
         pidSetOutputLimits(PIDF, -PIDOutputLimit, PIDOutputLimit)
-        pidSetProportionalMode(PIDF, "Proportional on Measurement")
         pidSetMode(PIDF, "Automatic")
         runOnTick(1)
     }
