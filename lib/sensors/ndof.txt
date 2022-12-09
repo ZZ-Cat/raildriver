@@ -42,101 +42,152 @@
         - Gyroscope: 100 Hz
         - Magnetometer: 20 Hz
         - Orientation Sensor: 50 Hz
-    
-    Notes:
-    Just like the speedometer, the 9DOF Sensor Library uses differential inputs per sensor axis.
-    These differential inputs are sourced from the locomotive's trucks, & are used to detect the locomotive's orientation,
-    acceleration, and angular velocity.
-    The orientation sensor is a fusion of the accelerometer, gyroscope, and magnetometer.
-
-    The Orientation Sensor, provides a quaternion (x, y, z, w) that represents the locomotive's orientation.
-    The quaternion is used to calculate the locomotive's pitch, roll, and yaw angles (in degrees).
-    Doing it this way over using Euler angles, allows for a more accurate representation of the locomotive's orientation
-    in 3D space, & it prevents gimbal lock - which is a problem that occurs when Euler angles are close to 90° or -90°.
-    Pitch angle data is used in RailDriver's PID Controller to detect when the locomotive is climbing or descending a hill,
-    & to provide a feedforward term to the PID Controller.
-
-    Acceleration is calculated by taking the difference between the current and previous sensor values.
-    The difference is then divided by the time it took to get the difference.
-    This gives me the acceleration in m/s^2 (meters per second squared).
-    The acceleration is used to detect when the locomotive is moving.
-    It can be used by other parts of RailDriver to detect when the locomotive is accelerating or decelerating.
-    For example, RailDriver's PID Controller can use the acceleration data as its process variable.
-    Thus, allowing the driver to control the locomotive's speed through the acceleration of the locomotive.
-    This lays the groundwork for RailDriver's implementation of the Acceleration Mode of its PID Controller.
-    Thus, providing the driver with a more traditional railroad engineering experience.
-
-    Angular velocity is calculated by taking the difference between the current and previous sensor values.
-    The difference is then divided by the time it took to get the difference.
-    This gives us the angular velocity in deg/s (degrees per second).
-    The angular velocity is used to detect when the locomotive is turning.
-    It can be used by RailDriver's PID Controller to detect when the locomotive is turning, & to provide a feedforward term
-    to the PID Controller to aid in the locomotive's cornering performance.
-
-    Timing:
-    Because Garry's Mod's E2s are single-threaded, we can't use the E2's built-in timer functions to poll the sensors.
-    The other reason why this is not possible is because the E2's built-in timer functions are not precise enough & the game
-    tick itself is not fast enough to poll the sensors at the desired rate.
-
-    Instead, I am creating a custom timer that measures the execution time of the sensor loop in microseconds.
-    The timer is then used to calculate the time it took to execute the sensor loop. This is used to calculate the
-    delta time (dt) in seconds. Thus, allowing me to calculate my desired polling rate & to calculate my sensor values.
-
-    I know for a fact that E2 hates standard ```while``` & ```for``` loops. So, I am supplementing the conditionals in the
-    ```while``` loop with a ```perf()``` function. This function helps to prevent the E2 from crashing, with the trade-off
-    of a loss in sensor polling rate.
-    To work around this, I am doing a burst of sensor polling once every 500 ms. This burst of sensor polling is done
-    to ensure that the sensor values are updated at the desired rate & are as accurate as possible without crashing the E2.
-
-    RailDriver's PID Controller executes roughly every 10 ticks. This means that the PID Controller is executed roughly
-    every 150 ms in single-player, & every 300 ms in multiplayer. This is why I am doing a burst of sensor polling instead
-    of continuously polling the sensors at their desired rates.
-
-    To reduce the impact on the E2's performance, I am only doing a burst of sensor polling inside one loop, as opposed to
-    using multiple consecutive loops. This also prevents staggered bursts of sensor polling, which would cause the sensor
-    values to be updated at different times. As a result, the sensor values would be less accurate & the PID Controller
-    would be less responsive.
-    Using a single loop also allows me to use a single timer to calculate the time it took to execute the sensor loop.
-    Thus, improving the accuracy of the sensor values.
-
-    Filtering:
-    In RailDriver's Speedometer Library, I used a low-pass filter to smooth out the speedometer's output.
-    At this point, I may or may not use a low-pass filter here, considering that I am using burst sensor polling.
-    I may use a low-pass filter to smooth out the sensor values, but I am not sure if it is necessary.
-    However, I will still write the code for the low-pass filter, just in case I decide to use it when I am testing the
-    9DOF Sensor Library in the future.
-
-    A low-pass filter is a filter that passes low-frequency signals, but attenuates (reduces) high-frequency signals.
-    A low-pass filter is used to smooth out the sensor values, & to reduce noise in the sensor values.
-    The low-pass filter is implemented as a recursive filter, which is a filter that uses the previous output as the input
-    for the next iteration of the filter.
-    The low-pass filter is implemented as a recursive filter, because it is more efficient than an iterative filter.
-
-    Math:
-    The math used in this library is based on real-world physics & engineering principles that are used in the real world.
-    I am using the same math that I learned with my studies in control systems engineering & mechanical engineering.
-    Also, the math that I am using is based on the same control theory that I taught myself when I was working on some of my
-    older projects, such as my old Vector Controller E2, Fantail Flybarless (an IRL RC helicopter stabilization system
-    that I designed & built, as a precursor to another project that I am currently helping to develop - RotorFlight), & my
-    old Smart Locomotive Controller E2 (which is the 2016 predecessor to RailDriver).
-    
-    For processing the sensor values, I will be using an improved version of the math that I used for my 3D Mouse Project from
-    2017. That project was a 3D mouse that I designed & built, & it was used to control my computer's mouse cursor in 3D
-    space. The mouse itself was connected to my computer via Bluetooth, & it used a 9-axis IMU (Inertial Measurement Unit)
-    to detect the mouse's orientation, acceleration, & angular velocity. It used a Cortex-M4 microcontroller to process the
-    sensor values, & it used a Bluetooth module to send the sensor values to my computer. All of the components could be
-    obtained from Adafruit, & the project was open-source. I never released the project, because I was working on other
-    projects at the time, & I never got around to finishing it. The hardware that it used at the time was very new & cutting
-    edge technology, & it was very expensive. Now, that hardware has become obsolete & 3D mice in general are very much
-    outdated, it would be very difficult to replicate the project, let alone maintain it or improve it.
-    Even if I did finish the project, I would not have released it, because I was not happy with the way that I implemented
-    the sensor processing. I was using a very simple & naive implementation of the sensor processing, & I was not using
-    the sensor values to their full potential. Also, at the time, I wasn't using FreeRTOS, which is a real-time operating
-    system that I now use for literally all of my embedded systems projects. Looking back on that project, it makes me wonder
-    how I was able to get it to work at all, considering the entire code was a total mess & single-threaded, no less.
-
-    Anyways, I digress.
-    The math that I am using in this library comes from a diverse palette of sources, such as my studies in control systems
-    engineering, mechanical engineering, my own personal projects, my own research, development & testing.
-    Any additional sources that I have, I will attribute them accordingly.
 ]#
+
+# This function initializes the 9DOF Sensor Library.
+# This function must be called before any other functions in the library can be used.
+# @param Trucks An array of the trucks that the sensor library will be used on.
+# @return Ndof A handle to the 9DOF Sensor Library.
+function table ndofInit(Trucks:array)
+{
+    assert(Trucks:count() == 2, "9DoF Sensor Library requires 2 trucks.")
+
+    local NdofSensor = table()
+
+    # Differential Input
+    NdofSensor["Differential Input - Positive", entity] = Trucks[1, entity]
+    NdofSensor["Differential Input - Negative", entity] = Trucks[2, entity]
+
+    # Timings
+    NdofSensor["Sensor Loop - Timer", string] = "Sensor Loop Timer"
+    NdofSensor["Sensor Loop - Interval", number] = 500
+    NdofSensor["Sensor Loop - Burst Count", number] = 0
+    NdofSensor["Sensor Loop - Burst Count Max", number] = 10
+    NdofSensor["Sensor Loop - Burst Interval", number] = NdofSensor["Sensor Loop - Interval", number] / NdofSensor["Sensor Loop - Burst Count Max", number]
+
+    NdofSensor["Sensor Loop - Current Time", number] = systime()
+    NdofSensor["Sensor Loop - Previous Time", number] = systime()
+    NdofSensor["Sensor Loop - Time Difference", number] = 0
+
+    # Totoal timing interval must not exceed 1000ms (1 second).
+    local TotalInterval = NdofSensor["Sensor Loop - Interval", number] + NdofSensor["Sensor Loop - Burst Interval", number]
+    assert(TotalInterval <= 1000, "Total timing interval must not exceed 1000ms (1 second).")
+
+    # Accelerometer
+    NdofSensor["Accelerometer - Current Speed", vector] = vec()
+    NdofSensor["Accelerometer - Previous Speed", vector] = vec()
+    NdofSensor["Accelerometer - Acceleration", vector] = vec()
+
+    return NdofSensor
+}
+
+# This function starts the 9DOF Sensor Library.
+# This function must be called after the 9DOF Sensor Library has been initialized.
+# @param Ndof A handle to the 9DOF Sensor Library.
+function void ndofStartSensorLoop(Ndof:table)
+{
+    timer(Ndof["Sensor Loop - Timer", string], Ndof["Sensor Loop - Interval", number])
+}
+
+# This function returns the sensor loop's timer identifier.
+# @param Ndof A handle to the 9DOF Sensor Library.
+# @return Timer A string containing the sensor loop's timer identifier.
+function string ndofGetClockId(Ndof:table)
+{
+    return Ndof["Sensor Loop - Timer", string]
+}
+
+# This function manages the sensor loop's execution timing.
+# This function must be called every time the sensor loop's timer expires.
+# @param Ndof A handle to the 9DOF Sensor Library.
+# @return void
+function void ndofSensorLoop(Ndof:table)
+{
+    local CurrentTime = systime() * 1000
+    local TimeDifference = CurrentTime - Ndof["Sensor Loop - Previous Time", number]
+    Ndof["Sensor Loop - Time Difference", number] = TimeDifference
+
+    if (TimeDifference >= Ndof["Sensor Loop - Interval", number])
+    {
+        Ndof["Sensor Loop - Burst Count", number] = 0
+        Ndof["Sensor Loop - Previous Time", number] = CurrentTime
+    }
+    else
+    {
+        Ndof["Sensor Loop - Burst Count", number] = Ndof["Sensor Loop - Burst Count", number] + 1
+    }
+
+    stoptimer(Ndof["Sensor Loop - Timer", string])
+
+    if (Ndof["Sensor Loop - Burst Count", number] < Ndof["Sensor Loop - Burst Count Max", number])
+    {
+        timer(Ndof["Sensor Loop - Timer", string], Ndof["Sensor Loop - Burst Interval", number])
+    }
+    else
+    {
+        timer(Ndof["Sensor Loop - Timer", string], Ndof["Sensor Loop - Interval", number])
+    }
+}
+
+# This function stops the sensor loop.
+# @param Ndof A handle to the 9DOF Sensor Library.
+# @return void
+function void ndofStopSensorLoop(Ndof:table)
+{
+    stoptimer(Ndof["Sensor Loop - Timer", string])
+}
+
+# This function gets the acceleration, angular velocity, & orientation of the trucks.
+# This function must be called every tick.
+# @param Ndof A handle to the 9DOF Sensor Library.
+# @return SensorValues An array of vectors containing the acceleration, angular velocity, & orientation of the trucks.
+function array ndofGetSensorValues(Ndof:table)
+{
+    local SensorValues = array(vec(), ang(), ang())
+    local T1 = Ndof["Differential Input - Positive", entity]
+    local T2 = Ndof["Differential Input - Negative", entity]
+
+    # Acceleration
+    local Acceleration = vec()
+    local CurrentSpeed = vec()
+
+    CurrentSpeed = CurrentSpeed:setX(T1:velL():x())
+    CurrentSpeed = CurrentSpeed:setY(T1:velL():y())
+    CurrentSpeed = CurrentSpeed:setZ(T1:velL():z())
+
+    Acceleration = Acceleration:setX((CurrentSpeed:x() - Ndof["Accelerometer - Previous Speed", vector]:x()) / Ndof["Sensor Loop - Time Difference", number] * 1000)
+    Acceleration = Acceleration:setY((CurrentSpeed:y() - Ndof["Accelerometer - Previous Speed", vector]:y()) / Ndof["Sensor Loop - Time Difference", number] * 1000)
+    Acceleration = Acceleration:setZ((CurrentSpeed:z() - Ndof["Accelerometer - Previous Speed", vector]:z()) / Ndof["Sensor Loop - Time Difference", number] * 1000)
+
+    Ndof["Accelerometer - Previous Speed", vector] = CurrentSpeed
+
+    SensorValues[1, vector] = Acceleration
+
+    # Angular Velocity
+    local AngularVelocity = ang()
+
+    AngularVelocity = AngularVelocity:setPitch(T1:angVel():pitch())
+    AngularVelocity = AngularVelocity:setYaw(T1:angVel():yaw())
+    AngularVelocity = AngularVelocity:setRoll(T1:angVel():roll())
+
+    SensorValues[2, angle] = AngularVelocity
+
+    # Orientation
+    local Orientation = ang()
+
+    Orientation = Orientation:setPitch(T1:angles():pitch())
+    Orientation = Orientation:setYaw(T1:angles():yaw())
+    Orientation = Orientation:setRoll(T1:angles():roll())
+
+    SensorValues[3, angle] = Orientation
+
+    return SensorValues
+}
+
+# This function gets the time difference between the current time and the previous time.
+# @param Ndof A handle to the 9DOF Sensor Library.
+# @return TimeDifference A number containing the time difference between the current time and the previous time.
+function number ndofGetTimeDelta(Ndof:table)
+{
+    return Ndof["Sensor Loop - Time Difference", number]
+}

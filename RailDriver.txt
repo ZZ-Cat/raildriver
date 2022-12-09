@@ -18,14 +18,14 @@
 
 @name RailDriver
 @model models/beer/wiremod/gate_e2_nano.mdl
-@persist Trucks:array Speedo:table
+@persist Trucks:array Speedo:table NDOF:table
 @persist [Direction Throttle Brake EmergencyBrake]:number
 @persist [OTALocal CLI PlayerControls ThrottleMap BrakeMap]:table TrainDriver:entity
 @persist PIDF:table
 @persist EmBrakeState EmBrakeThisSpeed EmBrakeLastSpeed EmBrakeObserverTickInterval EmBrakePCFaultTimeoutSet
 @persist Speed SpeedAbs SpeedMPH
 @persist DupeTickInterval DupeIsLoading DupeIsFinished RailDriverIsReady RailDriverIsInitialized RailDriverState
-@outputs Debugger:table
+@outputs Debugger:table DbgAcceleration:vector [DbgAngulerVelocity DbgOrientation]:angle
 @strict
 
 if (duped())
@@ -94,6 +94,7 @@ if (RailDriverState == 1)
     {
         #include "e2shared/RailDriver/lib/ota/local"
         #include "e2shared/RailDriver/lib/smartEntityManagement"
+        #include "e2shared/RailDriver/lib/sensors/ndof"
         #include "e2shared/RailDriver/lib/sensors/speedometer"
         #include "e2shared/RailDriver/lib/controls/playerControls"
         #include "e2shared/RailDriver/lib/cli"
@@ -146,6 +147,18 @@ if (RailDriverState == 1)
         else
         {
             error("RailDriver: Failed to initialize Speedometer.")
+        }
+
+        # Initialize NDOF Sensor.
+        NDOF = ndofInit(Trucks)
+        if (NDOF:count() > 0)
+        {
+            ndofStartSensorLoop(NDOF)
+        }
+
+        else
+        {
+            error("RailDriver: Failed to initialize NDOF Sensor.")
         }
 
         # Setup throttle and brake maps.
@@ -454,6 +467,33 @@ elseif (RailDriverState == 2)
         else
         {
             timer("Chat Print", 500)
+        }
+    }
+
+    if (clk(ndofGetClockId(NDOF)))
+    {
+        try
+        {
+            ndofSensorLoop(NDOF)
+
+            local SensorValues = ndofGetSensorValues(NDOF)
+
+            assert(SensorValues:count() == 3, "Invalid sensor values.")
+
+            local Acceleration = SensorValues[1, vector]
+            local AngularVelocity = SensorValues[2, angle]
+            local Orientation = SensorValues[3, angle]
+
+            # Debug.
+            DbgAcceleration = Acceleration
+            DbgAngularVelocity = AngularVelocity
+            DbgOrientation = Orientation
+        }
+
+        catch(Exception)
+        {
+            ndofStopSensorLoop(NDOF)
+            printColor(vec(255, 0, 0), "[RailDriver | NDOF | Error]", vec(255, 255, 255), Exception)
         }
     }
 
