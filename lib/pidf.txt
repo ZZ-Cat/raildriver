@@ -67,6 +67,7 @@ function table pidCreateInstance()
     S["PIDF Coefficient Kf Acceleration", number] = 0
     S["PIDF Coefficient Kf Yaw Rate", number] = 0
     S["PIDF Coefficient Kf Pitch Angle", number] = 0
+    S["PIDF Coefficient Kf Hill Climb/Descent", number] = 0
     S["PIDF Coefficient Kf Throttle", number] = 0
     S["PIDF Coefficient Kf Brake", number] = 0
 
@@ -83,6 +84,7 @@ function table pidCreateInstance()
     S["Internal FF Accel", number] = 0
     S["Internal FF Yaw Rate", number] = 0
     S["Internal FF Pit Ang", number] = 0
+    S["Internal FF Hill Climb/Descent", number] = 0
     S["Internal FF Thr", number] = 0
     S["Internal FF Brk", number] = 0
 
@@ -97,6 +99,7 @@ function table pidCreateInstance()
     S["FF Accel", number] = 0
     S["FF Yaw Rate", number] = 0
     S["FF Pit Ang", number] = 0
+    S["FF Hill Climb/Descent", number] = 0
     S["FF Thr", number] = 0
     S["FF Brk", number] = 0
     S["FF Sum", number] = 0
@@ -219,6 +222,13 @@ function number pidSetCoefficients(S:table, Gains:string, Value)
             S["Internal FF Pitch Angle", number] = S["PIDF Coefficient Kf Pitch Angle", number] * S["Scale", number]
             return S["PIDF Coefficient Kf Pitch Angle", number]
         break
+
+        case "kf hill climb/descent",
+        case "pidf coefficient kf hill climb/descent",
+        case "hill climb/descent feedforward",
+            S["PIDF Coefficient Kf Hill Climb/Descent", number] = Value
+            S["Internal FF Hill Climb/Descent", number] = S["PIDF Coefficient Kf Hill Climb/Descent", number] * S["Scale", number]
+            return S["PIDF Coefficient Kf Hill Climb/Descent", number]
 
         case "kf thr",
         case "pidf coefficient kf throttle",
@@ -382,6 +392,10 @@ function void pidSetFeedforward(S:table, FFname:string, Value)
         case "yaw rate",
             S["FF Yaw Rate", number] = S["Internal FF Yaw Rate", number] * Value
         break
+
+        case "hill climb/descent",
+            S["FF Hill Climb/Descent", number] = S["Internal FF Hill Climb/Descent", number] * Value
+        break
     }
 
     FeedForwardSum += S["FF Accel", number]
@@ -389,6 +403,7 @@ function void pidSetFeedforward(S:table, FFname:string, Value)
     FeedForwardSum += S["FF Pit Ang", number]
     FeedForwardSum += S["FF Thr", number]
     FeedForwardSum += S["FF Yaw Rate", number]
+    FeedForwardSum += S["FF Hill Climb/Descent", number]
 
     if (S["Use Feedforward Limit", number] != 0)
     {
@@ -397,6 +412,137 @@ function void pidSetFeedforward(S:table, FFname:string, Value)
 
     S["FF Sum", number] = FeedForwardSum * S["Internal FF Master", number]
 
+}
+
+# This function sets the hill climb & descent feedforward.
+# This is based on the gradient of the track, the locomotive's speed, the locomotive's direction, & the set point.
+# The hill climb & descent feedforward is only applied when the gradient is greater than 0.5%.
+# This is to prevent the feedforward from being applied when the locomotive is on a flat section of track.
+function void pidSetHillClimbDescentFeedforward(S:table, HillClimbDescentData:array)
+{
+    local Speed = HillClimbDescentData[1, number]
+    local Gradient = HillClimbDescentData[2, number]
+    local Direction = HillClimbDescentData[3, number]
+    local SetPoint = HillClimbDescentData[4, number]
+    local HillClimbDescentFF = 0
+
+    if (abs(Gradient) > 0.5)
+    {
+        # First off, calculate a value using the set point & the locomotive's speed.
+        # This value is used to scale the hill climb & descent feedforward to the locomotive's speed.
+        local SetPointSpeedCompensation = 1
+        if (Gradient > 0)
+        {
+            if (Direction == 1)
+            {
+                if (SetPoint == 0 & Speed >= 0)
+                {
+                    if (Speed == 0)
+                    {
+                        # Avoid division by zero.
+                        SetPointSpeedCompensation = 0
+                    }
+                    else
+                    {
+                        # Locomotive is stopping & going uphill.
+                        SetPointSpeedCompensation = 0.1 / Speed
+                    }
+                }
+                else
+                {
+                    if (Speed == 0)
+                    {
+                        # Avoid division by zero.
+                        SetPointSpeedCompensation = 0
+                    }
+                    else
+                    {
+                        # Locomotive is going forward & going uphill.
+                        SetPointSpeedCompensation = SetPoint / Speed
+                    }
+                }
+            }
+            elseif (Direction == -1)
+            {
+                if (SetPoint == 0 & Speed > 0)
+                {
+                    # Locomotive is stopping & going downhill.
+                    SetPointSpeedCompensation = Speed / 0.1
+                }
+                else
+                {
+                    if (SetPoint == 0)
+                    {
+                        # Avoid division by zero.
+                        SetPointSpeedCompensation = 0
+                    }
+                    else
+                    {
+                        # Locomotive is reversing & going downhill.
+                        SetPointSpeedCompensation = Speed / SetPoint
+                    }
+                }
+            }
+        }
+        else
+        {
+            if (Direction == 1)
+            {
+                if (SetPoint == 0 & Speed > 0)
+                {
+                    # Locomotive is stopping & going downhill.
+                    SetPointSpeedCompensation = Speed / 0.1
+                }
+                else
+                {
+                    if (SetPoint == 0)
+                    {
+                        # Avoid division by zero.
+                        SetPointSpeedCompensation = 0
+                    }
+                    else
+                    {
+                        # Locomotive is going forward & going downhill.
+                        SetPointSpeedCompensation = Speed / SetPoint
+                    }
+                }
+            }
+            elseif (Direction == -1)
+            {
+                if (SetPoint == 0 & Speed >= 0)
+                {
+                    if (Speed == 0)
+                    {
+                        # Avoid division by zero.
+                        SetPointSpeedCompensation = 0
+                    }
+                    else
+                    {
+                        # Locomotive is stopping & going uphill.
+                        SetPointSpeedCompensation = 0.1 / Speed
+                    }
+                }
+                else
+                {
+                    if (Speed == 0)
+                    {
+                        # Avoid division by zero.
+                        SetPointSpeedCompensation = 0
+                    }
+                    else
+                    {
+                        # Locomotive is reversing & going uphill.
+                        SetPointSpeedCompensation = SetPoint / Speed
+                    }
+                }
+            }
+        }
+
+        # Now, calculate the hill climb & descent feedforward.
+        HillClimbDescentFF = (Gradient * SetPointSpeedCompensation) * Direction
+    }
+
+    pidSetFeedforward(S, "hill climb/descent", HillClimbDescentFF)
 }
 
 # Temporary placement of I Term Relax function, until I can decide to yeet it later.
@@ -649,6 +795,12 @@ function number pidGetIterm(S:table)
 function number pidGetDterm(S:table)
 {
     return S["D-Term", number]
+}
+
+# This function returns the current value of the hill climb/descent feedforward.
+function number pidGetFFhillClimbDescent(S:table)
+{
+    return S["FF Hill Climb/Descent", number]
 }
 
 # This function returns the current value of the Feedforward Sum.
