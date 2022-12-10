@@ -175,9 +175,9 @@ function array ndofGetSensorValues(Ndof:table)
     # Orientation
     local Orientation = ang()
 
-    Orientation = Orientation:setPitch(T1:angles():pitch())
-    Orientation = Orientation:setYaw(T1:angles():yaw())
-    Orientation = Orientation:setRoll(T1:angles():roll())
+    Orientation = Orientation:setPitch(-T1:angles():roll())
+    Orientation = Orientation:setYaw(-T1:angles():yaw())
+    Orientation = Orientation:setRoll(T1:angles():pitch())
 
     SensorValues[3, angle] = Orientation
 
