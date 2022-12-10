@@ -207,6 +207,7 @@ if (RailDriverState == 1)
             pidSetItermDecay(PIDF, PIDItermDecayRate, PIDItermDecayThreshold, PIDItermDecayHysteresis)
             pidSetItermLimits(PIDF, -PIDItermLimit, PIDItermLimit)
             pidSetOutputLimits(PIDF, -PIDOutputLimit, PIDOutputLimit)
+            pidSetDirection(PIDF, Direction)
             pidSetMode(PIDF, "Automatic")
             runOnTick(1)
         }
@@ -611,6 +612,9 @@ elseif (RailDriverState == 2)
                 if (playerControlsDirectionIsUpdated(PlayerControls))
                 {
                     Direction = playerControlsGetDirection(PlayerControls)
+
+                    # Set the PIDF controller's direction.
+                    pidSetDirection(PIDF, Direction)
 
                     # Clear the Direction is Updated flag.
                     playerControlsClearDirectionIsUpdated(PlayerControls)

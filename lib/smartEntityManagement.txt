@@ -213,7 +213,7 @@ function number semDirectControlTrucks(Trucks:array, PIDFOutput:number, Reverser
     }
 
     # Calculate the traction motor output.
-    local MotorOutput = PIDFOutput * Reverser
+    local MotorOutput = PIDFOutput # * Reverser
 
     # Apply the traction motor output to the trucks.
     Trucks[1, entity]:applyForce(Trucks[1, entity]:toWorldAxis(vec(0, -MotorOutput, 0)))

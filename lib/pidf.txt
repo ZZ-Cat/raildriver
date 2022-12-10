@@ -432,6 +432,12 @@ function void pidSetOutput(S:table, Value)
     S["Control Variable", number] = Value
 }
 
+# This function sets the direction of the control variable.
+function void pidSetDirection(S:table, Value)
+{
+    S["Direction", number] = Value
+}
+
 function number pidCalculate(S:table)
 {
     # PID Controller can have several operating modes.
@@ -597,7 +603,7 @@ function number pidCalculate(S:table)
 
         # Apply a limit to the Control Variable.
         S["CV Sum", number] = clamp(S["CV Sum", number], S["CV Floor", number], S["CV Ceiling", number])
-        S["Control Variable", number] = S["CV Sum", number]
+        S["Control Variable", number] = S["CV Sum", number] * S["Direction", number]
 
         # Store a couple of variables for use in the next execution.
         S["Last Error", number] = Error
