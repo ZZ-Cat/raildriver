@@ -80,6 +80,7 @@ if (RailDriverState == 1)
     local PIDCoefficientKi = 850
     local PIDCoefficientKd = 250
 
+    local PIDCoefficientFFprimary = 100
     local PIDItermDecayRate = 0.5
     local PIDItermDecayThreshold = 3.0 * 17.6
     local PIDItermDecayHysteresis = 1
@@ -203,6 +204,7 @@ if (RailDriverState == 1)
         {
             # Set the initial PIDF Controller's parameters.
             pidSetPIDcoefficients(PIDF, PIDCoefficientKp, PIDCoefficientKi, PIDCoefficientKd)
+            pidSetFFcoefficients(PIDF, PIDCoefficientFFprimary)
             pidSetFFcoefficients(PIDF, 0, 0, 0, 0, 0)
             pidSetItermDecay(PIDF, PIDItermDecayRate, PIDItermDecayThreshold, PIDItermDecayHysteresis)
             pidSetItermLimits(PIDF, -PIDItermLimit, PIDItermLimit)

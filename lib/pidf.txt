@@ -292,6 +292,16 @@ function number pidSetFFcoefficients(S:table, FFaccel, FFyawRate, FFpitchAngle, 
     return 1
 }
 
+function number pidSetFFcoefficients(S:table, FFmaster)
+{
+    if (pidSetCoefficients(S, "master feedforward", FFmaster) == 0)
+    {
+        return 0
+    }
+
+    return 1
+}
+
 function number pidSetSampleTime(S:table, T)
 {
     if (T <= 0)
