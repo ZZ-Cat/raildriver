@@ -55,6 +55,13 @@
             },
             "Sensors":
             {
+                "9DoF":
+                {
+                    "File":"ndof.txt",
+                    "Path":"e2shared/RailDriver/lib/sensors",
+                    "Version":"0.1.0",
+                    "Hash":""
+                },
                 "Speedometer":
                 {
                     "File":"speedometer.txt",
@@ -102,6 +109,6 @@
                 }
             }
         },
-        "Hash":"4271356853"
+        "Hash":"2350320262"
     }
 }
