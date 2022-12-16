@@ -792,6 +792,9 @@ elseif (RailDriverState == 2)
                 pidSetFeedforward(PIDF, "Throttle", 0)
                 pidSetSetPoint(PIDF, 0)
 
+                # Set the Velocity Setpoint input to the Hill Climb/Descent Feedforward data.
+                HillClimbDescentData[4, number] = 0
+
                 # Set the Emergency Brake state to 2.
                 EmBrakeState = 2
 
