@@ -63,7 +63,7 @@ function table pidCreateInstance()
     S["Control Variable", number] = 0
 
     # Feedforward Gains:
-    S["PIDF Coefficient Kf Master", number] = 100
+    S["PIDF Coefficient Kf Primary", number] = 100
     S["PIDF Coefficient Kf Acceleration", number] = 0
     S["PIDF Coefficient Kf Yaw Rate", number] = 0
     S["PIDF Coefficient Kf Pitch Angle", number] = 0
@@ -80,7 +80,7 @@ function table pidCreateInstance()
     S["Internal P Gain", number] = 0
     S["Internal I Gain", number] = 0
     S["Internal D Gain", number] = 0
-    S["Internal FF Master", number] = 1.0
+    S["Internal FF Primary", number] = 1.0
     S["Internal FF Accel", number] = 0
     S["Internal FF Yaw Rate", number] = 0
     S["Internal FF Pit Ang", number] = 0
@@ -182,7 +182,7 @@ function number pidSetOutputLimits(S:table, Floor, Ceiling)
     }
 }
 
-function number pidSetCoefficients(S:table, Gains:string, Value)
+function number pidSetCoefficient(S:table, Gains:string, Value)
 {
     local MillisToSeconds = S["Sample Time", number] / 1000
     Gains = Gains:lower()
@@ -213,11 +213,11 @@ function number pidSetCoefficients(S:table, Gains:string, Value)
         break
 
         case "kf",
-        case "pidf coefficient kf master",
-        case "master feedforward",
-            S["PIDF Coefficient Kf Master", number] = Value
-            S["Internal FF Master", number] = S["PIDF Coefficient Kf Master", number] / 100
-            return S["PIDF Coefficient Kf Master", number]
+        case "pidf coefficient kf primary",
+        case "primary feedforward",
+            S["PIDF Coefficient Kf Primary", number] = Value
+            S["Internal FF Primary", number] = S["PIDF Coefficient Kf Primary", number] / 100
+            return S["PIDF Coefficient Kf Primary", number]
         break
 
         case "kf accel",
@@ -275,17 +275,17 @@ function number pidSetCoefficients(S:table, Gains:string, Value)
 
 function number pidSetPIDcoefficients(S:table, PtermGain, ItermGain, DtermGain)
 {
-    if (pidSetCoefficients(S, "proportional", PtermGain) == 0)
+    if (pidSetCoefficient(S, "proportional", PtermGain) == 0)
     {
         return 0
     }
 
-    if (pidSetCoefficients(S, "integral", ItermGain) == 0)
+    if (pidSetCoefficient(S, "integral", ItermGain) == 0)
     {
         return 0
     }
 
-    if (pidSetCoefficients(S, "derivative", DtermGain) == 0)
+    if (pidSetCoefficient(S, "derivative", DtermGain) == 0)
     {
         return 0
     }
@@ -295,27 +295,27 @@ function number pidSetPIDcoefficients(S:table, PtermGain, ItermGain, DtermGain)
 
 function number pidSetFFcoefficients(S:table, FFaccel, FFyawRate, FFpitchAngle, FFthr, FFbrk)
 {
-    if (pidSetCoefficients(S, "acceleration feedforward", FFaccel) == 0)
+    if (pidSetCoefficient(S, "acceleration feedforward", FFaccel) == 0)
     {
         return 0
     }
 
-    if (pidSetCoefficients(S, "yaw rate feedforward", FFyawRate) == 0)
+    if (pidSetCoefficient(S, "yaw rate feedforward", FFyawRate) == 0)
     {
         return 0
     }
 
-    if (pidSetCoefficients(S, "pitch angle feedforward", FFpitchAngle) == 0)
+    if (pidSetCoefficient(S, "pitch angle feedforward", FFpitchAngle) == 0)
     {
         return 0
     }
 
-    if (pidSetCoefficients(S, "throttle feedforward", FFthr) == 0)
+    if (pidSetCoefficient(S, "throttle feedforward", FFthr) == 0)
     {
         return 0
     }
 
-    if (pidSetCoefficients(S, "brake feedforward", FFbrk) == 0)
+    if (pidSetCoefficient(S, "brake feedforward", FFbrk) == 0)
     {
         return 0
     }
@@ -325,7 +325,7 @@ function number pidSetFFcoefficients(S:table, FFaccel, FFyawRate, FFpitchAngle, 
 
 function number pidSetFFcoefficients(S:table, FFmaster)
 {
-    if (pidSetCoefficients(S, "master feedforward", FFmaster) == 0)
+    if (pidSetCoefficient(S, "primary feedforward", FFmaster) == 0)
     {
         return 0
     }
@@ -431,7 +431,7 @@ function void pidSetFeedforward(S:table, FFname:string, Value)
         FeedForwardSum = clamp(FeedForwardSum, S["Feedforward Limit Min", number], S["Feedforward Limit Max", number])
     }
 
-    S["FF Sum", number] = FeedForwardSum * S["Internal FF Master", number]
+    S["FF Sum", number] = FeedForwardSum * S["Internal FF Primary", number]
 
 }
 

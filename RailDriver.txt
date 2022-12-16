@@ -202,22 +202,30 @@ if (RailDriverState == 1)
         Brake = 1
         EmergencyBrake = 0
 
-        # Initialize the PIDF controller.
+        # Initialize the PIDF Controller.
         PIDF = pidCreateInstance()
         if (PIDF:count() == 57)
         {
-            # Set the initial PIDF Controller's parameters.
             HillClimbDescentData = array(0, 0, 0)
-            pidSetPIDcoefficients(PIDF, PIDCoefficientKp, PIDCoefficientKi, PIDCoefficientKd)
-            pidSetFFcoefficients(PIDF, PIDCoefficientFFprimary)
-            pidSetFFcoefficients(PIDF, 0, 0, 0, 0, 0)
-            pidSetCoefficients(PIDF, "hill climb/descent feedforward", PIDCoefficientFFhillclimb)
-            pidSetFeedforwardLimits(PIDF, -PIDFeedforwardLimit, PIDFeedforwardLimit)
-            pidSetItermDecay(PIDF, PIDItermDecayRate, PIDItermDecayThreshold, PIDItermDecayHysteresis)
-            pidSetItermLimits(PIDF, -PIDItermLimit, PIDItermLimit)
-            pidSetOutputLimits(PIDF, -PIDOutputLimit, PIDOutputLimit)
+
+            # Set the PIDF Controller's proportional, integral, & derivative coefficients.
+            assert(pidSetCoefficient(PIDF, "proportional", PIDCoefficientKp) == PIDCoefficientKp, "Failed to set the PIDF Controller's proportional coefficient.")
+            assert(pidSetCoefficient(PIDF, "integral", PIDCoefficientKi) == PIDCoefficientKi, "Failed to set the PIDF Controller's integral coefficient.")
+            assert(pidSetCoefficient(PIDF, "derivative", PIDCoefficientKd) == PIDCoefficientKd, "Failed to set the PIDF Controller's derivative coefficient.")
+
+            # Set the PIDF Controller's feedforward coefficients.
+            assert(pidSetCoefficient(PIDF, "primary feedforward", PIDCoefficientFFprimary) == PIDCoefficientFFprimary, "Failed to set the PIDF Controller's primary feedforward coefficient.")
+            assert(pidSetCoefficient(PIDF, "hill climb/descent feedforward", PIDCoefficientFFhillclimb) == PIDCoefficientFFhillclimb, "Failed to set the PIDF Controller's hill climb/descent feedforward coefficient.")
+
+            # Set the PIDF Controller's limits.
+            assert(pidSetFeedforwardLimits(PIDF, -PIDFeedforwardLimit, PIDFeedforwardLimit) == 1, "Failed to set the PIDF Controller's feedforward limits.")
+            assert(pidSetItermDecay(PIDF, PIDItermDecayRate, PIDItermDecayThreshold, PIDItermDecayHysteresis) == 1, "Failed to set the PIDF Controller's integral decay.")
+            assert(pidSetItermLimits(PIDF, -PIDItermLimit, PIDItermLimit) == 1, "Failed to set the PIDF Controller's integral limits.")
+            assert(pidSetOutputLimits(PIDF, -PIDOutputLimit, PIDOutputLimit) == 1, "Failed to set the PIDF Controller's output limits.")
+
+            # Set the PIDF Controller's mode.
             pidSetDirection(PIDF, Direction)
-            pidSetMode(PIDF, "Automatic")
+            assert(pidSetMode(PIDF, "Automatic") == 1, "Failed to set the PIDF Controller's mode.")
             runOnTick(1)
         }
 
