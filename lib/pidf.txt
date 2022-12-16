@@ -109,6 +109,27 @@ function table pidCreateInstance()
     return S
 }
 
+function number pidSetFeedforwardLimits(S:table, Min, Max)
+{
+    if (Min > Max)
+    {
+        return 0
+    }
+
+    else
+    {
+        S["Feedforward Limit Min", number] = Min
+        S["Feedforward Limit Max", number] = Max
+
+        if (S["Use Feedforward Limit", number] != 0)
+        {
+            S["FF Sum", number] = clamp(S["FF Sum", number], S["Feedforward Limit Min", number], S["Feedforward Limit Max", number])
+        }
+
+        return 1
+    }
+}
+
 function number pidSetItermDecay(S:table, Rate, Threshold, Hysteresis)
 {
     S["I-Term Decay Rate", number] = Rate
