@@ -1,0 +1,193 @@
+#[
+    This script header is a part of RailDriver.
+
+    RailDriver. Smart Locomotive Control script for Garry's Mod Train Build Servers.
+    Copyright © 2022, Cassandra "ZZ Cat" Robinson. All rights reserved.
+
+    This E2 script is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This E2 script is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this E2 script.  If not, see <https://www.gnu.org/licenses/>.
+]#
+
+@name RailDriver/lib/sensors/ndof
+
+#[
+    9DOF Sensor Library
+
+    This library is used to detect the orientation, acceleration, and angular velocity of the locomotive.
+    It is used to detect the locomotive's orientation and speed, and to detect when the locomotive is moving.
+
+    Sensors:
+        - Accelerometer (3-axis)
+        - Gyroscope (3-axis)
+        - Magnetometer (3-axis)
+        - Orientation Sensor (fusion of accelerometer, gyroscope, and magnetometer)
+    
+    Units:
+        - Acceleration: m/s^2 (meters per second squared)
+        - Angular Velocity: deg/s (degrees per second)
+        - Orientation: Quaternion (x, y, z, w)
+    
+    Polling:
+        - Accelerometer: 100 Hz
+        - Gyroscope: 100 Hz
+        - Magnetometer: 20 Hz
+        - Orientation Sensor: 50 Hz
+]#
+
+# This function initializes the 9DOF Sensor Library.
+# This function must be called before any other functions in the library can be used.
+# @param Trucks An array of the trucks that the sensor library will be used on.
+# @return Ndof A handle to the 9DOF Sensor Library.
+function table ndofInit(Trucks:array)
+{
+    assert(Trucks:count() == 2, "9DoF Sensor Library requires 2 trucks.")
+
+    local NdofSensor = table()
+
+    # Differential Input
+    NdofSensor["Differential Input - Positive", entity] = Trucks[1, entity]
+    NdofSensor["Differential Input - Negative", entity] = Trucks[2, entity]
+
+    # Timings
+    NdofSensor["Sensor Loop - Timer", string] = "Sensor Loop Timer"
+    NdofSensor["Sensor Loop - Interval", number] = 500
+    NdofSensor["Sensor Loop - Burst Count", number] = 0
+    NdofSensor["Sensor Loop - Burst Count Max", number] = 10
+    NdofSensor["Sensor Loop - Burst Interval", number] = NdofSensor["Sensor Loop - Interval", number] / NdofSensor["Sensor Loop - Burst Count Max", number]
+
+    NdofSensor["Sensor Loop - Current Time", number] = systime()
+    NdofSensor["Sensor Loop - Previous Time", number] = systime()
+    NdofSensor["Sensor Loop - Time Difference", number] = 0
+
+    # Totoal timing interval must not exceed 1000ms (1 second).
+    local TotalInterval = NdofSensor["Sensor Loop - Interval", number] + NdofSensor["Sensor Loop - Burst Interval", number]
+    assert(TotalInterval <= 1000, "Total timing interval must not exceed 1000ms (1 second).")
+
+    # Accelerometer
+    NdofSensor["Accelerometer - Current Speed", vector] = vec()
+    NdofSensor["Accelerometer - Previous Speed", vector] = vec()
+    NdofSensor["Accelerometer - Acceleration", vector] = vec()
+
+    return NdofSensor
+}
+
+# This function starts the 9DOF Sensor Library.
+# This function must be called after the 9DOF Sensor Library has been initialized.
+# @param Ndof A handle to the 9DOF Sensor Library.
+function void ndofStartSensorLoop(Ndof:table)
+{
+    timer(Ndof["Sensor Loop - Timer", string], Ndof["Sensor Loop - Interval", number])
+}
+
+# This function returns the sensor loop's timer identifier.
+# @param Ndof A handle to the 9DOF Sensor Library.
+# @return Timer A string containing the sensor loop's timer identifier.
+function string ndofGetClockId(Ndof:table)
+{
+    return Ndof["Sensor Loop - Timer", string]
+}
+
+# This function manages the sensor loop's execution timing.
+# This function must be called every time the sensor loop's timer expires.
+# @param Ndof A handle to the 9DOF Sensor Library.
+# @return void
+function void ndofSensorLoop(Ndof:table)
+{
+    local CurrentTime = systime() * 1000
+    local TimeDifference = CurrentTime - Ndof["Sensor Loop - Previous Time", number]
+    Ndof["Sensor Loop - Time Difference", number] = TimeDifference
+
+    if (TimeDifference >= Ndof["Sensor Loop - Interval", number])
+    {
+        Ndof["Sensor Loop - Burst Count", number] = 0
+        Ndof["Sensor Loop - Previous Time", number] = CurrentTime
+    }
+    else
+    {
+        Ndof["Sensor Loop - Burst Count", number] = Ndof["Sensor Loop - Burst Count", number] + 1
+    }
+
+    stoptimer(Ndof["Sensor Loop - Timer", string])
+
+    if (Ndof["Sensor Loop - Burst Count", number] < Ndof["Sensor Loop - Burst Count Max", number])
+    {
+        timer(Ndof["Sensor Loop - Timer", string], Ndof["Sensor Loop - Burst Interval", number])
+    }
+    else
+    {
+        timer(Ndof["Sensor Loop - Timer", string], Ndof["Sensor Loop - Interval", number])
+    }
+}
+
+# This function stops the sensor loop.
+# @param Ndof A handle to the 9DOF Sensor Library.
+# @return void
+function void ndofStopSensorLoop(Ndof:table)
+{
+    stoptimer(Ndof["Sensor Loop - Timer", string])
+}
+
+# This function gets the acceleration, angular velocity, & orientation of the trucks.
+# This function must be called every tick.
+# @param Ndof A handle to the 9DOF Sensor Library.
+# @return SensorValues An array of vectors containing the acceleration, angular velocity, & orientation of the trucks.
+function array ndofGetSensorValues(Ndof:table)
+{
+    local SensorValues = array(vec(), ang(), ang())
+    local T1 = Ndof["Differential Input - Positive", entity]
+    local T2 = Ndof["Differential Input - Negative", entity]
+
+    # Acceleration
+    local Acceleration = vec()
+    local CurrentSpeed = vec()
+
+    CurrentSpeed = CurrentSpeed:setX(T1:velL():x())
+    CurrentSpeed = CurrentSpeed:setY(T1:velL():y())
+    CurrentSpeed = CurrentSpeed:setZ(T1:velL():z())
+
+    Acceleration = Acceleration:setX((CurrentSpeed:x() - Ndof["Accelerometer - Previous Speed", vector]:x()) / Ndof["Sensor Loop - Time Difference", number] * 1000)
+    Acceleration = Acceleration:setY((CurrentSpeed:y() - Ndof["Accelerometer - Previous Speed", vector]:y()) / Ndof["Sensor Loop - Time Difference", number] * 1000)
+    Acceleration = Acceleration:setZ((CurrentSpeed:z() - Ndof["Accelerometer - Previous Speed", vector]:z()) / Ndof["Sensor Loop - Time Difference", number] * 1000)
+
+    Ndof["Accelerometer - Previous Speed", vector] = CurrentSpeed
+
+    SensorValues[1, vector] = Acceleration
+
+    # Angular Velocity
+    local AngularVelocity = ang()
+
+    AngularVelocity = AngularVelocity:setPitch(T1:angVel():pitch())
+    AngularVelocity = AngularVelocity:setYaw(T1:angVel():yaw())
+    AngularVelocity = AngularVelocity:setRoll(T1:angVel():roll())
+
+    SensorValues[2, angle] = AngularVelocity
+
+    # Orientation
+    local Orientation = ang()
+
+    Orientation = Orientation:setPitch(-T1:angles():roll())
+    Orientation = Orientation:setYaw(-T1:angles():yaw())
+    Orientation = Orientation:setRoll(T1:angles():pitch())
+
+    SensorValues[3, angle] = Orientation
+
+    return SensorValues
+}
+
+# This function gets the time difference between the current time and the previous time.
+# @param Ndof A handle to the 9DOF Sensor Library.
+# @return TimeDifference A number containing the time difference between the current time and the previous time.
+function number ndofGetTimeDelta(Ndof:table)
+{
+    return Ndof["Sensor Loop - Time Difference", number]
+}

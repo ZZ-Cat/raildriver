@@ -18,14 +18,15 @@
 
 @name RailDriver
 @model models/beer/wiremod/gate_e2_nano.mdl
-@persist Trucks:array Speedo:table
+@persist Trucks:array Speedo:table NDOF:table
 @persist [Direction Throttle Brake EmergencyBrake]:number
 @persist [OTALocal CLI PlayerControls ThrottleMap BrakeMap]:table TrainDriver:entity
 @persist PIDF:table
+@persist HillClimbDescentData:array
 @persist EmBrakeState EmBrakeThisSpeed EmBrakeLastSpeed EmBrakeObserverTickInterval EmBrakePCFaultTimeoutSet
 @persist Speed SpeedAbs SpeedMPH
 @persist DupeTickInterval DupeIsLoading DupeIsFinished RailDriverIsReady RailDriverIsInitialized RailDriverState
-@outputs Debugger:table
+@outputs Debugger:table DbgAcceleration:vector [DbgAngulerVelocity DbgOrientation]:angle DbgGradient DbgHillClimbDescentFF
 @strict
 
 if (duped())
@@ -80,11 +81,15 @@ if (RailDriverState == 1)
     local PIDCoefficientKi = 850
     local PIDCoefficientKd = 250
 
+    local PIDCoefficientFFprimary = 100
+    local PIDCoefficientFFhillclimb = 5500
+
     local PIDItermDecayRate = 0.5
     local PIDItermDecayThreshold = 3.0 * 17.6
     local PIDItermDecayHysteresis = 1
 
-    local PIDItermLimit = 75000
+    local PIDFeedforwardLimit = 20000
+    local PIDItermLimit = 15000
     local PIDOutputLimit = 75000
 
     local SpeedometerFilterCutoffFrequency = 1
@@ -94,6 +99,7 @@ if (RailDriverState == 1)
     {
         #include "e2shared/RailDriver/lib/ota/local"
         #include "e2shared/RailDriver/lib/smartEntityManagement"
+        #include "e2shared/RailDriver/lib/sensors/ndof"
         #include "e2shared/RailDriver/lib/sensors/speedometer"
         #include "e2shared/RailDriver/lib/controls/playerControls"
         #include "e2shared/RailDriver/lib/cli"
@@ -148,6 +154,18 @@ if (RailDriverState == 1)
             error("RailDriver: Failed to initialize Speedometer.")
         }
 
+        # Initialize NDOF Sensor.
+        NDOF = ndofInit(Trucks)
+        if (NDOF:count() > 0)
+        {
+            ndofStartSensorLoop(NDOF)
+        }
+
+        else
+        {
+            error("RailDriver: Failed to initialize NDOF Sensor.")
+        }
+
         # Setup throttle and brake maps.
         ThrottleMap["Throttle Input Type", string] = "Velocity"
         ThrottleMap["Velocity Setpoint", array] = array(0, 5, 15, 20, 30, 40, 60)
@@ -184,17 +202,32 @@ if (RailDriverState == 1)
         Brake = 1
         EmergencyBrake = 0
 
-        # Initialize the PIDF controller.
+        # Initialize the PIDF Controller.
         PIDF = pidCreateInstance()
-        if (PIDF:count() == 54)
+        if (PIDF:count() == 57)
         {
-            # Set the initial PIDF Controller's parameters.
-            pidSetPIDcoefficients(PIDF, PIDCoefficientKp, PIDCoefficientKi, PIDCoefficientKd)
-            pidSetFFcoefficients(PIDF, 0, 0, 0, 0, 0)
-            pidSetItermDecay(PIDF, PIDItermDecayRate, PIDItermDecayThreshold, PIDItermDecayHysteresis)
-            pidSetItermLimits(PIDF, -PIDItermLimit, PIDItermLimit)
-            pidSetOutputLimits(PIDF, -PIDOutputLimit, PIDOutputLimit)
-            pidSetMode(PIDF, "Automatic")
+            HillClimbDescentData = array(0, 0, 0)
+
+            # Set the PIDF Controller's proportional, integral, & derivative coefficients.
+            assert(pidSetCoefficient(PIDF, "proportional", PIDCoefficientKp) == PIDCoefficientKp, "Failed to set the PIDF Controller's proportional coefficient.")
+            assert(pidSetCoefficient(PIDF, "integral", PIDCoefficientKi) == PIDCoefficientKi, "Failed to set the PIDF Controller's integral coefficient.")
+            assert(pidSetCoefficient(PIDF, "derivative", PIDCoefficientKd) == PIDCoefficientKd, "Failed to set the PIDF Controller's derivative coefficient.")
+
+            # Set the PIDF Controller's feedforward coefficients.
+            assert(pidSetCoefficient(PIDF, "primary feedforward", PIDCoefficientFFprimary) == PIDCoefficientFFprimary, "Failed to set the PIDF Controller's primary feedforward coefficient.")
+            assert(pidSetCoefficient(PIDF, "hill climb/descent feedforward", PIDCoefficientFFhillclimb) == PIDCoefficientFFhillclimb, "Failed to set the PIDF Controller's hill climb/descent feedforward coefficient.")
+
+            # Set the PIDF Controller's mode.
+            pidSetDirection(PIDF, Direction)
+            assert(pidSetMode(PIDF, "Automatic") == 1, "Failed to set the PIDF Controller's mode.")
+
+            # Set the PIDF Controller's limits.
+            assert(pidSetFeedforwardLimits(PIDF, -PIDFeedforwardLimit, PIDFeedforwardLimit) == 1, "Failed to set the PIDF Controller's feedforward limits.")
+            assert(pidSetItermDecay(PIDF, PIDItermDecayRate, PIDItermDecayThreshold, PIDItermDecayHysteresis) == 1, "Failed to set the PIDF Controller's integral decay.")
+            assert(pidSetItermLimits(PIDF, -PIDItermLimit, PIDItermLimit) == 1, "Failed to set the PIDF Controller's integral limits.")
+            assert(pidSetOutputLimits(PIDF, -PIDOutputLimit, PIDOutputLimit) == 1, "Failed to set the PIDF Controller's output limits.")
+
+            # Enable the PIDF Controller.
             runOnTick(1)
         }
 
@@ -457,6 +490,43 @@ elseif (RailDriverState == 2)
         }
     }
 
+    if (clk(ndofGetClockId(NDOF)))
+    {
+        try
+        {
+            ndofSensorLoop(NDOF)
+
+            local SensorValues = ndofGetSensorValues(NDOF)
+
+            assert(SensorValues:count() == 3, "Invalid sensor values.")
+
+            local Acceleration = SensorValues[1, vector]
+            local AngularVelocity = SensorValues[2, angle]
+            local Orientation = SensorValues[3, angle]
+
+            # Debug.
+            DbgAcceleration = Acceleration
+            DbgAngularVelocity = AngularVelocity
+            DbgOrientation = Orientation
+
+            # Calculate the track's grade in percent from the pitch of the locomotive's orientation.
+            local Gradient = 0
+            Gradient = tan(Orientation:pitch()) * 100
+
+            # Debug.
+            DbgGradient = round(Gradient, 4)
+
+            # Set the Gradient input to the Hill Climb/Descent Feedforward data.
+            HillClimbDescentData[2, number] = Gradient
+        }
+
+        catch(Exception)
+        {
+            ndofStopSensorLoop(NDOF)
+            printColor(vec(255, 0, 0), "[RailDriver | NDOF | Error]", vec(255, 255, 255), ": " + Exception)
+        }
+    }
+
     if (clk(speedometerGetClockId(Speedo)))
     {
         try
@@ -476,6 +546,9 @@ elseif (RailDriverState == 2)
             # This is the measured speed of the locomotive.
             pidSetProcessVariable(PIDF, SpeedAbs)
 
+            # Set the Speed input to the Hill Climb/Descent Feedforward data.
+            HillClimbDescentData[1, number] = SpeedAbs
+
             # Convert speed from Garry's Mod units to miles per hour.
             SpeedMPH = round(toUnit("mph", SpeedAbs) * 4 / 3)
         }
@@ -490,6 +563,12 @@ elseif (RailDriverState == 2)
     {
         try
         {
+            # Set the Hill Climb/Descent Feedforward input to the PIDF controller.
+            pidSetHillClimbDescentFeedforward(PIDF, HillClimbDescentData)
+
+            # Debug.
+            DbgHillClimbDescentFF = pidGetFFhillClimbDescent(PIDF)
+
             # Calculate the PIDF controller's output.
             pidCalculate(PIDF) # <--- This is where the magick happens. =^/,..,^=
 
@@ -572,6 +651,12 @@ elseif (RailDriverState == 2)
                 {
                     Direction = playerControlsGetDirection(PlayerControls)
 
+                    # Set the PIDF controller's direction.
+                    pidSetDirection(PIDF, Direction)
+
+                    # Set the Direction input to the Hill Climb/Descent Feedforward data.
+                    HillClimbDescentData[3, number] = Direction
+
                     # Clear the Direction is Updated flag.
                     playerControlsClearDirectionIsUpdated(PlayerControls)
                 }
@@ -588,6 +673,9 @@ elseif (RailDriverState == 2)
                     # Set the PIDF controller's setpoint.
                     pidSetFeedforward(PIDF, "Throttle", VelocitySetpointGM)
                     pidSetSetPoint(PIDF, VelocitySetpointGM)
+
+                    # Set the Velocity Setpoint input to the Hill Climb/Descent Feedforward data.
+                    HillClimbDescentData[4, number] = VelocitySetpointGM
 
                     # Clear the Throttle is Updated flag.
                     playerControlsClearThrottleIsUpdated(PlayerControls)
@@ -705,6 +793,9 @@ elseif (RailDriverState == 2)
                 # Set the PIDF controller's setpoint & feedforward to 0.
                 pidSetFeedforward(PIDF, "Throttle", 0)
                 pidSetSetPoint(PIDF, 0)
+
+                # Set the Velocity Setpoint input to the Hill Climb/Descent Feedforward data.
+                HillClimbDescentData[4, number] = 0
 
                 # Set the Emergency Brake state to 2.
                 EmBrakeState = 2
