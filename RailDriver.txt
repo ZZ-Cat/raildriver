@@ -89,7 +89,7 @@ if (RailDriverState == 1)
     local PIDItermDecayHysteresis = 1
 
     local PIDFeedforwardLimit = 20000
-    local PIDItermLimit = 75000
+    local PIDItermLimit = 15000
     local PIDOutputLimit = 75000
 
     local SpeedometerFilterCutoffFrequency = 1
