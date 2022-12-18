@@ -82,7 +82,7 @@ if (RailDriverState == 1)
     local PIDCoefficientKd = 250
 
     local PIDCoefficientFFprimary = 100
-    local PIDCoefficientFFhillclimb = 2000
+    local PIDCoefficientFFhillclimb = 5500
 
     local PIDItermDecayRate = 0.5
     local PIDItermDecayThreshold = 3.0 * 17.6
