@@ -458,16 +458,8 @@ function void pidSetHillClimbDescentFeedforward(S:table, HillClimbDescentData:ar
             {
                 if (SetPoint == 0 & Speed >= 0)
                 {
-                    if (Speed == 0)
-                    {
-                        # Avoid division by zero.
-                        SetPointSpeedCompensation = 0
-                    }
-                    else
-                    {
-                        # Locomotive is stopping & going uphill.
-                        SetPointSpeedCompensation = 0.1 / Speed
-                    }
+                    # Locomotive is stopping & going uphill.
+                    SetPointSpeedCompensation = 0.001 * Speed
                 }
                 else
                 {
@@ -532,16 +524,8 @@ function void pidSetHillClimbDescentFeedforward(S:table, HillClimbDescentData:ar
             {
                 if (SetPoint == 0 & Speed >= 0)
                 {
-                    if (Speed == 0)
-                    {
-                        # Avoid division by zero.
-                        SetPointSpeedCompensation = 0
-                    }
-                    else
-                    {
-                        # Locomotive is stopping & going uphill.
-                        SetPointSpeedCompensation = 0.1 / Speed
-                    }
+                    # Locomotive is stopping & going uphill.
+                    SetPointSpeedCompensation = 0.001 * Speed
                 }
                 else
                 {
