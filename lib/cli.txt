@@ -43,6 +43,8 @@ function table cliCreateQueue(Name:string)
     Cli["Queues", table][Name, table]["Flags", table] = table()
     Cli["Queues", table][Name, table]["Flags", table]["is empty", number] = 1
 
+    ReceivedItem = table()
+
     # Return the queue.
     return Cli
 }

@@ -142,6 +142,7 @@ if (RailDriverState == 1)
         }
 
         # Initialize Speedometer.
+        SpeedAbs = 0
         Speedo = speedometerInit(Trucks[1, entity], Trucks[2, entity])
         if (Speedo:count() == 8)
         {
@@ -168,10 +169,13 @@ if (RailDriverState == 1)
         }
 
         # Setup throttle and brake maps.
+        ThrottleMap = table()
         ThrottleMap["Throttle Input Type", string] = "Velocity"
         ThrottleMap["Velocity Setpoint", array] = array(0, 5, 15, 20, 30, 40, 60)
         ThrottleMap["Acceleration Setpoint", array] = array(0, 0.5, 1, 1.5, 2, 2.5, 3)
         ThrottleMap["Torque Setpoint", array] = array(0, 1000, 2000, 3000, 4000, 5000, 6000)
+
+        BrakeMap = table()
         BrakeMap["Brake Input Type", string] = "Velocity"
         BrakeMap["Velocity Setpoint", array] = array(0, 0, 0, 0, 0, 0, 0)
         BrakeMap["Deceleration Setpoint", array] = array(0, -0.5, -1, -1.5, -2, -2.5, -3)
@@ -202,6 +206,7 @@ if (RailDriverState == 1)
         Throttle = 1
         # Brake = 1
         EmergencyBrake = 0
+        EmBrakePCFaultTimeoutSet = 0
 
         # Initialize the PIDF Controller.
         PIDF = pidCreateInstance()
@@ -251,6 +256,7 @@ if (RailDriverState == 1)
             timer("Chat Print", 2200)
         }
 
+        Debugger = table()
         timer("Debug", 100)
 
         #[

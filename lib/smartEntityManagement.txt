@@ -23,10 +23,6 @@
 
 function number semInit()
 {
-    if (SemE2Locked) {
-        return 0
-    }
-
     SemE2Locked = 0
     SemE2 = entity()
     SemE2IsWeldedTo = SemE2:isWeldedTo()
