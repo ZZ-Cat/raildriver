@@ -193,83 +193,73 @@ function number pidSetCoefficient(S:table, Gains:string, Value)
         case "proportional",
             S["Proportional", number] = Value
             S["Internal P Gain", number] = S["Proportional", number] * S["Scale", number]
-            return S["Proportional", number]
-        break
+        return S["Proportional", number]
 
         case "ki",
         case "pidf coefficient ki",
         case "integral",
             S["Integral", number] = Value
             S["Internal I Gain", number] = (S["Integral", number] * S["Scale", number]) * MillisToSeconds
-            return S["Integral", number]
-        break
+        return S["Integral", number]
 
         case "kd",
         case "pidf coefficient kd",
         case "derivative",
             S["Derivative", number] = Value
             S["Internal D Gain", number] = (S["Derivative", number] * S["Scale", number]) / MillisToSeconds
-            return S["Derivative", number]
-        break
+        return S["Derivative", number]
 
         case "kf",
         case "pidf coefficient kf primary",
         case "primary feedforward",
             S["PIDF Coefficient Kf Primary", number] = Value
             S["Internal FF Primary", number] = S["PIDF Coefficient Kf Primary", number] / 100
-            return S["PIDF Coefficient Kf Primary", number]
-        break
+        return S["PIDF Coefficient Kf Primary", number]
 
         case "kf accel",
         case "pidf coefficient kf acceleration",
         case "acceleration feedforward",
             S["PIDF Coefficient Kf Acceleration", number] = Value 
             S["Internal FF Accel", number] = S["PIDF Coefficient Kf Acceleration", number] * S["Scale", number]
-            return S["PIDF Coefficient Kf Acceleration", number]
-        break
+        return S["PIDF Coefficient Kf Acceleration", number]
 
         case "kf yaw rate",
         case "pidf coefficient kf yaw rate",
         case "yaw rate feedforward",
             S["PIDF Coefficient Kf Yaw Rate", number] = Value
             S["Internal FF Yaw Rate", number] = S["PIDF Coefficient Kf Yaw Rate", number] * S["Scale", number]
-            return S["PIDF Coefficient Kf Yaw Rate", number]
-        break
+        return S["PIDF Coefficient Kf Yaw Rate", number]
 
         case "kf pit ang",
         case "pidf coefficient kf pitch angle",
         case "pitch angle feedforward",
             S["PIDF Coefficient Kf Pitch Angle", number] = Value
             S["Internal FF Pitch Angle", number] = S["PIDF Coefficient Kf Pitch Angle", number] * S["Scale", number]
-            return S["PIDF Coefficient Kf Pitch Angle", number]
-        break
+        return S["PIDF Coefficient Kf Pitch Angle", number]
 
         case "kf hill climb/descent",
         case "pidf coefficient kf hill climb/descent",
         case "hill climb/descent feedforward",
             S["PIDF Coefficient Kf Hill Climb/Descent", number] = Value
             S["Internal FF Hill Climb/Descent", number] = S["PIDF Coefficient Kf Hill Climb/Descent", number] * S["Scale", number]
-            return S["PIDF Coefficient Kf Hill Climb/Descent", number]
+        return S["PIDF Coefficient Kf Hill Climb/Descent", number]
 
         case "kf thr",
         case "pidf coefficient kf throttle",
         case "throttle feedforward",
             S["PIDF Coefficient Kf Throttle", number] = Value
             S["Internal FF Thr", number] = S["PIDF Coefficient Kf Throttle", number] * S["Scale", number]
-            return S["PIDF Coefficient Kf Throttle", number]
-        break
+        return S["PIDF Coefficient Kf Throttle", number]
 
         case "kf brk",
         case "pidf coefficient kf brake",
         case "brake feedforward",
             S["PIDF Coefficient Kf Brake", number] = Value
             S["Internal FF Brk", number] = S["PIDF Coefficient Kf Brake", number] * S["Scale", number]
-            return S["PIDF Coefficient Kf Brake", number]
-        break
+        return S["PIDF Coefficient Kf Brake", number]
 
         default,
-            return 0
-        break
+        return 0
     }
 }
 
@@ -368,8 +358,7 @@ function number pidSetMode(S:table, M:string)
     {
         case "manual",
             S["Mode", number] = 0
-            return 1
-        break
+        return 1
 
         case "automatic",
             if (S["Mode", number] == 0)
@@ -377,12 +366,10 @@ function number pidSetMode(S:table, M:string)
                 pidInitialize(S)
             }
             S["Mode", number] = 1
-            return 1
-        break
+        return 1
 
         default,
-            return 0
-        break
+        return 0
     }
 }
 
