@@ -27,7 +27,7 @@
 @persist EmBrakeState EmBrakeThisSpeed EmBrakeLastSpeed EmBrakeObserverTickInterval EmBrakePCFaultTimeoutSet
 @persist Speed SpeedAbs SpeedMPH
 @persist DupeTickInterval DupeIsLoading DupeIsFinished RailDriverState
-@outputs Debugger:table DbgAcceleration:vector [DbgAngulerVelocity DbgOrientation]:angle DbgGradient DbgHillClimbDescentFF
+@outputs Debugger:table DbgAcceleration:vector [DbgAngularVelocity DbgOrientation]:angle DbgGradient DbgHillClimbDescentFF
 @strict
 
 if (duped())
