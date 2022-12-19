@@ -553,7 +553,7 @@ function void pidSetHillClimbDescentFeedforward(S:table, HillClimbDescentData:ar
 # Temporary placement of I Term Relax function, until I can decide to yeet it later.
 # Yes, I took this function from RotorFlight & adapted it to RailDriver.
 # If you would like to check out RotorFlight, visit their GitHub.
-function number pidSetItermRelax(S:table, Iterm, ItermErrorRate, ProcessVariable, SetPoint)
+function number pidSetItermRelax(S:table, Iterm, ItermErrorRate, SetPoint)
 {
     local ItermRelaxFactor = max(0, 1.0 - SetPoint / S["I-Term Relax Threshold", number])
 
@@ -668,7 +668,7 @@ function number pidCalculate(S:table)
             local ItermErrorRate = (ITermError - S["Last Error", number]) / TimeDelta
 
             # Calculate I Term Relax.
-            ItermErrorRate = pidSetItermRelax(S, S["I-Term", number], ItermErrorRate, S["Process Variable", number], S["Set Point", number])
+            ItermErrorRate = pidSetItermRelax(S, S["I-Term", number], ItermErrorRate, S["Set Point", number])
 
             # Calculate I Term.
             S["I-Term", number] = S["I-Term", number] + (ItermErrorRate * TimeDelta)

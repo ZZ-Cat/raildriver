@@ -20,7 +20,6 @@
 
 @name RailDriver/lib/smartEntityManagement
 @persist SemE2Locked [SemE2IsWeldedTo SemE2IsParentedTo SemE2]:entity
-@persist SemBrakeForceCoefficient
 
 function number semInit()
 {
@@ -205,7 +204,7 @@ function number semValidateTrucks(Trucks:array)
 
 # This function is used to directly control the locomotive trucks' traction motors.
 # Currently, it is used by RailDriver to temporarily bypass the 'semControlTrucks()' function below this one.
-function number semDirectControlTrucks(Trucks:array, PIDFOutput:number, Reverser:number)
+function number semDirectControlTrucks(Trucks:array, PIDFOutput:number)
 {
     if (!semValidateTrucks(Trucks))
     {
@@ -213,13 +212,11 @@ function number semDirectControlTrucks(Trucks:array, PIDFOutput:number, Reverser
     }
 
     # Calculate the traction motor output.
-    local MotorOutput = PIDFOutput # * Reverser
+    local MotorOutput = PIDFOutput
 
     # Apply the traction motor output to the trucks.
     Trucks[1, entity]:applyForce(Trucks[1, entity]:toWorldAxis(vec(0, -MotorOutput, 0)))
     Trucks[2, entity]:applyForce(Trucks[2, entity]:toWorldAxis(vec(0, MotorOutput, 0)))
-    #Trucks[1, entity]:applyForceCenter(Trucks[1, entity]:getForward() * MotorOutput)
-    #Trucks[2, entity]:applyForceCenter(Trucks[2, entity]:getForward() * MotorOutput)
     return 1
 }
 
