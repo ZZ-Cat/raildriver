@@ -19,8 +19,6 @@
 ]#
 
 @name RailDriver/lib/controls/playerControls
-@persist PCDirection PCThrottle PCBrake PCEmergencyBrake PCHorn PCHeadlights PCDitchLights
-@persist PCTrainDriver:entity
 
 function table encodeKeyboardControls(KeyboardControls:table)
 {
@@ -684,10 +682,10 @@ function number playerControlsUpdate(Controls:table)
     local IncreaseBrake = Driver:keyPressed(KeyboardControls["Increase Brake Key", string]) & (KeyboardControls["Increase Brake has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Increase Brake Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
     local DecreaseBrake = Driver:keyPressed(KeyboardControls["Decrease Brake Key", string]) & (KeyboardControls["Decrease Brake has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Decrease Brake Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
     local EmergencyBrake = Driver:keyPressed(KeyboardControls["Emergency Brake Key", string]) & (KeyboardControls["Emergency Brake has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Emergency Brake Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
-    local Horn = Driver:keyPressed(KeyboardControls["Horn Key", string]) & (KeyboardControls["Horn has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Horn Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
-    local Bell = Driver:keyPressed(KeyboardControls["Bell Key", string]) & (KeyboardControls["Bell has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Bell Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
-    local Headlights = Driver:keyPressed(KeyboardControls["Headlights Key", string]) & (KeyboardControls["Headlights has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Headlights Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
-    local DitchLights = Driver:keyPressed(KeyboardControls["Ditch Lights Key", string]) & (KeyboardControls["Ditch Lights has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Ditch Lights Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
+    # local Horn = Driver:keyPressed(KeyboardControls["Horn Key", string]) & (KeyboardControls["Horn has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Horn Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
+    # local Bell = Driver:keyPressed(KeyboardControls["Bell Key", string]) & (KeyboardControls["Bell has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Bell Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
+    # local Headlights = Driver:keyPressed(KeyboardControls["Headlights Key", string]) & (KeyboardControls["Headlights has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Headlights Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
+    # local DitchLights = Driver:keyPressed(KeyboardControls["Ditch Lights Key", string]) & (KeyboardControls["Ditch Lights has Modifier", number] ? (Driver:keyPressed(KeyboardControls["Ditch Lights Modifier", string]) & ModifierKeyPressed) : !ModifierKeyPressed)
 
     # Update the direction.
     if (IncreaseDirection & !DecreaseDirection)
@@ -981,7 +979,7 @@ function number playerControlsValid(Controls:table, Speed)
             {
                 # Advise the player that they need to set the Direction to its Last Valid Direction, whether it be Forward, Neutral or Reverse.
                 local LastValidDirection = Controls["Last Valid Direction", number] == 1 ? "Forward" : Controls["Last Valid Direction", number] == -1 ? "Reverse" : "Neutral"
-                Controls["Faults", table]["Message", string] = "Direction Fault: Direction needs to be set to " + Controls["Last Valid Direction", number] + "."
+                Controls["Faults", table]["Message", string] = "Direction Fault: Direction needs to be set to " + LastValidDirection + "."
 
                 # Clear the Direction is Updated & Player Controls Updated flags.
                 Controls["Flags", table]["Direction is Updated", number] = 0

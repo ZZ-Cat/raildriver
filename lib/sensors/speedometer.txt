@@ -132,6 +132,9 @@ function void speedometerFilterTimeConstant(S:table, CutoffFrequency)
 # This is done to ensure that the filter's cutoff frequency is correct.
 function number speedometerFilterCutoffFrequency(S:table, Coefficient, TimeConstant)
 {
+    # Speedometer Handle is unused.
+    S:clear()
+
     # The filter's cutoff frequency is calculated from the filter's coefficient and time constant.
     local CutoffFrequency = 0
     CutoffFrequency = 1 / (2 * pi() * Coefficient * TimeConstant)

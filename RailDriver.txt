@@ -19,14 +19,15 @@
 @name RailDriver
 @model models/beer/wiremod/gate_e2_nano.mdl
 @persist Trucks:array Speedo:table NDOF:table
-@persist [Direction Throttle Brake EmergencyBrake]:number
+# @persist Brake
+@persist [Direction Throttle EmergencyBrake]:number
 @persist [OTALocal CLI PlayerControls ThrottleMap BrakeMap]:table TrainDriver:entity
 @persist PIDF:table
 @persist HillClimbDescentData:array
 @persist EmBrakeState EmBrakeThisSpeed EmBrakeLastSpeed EmBrakeObserverTickInterval EmBrakePCFaultTimeoutSet
 @persist Speed SpeedAbs SpeedMPH
-@persist DupeTickInterval DupeIsLoading DupeIsFinished RailDriverIsReady RailDriverIsInitialized RailDriverState
-@outputs Debugger:table DbgAcceleration:vector [DbgAngulerVelocity DbgOrientation]:angle DbgGradient DbgHillClimbDescentFF
+@persist DupeTickInterval DupeIsLoading DupeIsFinished RailDriverState
+@outputs Debugger:table DbgAcceleration:vector [DbgAngularVelocity DbgOrientation]:angle DbgGradient DbgHillClimbDescentFF
 @strict
 
 if (duped())
@@ -141,6 +142,7 @@ if (RailDriverState == 1)
         }
 
         # Initialize Speedometer.
+        SpeedAbs = 0
         Speedo = speedometerInit(Trucks[1, entity], Trucks[2, entity])
         if (Speedo:count() == 8)
         {
@@ -167,10 +169,13 @@ if (RailDriverState == 1)
         }
 
         # Setup throttle and brake maps.
+        ThrottleMap = table()
         ThrottleMap["Throttle Input Type", string] = "Velocity"
         ThrottleMap["Velocity Setpoint", array] = array(0, 5, 15, 20, 30, 40, 60)
         ThrottleMap["Acceleration Setpoint", array] = array(0, 0.5, 1, 1.5, 2, 2.5, 3)
         ThrottleMap["Torque Setpoint", array] = array(0, 1000, 2000, 3000, 4000, 5000, 6000)
+
+        BrakeMap = table()
         BrakeMap["Brake Input Type", string] = "Velocity"
         BrakeMap["Velocity Setpoint", array] = array(0, 0, 0, 0, 0, 0, 0)
         BrakeMap["Deceleration Setpoint", array] = array(0, -0.5, -1, -1.5, -2, -2.5, -3)
@@ -199,8 +204,9 @@ if (RailDriverState == 1)
 
         Direction = 0
         Throttle = 1
-        Brake = 1
+        # Brake = 1
         EmergencyBrake = 0
+        EmBrakePCFaultTimeoutSet = 0
 
         # Initialize the PIDF Controller.
         PIDF = pidCreateInstance()
@@ -250,6 +256,7 @@ if (RailDriverState == 1)
             timer("Chat Print", 2200)
         }
 
+        Debugger = table()
         timer("Debug", 100)
 
         #[
@@ -602,7 +609,7 @@ elseif (RailDriverState == 2)
             ]#
 
             # Apply the PIDF Controller's output directly to the locomotive's traction motors.
-            if (!semDirectControlTrucks(Trucks, PIDFOutput, Direction))
+            if (!semDirectControlTrucks(Trucks, PIDFOutput))
             {
                 #[ 
                     Notes from ZZ Cat:
@@ -683,7 +690,7 @@ elseif (RailDriverState == 2)
 
                 if (playerControlsBrakeIsUpdated(PlayerControls))
                 {
-                    Brake = playerControlsGetBrake(PlayerControls)
+                    # Brake = playerControlsGetBrake(PlayerControls)
 
                     # Brake currently is not used.
                     # So, I'm gonna let it silently do nothing. =^/.~=
@@ -867,7 +874,7 @@ elseif (RailDriverState == 2)
                 runOnTick(0)
 
                 # Set the locomotive's traction motors to 0.
-                semDirectControlTrucks(Trucks, 0, Direction)
+                semDirectControlTrucks(Trucks, 0)
 
                 # Set the locomotive's brakes to 100%.
                 semDirectControlBrakes(Trucks, 2)
@@ -917,7 +924,7 @@ elseif (RailDriverState == 2)
                     playerControlsClearEmergencyBrakeIsActive(PlayerControls)
 
                     # Set the locomotive's traction motors to 0.
-                    semDirectControlTrucks(Trucks, 0, Direction)
+                    semDirectControlTrucks(Trucks, 0)
 
                     # Set the locomotive's brakes to 0.
                     semDirectControlBrakes(Trucks, 0)
@@ -1010,7 +1017,7 @@ elseif (RailDriverState == 2)
                     runOnTick(0)
 
                     # Set the locomotive's traction motors to 0.
-                    semDirectControlTrucks(Trucks, 0, Direction)
+                    semDirectControlTrucks(Trucks, 0)
 
                     # Set the locomotive's brakes to 100%.
                     semDirectControlBrakes(Trucks, 2)
@@ -1030,7 +1037,7 @@ elseif (RailDriverState == 2)
                     runOnTick(1)
 
                     # Set the locomotive's traction motors to 0.
-                    semDirectControlTrucks(Trucks, 0, Direction)
+                    semDirectControlTrucks(Trucks, 0)
 
                     # Set the locomotive's brakes to 0.
                     semDirectControlBrakes(Trucks, 0)

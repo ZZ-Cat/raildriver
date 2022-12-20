@@ -145,7 +145,7 @@ function array ndofGetSensorValues(Ndof:table)
 {
     local SensorValues = array(vec(), ang(), ang())
     local T1 = Ndof["Differential Input - Positive", entity]
-    local T2 = Ndof["Differential Input - Negative", entity]
+    # local T2 = Ndof["Differential Input - Negative", entity]
 
     # Acceleration
     local Acceleration = vec()

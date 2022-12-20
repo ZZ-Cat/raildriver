@@ -1,0 +1,128 @@
+#[
+    Events
+
+    Events are set to replace the old clk() system. They are much more efficient and easier to use.
+    Events are easier to use because you can use them in any order, and they are more efficient because
+    they are only called when they are needed, as opposed to the old clk() system, which polled an internal
+    variable to see if the function should be executed.
+
+    The following events are available:
+    - chat(s, s, n) - Called when a chat message is received. This replaces runOnChat(n) & chatClk().
+    - chipUsed(e) - Called when the E2 is used. This replaces runOnUse(n) & useClk().
+    - fileErrored(s, n) - Called when a file fails to load. This replaces runOnFile(n) & fileClk().
+    - fileLoaded(s, s) - Called when a file is loaded. This replaces the same functions as above.
+    - httpErrored(s, s) - Called when an HTTP request fails. This replaces runOnHTTP(n) & httpClk().
+    - httpLoaded(s, n, s) - Called when an HTTP request is successful. This replaces the same functions as above.
+    - input(s) - Called when a wire input is received. This replaces inputClk().
+    - playerConnect(e) - Called when a player connects. This replaces runOnPlayerConnect(n) & playerConnectClk().
+    - playerDeath(e, e, e) - Called when a player dies. This replaces runOnDeath(n) & deathClk().
+    - playerDisconnect(e) - Called when a player disconnects. This replaces runOnPlayerDisconnect(n) & playerDisconnectClk().
+    - playerSpawn(e) - Called when a player spawns. This replaces runOnSpawn(n) & spawnClk().
+    - removed(n) - Called when the E2 is removed. This replaces runOnLast(n), last() & removing().
+    - tick() - Called every tick. This replaces runOnTick(n) & tickClk().
+
+    The following events are not yet available, as they are niche uses, but Wiremod may add them in the future
+    if there is enough demand:
+    - clk() - The entire timer library will be rewritten to include lambda functions.
+    - dsClk()
+    - egpQueueClk()
+    - fileListClk()
+
+    Additionally, this script uses a state machine to make this E2 compatible with the Advanced Duplicator 2 tool.
+    This means that the E2 will not initialize & run its main code until the duplicator has finished spawning the E2.
+    The advantage here is that the E2 will function reliably when spawned by the Advanced Duplicator 2 tool.
+
+    Two sections in this script are highlighted where you can write your initialization code & main code.
+    The initialization section is highlighted by the comment "# Initialization code goes here".
+    The main section is highlighted by the comment "# Main code goes here".
+    Initialization code is only run once, when the E2 is first spawned, duplicated, or reloaded.
+    Main code is run every tick, and is the main code that you will be writing.
+    If you have any includes, they should be placed in the initialization section.
+    You can use functions from your includes in the main section as well as the initialization section.
+
+    For more information, please see the following links:
+    - https://github.com/wiremot/wire/pull/2452
+    - https://github.com/wiremod/wire/wiki/Expression-2-Syntax#Events-new
+]#
+
+@name Events
+@persist DupeTickInterval DupeIsLoading DupeIsFinished MainState
+@strict
+
+if (duped())
+{
+    DupeIsLoading = 1
+    DupeIsFinished = 0
+    DupeTickInterval = tickInterval() * 1000
+    MainState = 0
+    timer("Dupe Timer", DupeTickInterval)
+}
+elseif (dupefinished())
+{
+    DupeIsLoading = 0
+    DupeIsFinished = 1
+    MainState = 0
+}
+elseif (clk("Dupe Timer"))
+{
+    try
+    {
+        stoptimer("Dupe Timer")
+
+        if (DupeIsLoading & !DupeIsFinished)
+        {
+            timer("Dupe Timer", DupeTickInterval)
+        }
+        elseif (!DupeIsLoading & DupeIsFinished)
+        {
+            reset()
+        }
+        else
+        {
+            error("Events failed to load.")
+        }
+    }
+    catch(Exception)
+    {
+        MainState = 0
+        printColor(vec(255, 0, 0), "[Events | ERROR]", vec(255, 255, 255), ": " + Exception)
+    }
+}
+elseif (first())
+{
+    MainState = 1
+    printColor(vec(220, 255, 0), "[Events]", vec(255, 255, 255), ": Initializing...")
+}
+
+if (MainState == 1)
+{
+    try
+    {
+        # Initialization code goes here
+
+        MainState = 2
+        printColor(vec(220, 255, 0), "[Events]", vec(255, 255, 255), ": Initialized.")
+    }
+    catch (Exception)
+    {
+        MainState = 0
+        printColor(vec(255, 0, 0), "[Events | Init | ERROR]", vec(255, 255, 255), ": " + Exception)
+    }
+}
+elseif (MainState == 2)
+{
+    event tick()
+    {
+        try
+        {
+            # Main code goes here
+            local F = randint(0, 255)
+            assert(F, "This is an error.")
+        }
+        catch (Exception)
+        {
+            MainState = 0
+            printColor(vec(255, 0, 0), "[Events | Main | ERROR]", vec(255, 255, 255), ": " + Exception)
+        }
+    }
+}
