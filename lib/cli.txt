@@ -309,6 +309,9 @@ function table cliInit(CliPrefix:string)
     # Register the help command.
     Cli["Commands", table]["help", table] = table()
     Cli["Commands", table]["help", table]["Arguments", array] = array()
+    Cli["Commands", table]["update", table]["Arguments Count", number] = 0
+    Cli["Commands", table]["update", table]["Arguments List", array] = array()
+    Cli["Commands", table]["update", table]["Arguments List Count", number] = 0
     Cli["Commands", table]["help", table]["help", string] = "Displays this help message."
     Cli["Commands", table]["Flags", table]["help is updated", number] = 0
 
@@ -321,19 +324,29 @@ function table cliInit(CliPrefix:string)
     # Register the controls command.
     Cli["Commands", table]["controls", table] = table()
     Cli["Commands", table]["controls", table]["Arguments", array] = array()
+    Cli["Commands", table]["update", table]["Arguments Count", number] = 0
+    Cli["Commands", table]["update", table]["Arguments List", array] = array()
+    Cli["Commands", table]["update", table]["Arguments List Count", number] = 0
     Cli["Commands", table]["controls", table]["help", string] = "Displays a list of available player controls."
     Cli["Commands", table]["Flags", table]["controls is updated", number] = 0
 
     # Register the restart command.
     Cli["Commands", table]["restart", table] = table()
     Cli["Commands", table]["restart", table]["Arguments", array] = array()
+    Cli["Commands", table]["update", table]["Arguments Count", number] = 0
+    Cli["Commands", table]["update", table]["Arguments List", array] = array()
+    Cli["Commands", table]["update", table]["Arguments List Count", number] = 0
     Cli["Commands", table]["restart", table]["help", string] = "Restarts RailDriver."
     Cli["Commands", table]["Flags", table]["restart is updated", number] = 0
 
     # Register the update command with the argument "local".
     Cli["Commands", table]["update", table] = table()
     Cli["Commands", table]["update", table]["Arguments", array] = array()
-    Cli["Commands", table]["update", table]["Arguments", array]:pushString("local")
+    Cli["Commands", table]["update", table]["Arguments Count", number] = 1
+    Cli["Commands", table]["update", table]["Arguments List", array] = array()
+    Cli["Commands", table]["update", table]["Arguments List", array]:pushString("local")
+    Cli["Commands", table]["update", table]["Arguments List", array]:pushString("online")
+    Cli["Commands", table]["update", table]["Arguments List Count", number] = 2
     Cli["Commands", table]["update", table]["help", string] = "Uses Over-The-Air Updates to update RailDriver.\n  Arguments:\n    local - Updates RailDriver from your e2shared folder.\n    online - Coming soon."
     Cli["Commands", table]["Flags", table]["update is updated", number] = 0
 
@@ -349,6 +362,16 @@ function table cliInit(CliPrefix:string)
 # @return true if the command was registered successfully, false otherwise.
 function number cliRegisterCommand(Cli:table, Command:string, Arguments:array, Help:string)
 {
+    # Command & arguments are case-insensitive.
+    Command = Command:lower()
+    if (Arguments:count() > 0)
+    {
+        for (I = 1, Arguments:count())
+        {
+            Arguments[I, string] = Arguments[I, string]:lower()
+        }
+    }
+
     # Check if the command already exists.
     if (Cli["Commands", table]:exists(Command) == 1)
     {
@@ -373,6 +396,9 @@ function number cliRegisterCommand(Cli:table, Command:string, Arguments:array, H
 # @return true if the command was unregistered successfully, false otherwise.
 function number cliUnregisterCommand(Cli:table, Command:string)
 {
+    # Command is case-insensitive.
+    Command = Command:lower()    
+
     # Check if the command exists.
     if (Cli["Commands", table]:exists(Command) != 1)
     {
@@ -381,14 +407,32 @@ function number cliUnregisterCommand(Cli:table, Command:string)
         return 0
     }
 
-    # Unregister the command, argumants, help text, and flags.
-    Cli["Commands", table][Command, table] = table()
-    Cli["Commands", table][Command, table]["Arguments", array] = array()
-    Cli["Commands", table][Command, table]["help", string] = ""
-    Cli["Commands", table]["Flags", table][Command + " is updated", number] = 0
+    # Unregister the command, arguments, help text, and flags.
+    Cli["Commands", table]:remove(Command)
+    Cli["Commands", table]["Flags", table]:remove(Command + " is updated")
 
     # Return success.
     return 1
+}
+
+# This function is called by the RailDriver E2 script to check if a command exists.
+# @param Cli A handle to the CLI library.
+# @param Command The command to check.
+# @return true if the command exists, false otherwise.
+function number cliCommandExists(Cli:table, Command:string)
+{
+    # Command is case-insensitive.
+    Command = Command:lower()
+
+    # Check if the command exists.
+    if (Cli["Commands", table]:exists(Command) == 1 & Cli["Commands", table][Command, table]:count() > 0)
+    {
+        # The command exists.
+        return 1
+    }
+
+    # The command does not exist.
+    return 0
 }
 
 # This function is called by the RailDriver E2 script to check if a command has been updated.
@@ -589,7 +633,7 @@ function number cliProcessMessage(Cli:table, Message:string)
     }
 
     # Check if the command has any arguments.
-    if (Arguments:count() > 0 & Cli["Commands", table][Command, table]["Arguments", array]:count() == 0)
+    if (Arguments:count() > 0 & Cli["Commands", table][Command, table]["Arguments Count", number] == 0)
     {
         # The command does not accept any arguments.
         printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Command '" + Command + "' does not accept any arguments.")
@@ -597,21 +641,44 @@ function number cliProcessMessage(Cli:table, Message:string)
     }
 
     # Check if the command has the correct number of arguments.
-    if (Arguments:count() != Cli["Commands", table][Command, table]["Arguments", array]:count())
+    if (Arguments:count() != Cli["Commands", table][Command, table]["Arguments Count", number])
     {
         # The command does not have the correct number of arguments.
-        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Command '" + Command + "' requires " + Cli["Commands", table][Command, table]["Arguments", array]:count() + " argument(s).")
+        printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Command '" + Command + "' requires " + Cli["Commands", table][Command, table]["Arguments Count", number] + " argument(s).")
         return 0
     }
 
-    # Check if the arguments are valid.
-    for (I = 1, Arguments:count())
+    # Check if the command has any arguments.
+    if (Arguments:count() > 0)
     {
+        # Check if the arguments are valid.
+        local ArgumentIsValid = 0
+        local InvalidArgument = ""
+        for (I = 1, Arguments:count())
+        {
+            # Check if the argument is valid.
+            for(J = 1, Cli["Commands", table][Command, table]["Arguments List", array]:count())
+            {
+                if (Arguments[I, string] == Cli["Commands", table][Command, table]["Arguments List", array][J, string])
+                {
+                    ArgumentIsValid = 1
+                    break
+                }
+            }
+
+            # Get the invalid argument.
+            if (ArgumentIsValid == 0)
+            {
+                InvalidArgument = Arguments[I, string]
+                break
+            }
+        }
+
         # Check if the argument is valid.
-        if (Cli["Commands", table][Command, table]["Arguments", array][I, string]:find(Arguments[I, string]) == 0)
+        if (ArgumentIsValid == 0)
         {
             # The argument is not valid.
-            printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Argument '" + Arguments[I, string] + "' is not valid for command '" + Command + "'.")
+            printColor(vec(255, 0, 0), "[RailDriver | cli | ERROR]", vec(255, 255, 255), ": Argument '" + InvalidArgument + "' is not valid for command '" + Command + "'.")
             return 0
         }
     }

@@ -21,7 +21,7 @@
 @persist Trucks:array Speedo:table NDOF:table
 # @persist Brake
 @persist [Direction Throttle EmergencyBrake]:number
-@persist [OTALocal CLI PlayerControls ThrottleMap BrakeMap]:table TrainDriver:entity
+@persist [OTALocal OTAOnline OTAOnline CLI PlayerControls ThrottleMap BrakeMap]:table TrainDriver:entity
 @persist PIDF:table
 @persist HillClimbDescentData:array
 @persist EmBrakeState EmBrakeThisSpeed EmBrakeLastSpeed EmBrakeObserverTickInterval EmBrakePCFaultTimeoutSet
@@ -30,6 +30,8 @@
 @outputs Debugger:table DbgAcceleration:vector [DbgAngularVelocity DbgOrientation]:angle DbgGradient DbgHillClimbDescentFF
 @strict
 
+# Monitor Advanced Duplicator 2 for Dupe loading.
+# This resolves a bug (#30) where RailDriver would not initialize properly after a Dupe is loaded.
 if (duped())
 {
     DupeIsLoading = 1
@@ -76,6 +78,8 @@ elseif (first())
     RailDriverState = 1
 }
 
+# New RailDriver initialization sequence uses a state machine.
+# This ensures that RailDriver initializes properly, even after a Dupe is loaded.
 if (RailDriverState == 1)
 {
     local PIDCoefficientKp = 1020
@@ -99,6 +103,7 @@ if (RailDriverState == 1)
     try
     {
         #include "e2shared/RailDriver/lib/ota/local"
+        #include "e2shared/RailDriver/lib/ota/remote"
         #include "e2shared/RailDriver/lib/smartEntityManagement"
         #include "e2shared/RailDriver/lib/sensors/ndof"
         #include "e2shared/RailDriver/lib/sensors/speedometer"
@@ -242,13 +247,17 @@ if (RailDriverState == 1)
             error("Failed to initialize PIDF controller.")
         }
 
-        # Initialize OTA.
+        # Initialize Local OTA Updates.
         OTALocal = otaLocalInit()
         if (OTALocal:count() == 0)
         {
             error("Failed to initialize local Over The Air (OTA) Updates.")
         }
         otaLocalLoadVersionFile(OTALocal)
+
+        # Initialize Online OTA Updates.
+        OTAOnline = otaOnlineInit()
+        assert(OTAOnline:count() != 0, "Failed to initialize online Over The Air (OTA) Updates.")
 
         # Show the RailDriver welcome message.
         if (cliPrintToChat(CLI, "info", "Welcome to RailDriver!\nType '.raildriver help' for a list of commands."))
@@ -280,12 +289,44 @@ if (RailDriverState == 1)
     catch (Exception)
     {
         RailDriverState = 0
+        stopAllTimers()
+        runOnKeys(TrainDriver, 0)
+        runOnTick(0)
         printColor(vec(255, 0, 0), "[RailDriver | Init | Error]", vec(255, 255, 255), ": " + Exception)
     }
 }
 
+# New RailDriver running state.
+# This state is entered after RailDriver has been initialized successfully.
+# If the initialization fails, RailDriver will not enter this state.
 elseif (RailDriverState == 2)
 {
+    if (clk(otaOnlineGetClockID(OTAOnline)))
+    {
+        try
+        {
+            otaOnlineSendRequestHandler(OTAOnline)
+        }
+
+        catch (Exception)
+        {
+            printColor(vec(255, 0, 0), "[RailDriver | Http | Error]", vec(255, 255, 255), ": " + Exception)
+        }
+    }
+
+    if (httpClk())
+    {
+        try
+        {
+            otaOnlineReceiveResponseHandler(OTAOnline)
+        }
+
+        catch (Exception)
+        {
+            printColor(vec(255, 0, 0), "[RailDriver | Http | Error]", vec(255, 255, 255), ": " + Exception)
+        }
+    }
+
     if (clk(otaLocalGetClockID(OTALocal)))
     {
         try
@@ -330,11 +371,11 @@ elseif (RailDriverState == 2)
                 Message += "Commands:\n"
                 Message += "All commands are prefixed with '.raildriver',\n"
                 Message += "and are case-insensitive.\n"
-                Message += "help - " + cliGetHelp(CLI, "help") + "\n"
-                Message += "about - " + cliGetHelp(CLI, "about") + "\n"
-                Message += "controls - " + cliGetHelp(CLI, "controls") + "\n"
-                Message += "restart - " + cliGetHelp(CLI, "restart") + "\n"
-                Message += "update - " + cliGetHelp(CLI, "update") + "\n"
+                Message += cliCommandExists(CLI, "help") ? "help - " + cliGetHelp(CLI, "help") + "\n" : ""
+                Message += cliCommandExists(CLI, "about") ? "about - " + cliGetHelp(CLI, "about") + "\n" : ""
+                Message += cliCommandExists(CLI, "controls") ? "controls - " + cliGetHelp(CLI, "controls") + "\n" : ""
+                Message += cliCommandExists(CLI, "restart") ? "restart - " + cliGetHelp(CLI, "restart") + "\n" : ""
+                Message += cliCommandExists(CLI, "update") ? "update - " + cliGetHelp(CLI, "update") + "\n" : ""
 
                 if (cliPrintToChat(CLI, "help", Message))
                 {
@@ -395,7 +436,6 @@ elseif (RailDriverState == 2)
                     if (cliPrintToChat(CLI, "restart", "Restarting..."))
                     {
                         runOnChat(0)
-                        runOnTick(0)
                         runOnKeys(TrainDriver, 0)
                         stopAllTimers()
                         timer("Chat Print", 100)
@@ -429,24 +469,16 @@ elseif (RailDriverState == 2)
 
                         Message += "Updating...\n"
 
+                        stopAllTimers()
+
                         # Update the E2 using the local version.
-                        if (otaLocalUploadRailDriver(OTALocal) == 1)
+                        # Formerly 'otaLocalUploadRailDriver(OTALocal)'
+                        if (otaLocalUpdateRailDriver(OTALocal) == 1)
                         {
-                            runOnChat(0)
+                            #runOnChat(0)
                             runOnTick(0)
                             runOnKeys(TrainDriver, 0)
-                            local Timers = getTimers()
-                            for (I = 1, Timers:count())
-                            {
-                                if (Timers[I, string] == otaLocalGetClockID(OTALocal))
-                                {
-                                    continue
-                                }
-                                else
-                                {
-                                    stoptimer(Timers[I, string])
-                                }
-                            }
+                            timer("OTA Updates Watchdog", 10000)
                         }
                         else
                         {
@@ -462,14 +494,43 @@ elseif (RailDriverState == 2)
                     # Check if the argument is 'online'.
                     elseif (Arguments[1, string] == "online")
                     {
+                        local Message = ""
+                        Message += "Online updates are a work in progress.\n"
+                        Message += "Please wait for version 1.0.0-RC1.\n"
+                        Message += "RailDriver is now waiting for the watchdog to expire...\n"
+
+                        stopAllTimers()
+
                         # Update the E2 using the online version.
-                        if (cliPrintToChat(CLI, "warning", "Online updates are not yet implemented."))
+                        if (otaOnlineUpdateRailDriver(OTAOnline, OTALocal) == 1)
+                        {
+                            runOnChat(0)
+                            runOnTick(0)
+                            runOnKeys(TrainDriver, 0)
+                            timer("OTA Updates Watchdog", 10000)
+                        }
+                        else
+                        {
+                            Message = "Unable to update RailDriver.\n"
+                        }
+
+                        if (cliPrintToChat(CLI, "error", Message))
                         {
                             timer("Chat Print", 100)
                         }
                     }
                 }
             }
+        }
+    }
+
+    if (clk("OTA Updates Watchdog"))
+    {
+        # Update failed.
+        if (cliPrintToChat(CLI, "error", "Unable to update RailDriver.\nOTA Updates Watchdog triggered.\nPlease wait while RailDriver restarts..."))
+        {
+            timer("Chat Print", 100)
+            timer("Restart", 5000)
         }
     }
 
@@ -909,7 +970,7 @@ elseif (RailDriverState == 2)
                 }
 
                 # If the locomotive is not stopped, set the Emergency Brake state to 5.
-                else
+                elseif (EmBrakeThisSpeed >= EmBrakeLastSpeed)
                 {
                     EmBrakeState = 5
                 }
@@ -952,34 +1013,12 @@ elseif (RailDriverState == 2)
                 semFreezeTrain()
                 semDirectControlBrakes(Trucks, 0)
 
-                # Disable RailDriver.
-                local Timers = getTimers()
-                for (I = 1, Timers:count())
-                {
-                    if (Timers[I, string] == speedometerGetClockId(Speedo))
-                    {
-                        continue
-                    }
-                    else
-                    {
-                        stoptimer(Timers[I, string])
-                    }
-                }
-                runOnKeys(TrainDriver, 0)
-                runOnTick(0)
+            # Set the Emergency Brake state to 0.
+            EmBrakeState = 0
 
-                # Set the Emergency Brake state to 0.
-                EmBrakeState = 0
-
-                # Unlock the RailDriver, so that it can be manually reset.
-                if (semE2IsLocked())
-                {
-                    semUnlockE2()
-                }
-
-                # Display an error message.
-                error("The train has been frozen due to a non-recoverable fault.")
-            }
+            # Display an error message.
+            error("The train has been frozen due to a non-recoverable fault.")
+        }
 
             # Emergency Brake state 6.
             # This state is for tuning the Emergency Brake.
@@ -1053,6 +1092,33 @@ elseif (RailDriverState == 2)
 
         catch(Exception)
         {
+
+        # Disable RailDriver.
+        local Timers = getTimers()
+        for (I = 1, Timers:count())
+        {
+            if (Timers[I, string] == speedometerGetClockId(Speedo))
+            {
+                continue
+            }
+            else
+            {
+                stoptimer(Timers[I, string])
+            }
+        }
+        runOnKeys(TrainDriver, 0)
+        runOnTick(0)
+
+        # Unregister CLI controls & update commands.
+        cliUnregisterCommand(CLI, "controls")
+        cliUnregisterCommand(CLI, "update")
+
+        # Unlock the RailDriver, so that it can be manually reset.
+        if (semE2IsLocked())
+        {
+            semUnlockE2()
+        }
+
             printColor(vec(255, 0, 0), "[RailDriver | EmBrake | Fatal Error]", vec(255, 255, 255), ": " + Exception)
         }
     }
