@@ -32,7 +32,7 @@ function table otaOnlineInit()
 {
     local Ota = table()
 
-    Ota["Online Updates Branch", string] = "Version-File-Scanning-Method-1"
+    Ota["Online Updates Branch", string] = "Over-The-Air-Updates_Part-2-of-2_Online"
     Ota["Version File URL", string] = ""
     Ota["Clock ID", string] = "RailDriver OTA Online Clock"
     Ota["Clock Delay", number] = 0
