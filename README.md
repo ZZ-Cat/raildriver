@@ -133,14 +133,9 @@ Increase your Tick Quota to at least 50,000 or higher by typing ```wire_expressi
 
 ## RailDriver-LTS
 
-RailDriver now has a version with [Long-Term Support](https://github.com/ZZ-Cat/RailDriver/tree/RailDriver-LTS).
+RailDriver-LTS can be found [here](https://github.com/ZZ-Cat/RailDriver/tree/RailDriver-LTS).
 
-I am aware that not all multiplayer servers keep their versions of Expression2 up-to-date with the latest releases.
-If you're seeing a compilation error regarding the ```@strict``` directive & the ```try``` & ```catch``` statements, or the ```httpRequest()``` functions, this is because the server that you're in is using a wickedly outdated version of Expression2 & the server owners haven't updated it in a _very_ long time. This is certainly the case for RailDriver's target server: [The Flatgrass Construct & Northern Railroad](https://steamcommunity.com/groups/Flatgrass_Construct_Railroad).
-
-To work around this issue, I have created a branch called [RailDriver-LTS](https://github.com/ZZ-Cat/RailDriver/tree/RailDriver-LTS). It is a version of RailDriver with long-term support, where It trades a certain level of reliability for maintaining backward-compatibility with Garry's Mod train build servers that would otherwise render RailDriver completely incompatible.
-
-Updates to RailDriver-LTS are exponentially less frequent when compared to the latest updates of its Main-Trunk counterpart, & (by extension) it is nowhere near as feature-rich either. This is because many of RailDriver's features rely on the very latest releases of Expression2. Thus, these features are intentionally omitted from RailDriver-LTS for compatiblity reasons.
+RailDriver-LTS offers Long-Term Support, & is backwards-compatible with Garry's Mod Train Build servers that are using legacy versions of Expression2. RailDriver-LTS is updated roughly once per year & when it's absolutely necessary to do so.
 
 ## Software License
 
