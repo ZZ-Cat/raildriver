@@ -31,31 +31,6 @@ All you need to do is spawn RailDriver's E2 chip on your locomotive's body & go!
 
 ## Installation
 
-Part 1 of 2 of Over-The-Air Updates is now [live](https://github.com/ZZ-Cat/RailDriver/pull/26)!
-Once you have placed RailDriver into your ```e2shared``` directory, you can use ```.raildriver update local``` to update RailDriver instead of using Expression2's editor & your toolgun to keep RailDriver updated.
-
-### Download RailDriver
-
-1. Click the green code button & hit "Download ZIP".
-2. Extract that to your directory. EG ```SteamLibrary\steamapps\common\GarrysMod\garrysmod\data\expression2```
-3. You _must_ put RailDriver into your Expression 2's ```e2shared``` folder in order for it to work correctly.
-Local OTA Updates are now live, & if RailDriver is anywhere _but_ your ```e2shared``` folder it _will not_ function & things will be broken.
-
-If you have already updated RailDriver since #26 has been merged, this is where you can use ```.raildriver update local``` in Garry's Mod's in-game chat to update RailDriver.
-If this is your first time installing RailDriver ever, follow the instructions in the section below.
-
-### Fire up Garry's Mod
-
-Now that Local OTA Updates are live, you only need to do this once-only, as RailDriver's Local OTA Updates can be used in place of this.
-
-This section takes place in your tool gun. So, make sure you have Expression2 selected.
-
-1. In your ```e2shared``` folder, double-click on the ```RailDriver``` folder, & double-click ```RailDriver.txt```.
-2. Aim your toolgun at your locomotive & spawn RailDriver's E2 chip in an inconspicuous spot.
-3. That's all there is to it.
-
-Once RailDriver has initialized, you will be greeted with ```Welcome to RailDriver!``` & ```Type '.raildriver help' for a list of commands.``` in Garry's Mod's in-game chat.
-
 ### When you use RailDriver
 
 Here's some helpful tips for when you're using RailDriver:
