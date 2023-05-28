@@ -34,51 +34,6 @@ All you need to do is spawn RailDriver's E2 chip on your locomotive's body & go!
 Part 1 of 2 of Over-The-Air Updates is now [live](https://github.com/ZZ-Cat/RailDriver/pull/26)!
 Once you have placed RailDriver into your ```e2shared``` directory, you can use ```.raildriver update local``` to update RailDriver instead of using Expression2's editor & your toolgun to keep RailDriver updated.
 
-### Prerequisites
-
-You need these before you can use RailDriver.
-
-- [Garry's Mod](https://store.steampowered.com/app/4000/Garrys_Mod)!
-- [Wiremod](https://steamcommunity.com/id/wireteam/myworkshopfiles/?appid=4000)!
-- [The FC&N Server Addons Pack](https://steamcommunity.com/sharedfiles/filedetails/?id=390798140).
-It's not imperative that you use literally everything in this addon pack.
-But, I highly recommend you at the _very least_ get the following items:
-  - [gm_sunsetgulch](https://steamcommunity.com/sharedfiles/filedetails/?id=311697867)
-    - If you go this route, you _will_ need to install [Half-Life 2: Episode 2](https://store.steampowered.com/app/420/HalfLife_2_EpisodeTwo) to see some of the texturess in that map.
-    - You _will_ also need [Magnum's Trakpak 2](https://steamcommunity.com/sharedfiles/filedetails/?id=391016040).
-  - [Grovestreetgman's Propper Trains](https://steamcommunity.com/sharedfiles/filedetails/?id=1195015027)
-  - [Grovestreetgman's Shared Textures](https://steamcommunity.com/sharedfiles/filedetails/?id=676234187)
-  - [Grovestreetgman's Train Parts](https://steamcommunity.com/sharedfiles/filedetails/?id=276309010)
-  - [Grovestreetgman's Train Sounds](https://steamcommunity.com/sharedfiles/filedetails/?id=240020348)
-  - [Magnum's Train Model Pack (Consolidated)](https://steamcommunity.com/sharedfiles/filedetails/?id=260954002)
-  - [Magnum's Trakpak 2](https://steamcommunity.com/sharedfiles/filedetails/?id=391016040)
-    - **NB:** This _is_ discontinued, but is still being maintained, & it is required if you want to run in Sunset Gulch.
-      [TrakPak 3](https://steamcommunity.com/sharedfiles/filedetails/?id=2379202601) is its successor.
-  - [The Big Propper Train Shared Texture Pack](https://steamcommunity.com/sharedfiles/filedetails/?id=1227050421)
-
-By rights, you should also at least have one locomotive already pre-made.
-If you don't have this, you need to do some prep-work:
-
-1. A locomotive body blank. I highly recommend starting off with an SD40.
-2. Your locomotive _must_ have a set of trucks _axis contrained_ to the body.
-The SD40 uses ```locobogey3.mdl```.
-You _can_ also use Advanced Ballsocket constraints on the trucks in place of the axis constraint,
-but this is known to cause stability & derailment issues.
-3. A Wire Gate attached to your locomotive's body. **DO NOT PARENT IT YET!**
-4. Your seat of choice frozen in place in the locomotive's cabin.
-5. Now, parent your seat to the Gate, & _then_ parent the gate to the Locomotive's body.
-
-RailDriver uses several Expression2 extensions that may be disabled by default.
-If this is the case, you need to enable the following extensions:
-
-- chatprint - This is used to alert you to any of RailDriver's errors.
-- file - This is used by Local OTA Updates.
-- http - When Online OTA Updates is implemented, this is how RailDriver will go about it.
-- propcore - For things like ```E:applyForce()```. Your locomotive will not go anywhere without it.
-- remoteupload - Local OTA Updates uses this to update RailDriver's E2 chip.
-- serialization - The Version File is encoded in .json format. RailDriver uses this to decode & encode the Version File.
-- vgui - Configurator will use this, when it is implemented in a future release.
-
 ### Download RailDriver
 
 1. Click the green code button & hit "Download ZIP".
