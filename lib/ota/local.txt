@@ -297,9 +297,6 @@ function void otaLocalLoadFileHandler(Ota:table)
 # @return number 1 if the player is a developer, 0 otherwise.
 function number otaLocalPlayerIsDeveloper(Ota:table, Data:table, Player:entity)
 {
-    # OTA Handle is unused.
-    Ota:clear()
-
     local ThisPerson = Player
     local ThisPersonSteamID = ThisPerson:steamID()
     local ThisPersonSteamID64 = steamIDTo64(ThisPersonSteamID)
