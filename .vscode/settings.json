@@ -6,6 +6,7 @@
     },
     "conventionalCommits.scopes": [
         "project-settings",
-        "readme"
+        "readme",
+        "ota-local"
     ]
 }
