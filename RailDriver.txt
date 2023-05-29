@@ -21,7 +21,7 @@
 @persist Trucks:array Speedo:table NDOF:table
 # @persist Brake
 @persist [Direction Throttle EmergencyBrake]:number
-@persist [OTALocal OTAOnline OTAOnline CLI PlayerControls ThrottleMap BrakeMap]:table TrainDriver:entity
+@persist [OTALocal OTAOnline CLI PlayerControls ThrottleMap BrakeMap]:table TrainDriver:entity
 @persist PIDF:table
 @persist HillClimbDescentData:array
 @persist EmBrakeState EmBrakeThisSpeed EmBrakeLastSpeed EmBrakeObserverTickInterval EmBrakePCFaultTimeoutSet
