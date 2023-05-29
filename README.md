@@ -29,6 +29,8 @@ My main target for this project is for those that want to just run their trains,
 The control interface is greatly simplified, & you have everything you need to get going within minutes of showing up in your favorite GMTB server.
 All you need to do is spawn RailDriver's E2 chip on your locomotive's body & go!
 
+All of RailDriver's documentation has moved to the [wiki](https://github.com/ZZ-Cat/RailDriver/wiki).
+
 ## RailDriver-LTS
 
 RailDriver-LTS can be found [here](https://github.com/ZZ-Cat/RailDriver/tree/RailDriver-LTS).
