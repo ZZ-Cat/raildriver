@@ -46,21 +46,6 @@ This is a convenience measure, as it provides peace-of-mind from would-be griefe
 - If you need to  update or restart RailDriver, stop your locomotive first.
 This will put RailDriver in a known state during the update & restart processes.
 
-### Notes about ops count & tick quotas
-
-RailDriver is reasonably computationally intensive for an Expression2 script.
-This is due to the fact that RailDriver uses a PIDF Control Loop to manage your locomotive's speed, throttle, braking, acceleration & deceleration. The control loop uses E2's ```tickClk()``` for execution, & the control loop is constantly running. Even when your locomotive has stopped.
-
-RailDriver's speedometer uses differential inputs that are sourced from your locomotive's bogeys & are converted into a single speed value. This value is then sent through a low-pass filter to reduce the amount of noise that is picked up by the bogeys.
-The control loop uses this speed value as its feedback to manage the locomotive's speed in a smooth & precise manner.
-
-There is a vast amount of checks-&-balances that are strategically placed throughout RailDriver's source code, that are constantly monitoring your locomotive's primary operations. This is to ensure RailDriver is running smoothly & reliably at all times.
-
-All of this equates to RailDriver's average ops count being around 1950~2000 ops. I strongly advise you either use ```wire_expression2_unlimited 1``` or you set your Expression2 soft & hard quotas accordingly.
-
-If you get a ```RailDriver Tick Quota Exceeded``` error, it is likely that your Tick Quota is too low.
-Increase your Tick Quota to at least 50,000 or higher by typing ```wire_expression2_quotatick 50000``` into Garry's Mod's console, followed by ```wire_expression2_reload```.
-
 ## RailDriver-LTS
 
 RailDriver-LTS can be found [here](https://github.com/ZZ-Cat/RailDriver/tree/RailDriver-LTS).
