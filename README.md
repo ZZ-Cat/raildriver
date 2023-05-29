@@ -29,23 +29,6 @@ My main target for this project is for those that want to just run their trains,
 The control interface is greatly simplified, & you have everything you need to get going within minutes of showing up in your favorite GMTB server.
 All you need to do is spawn RailDriver's E2 chip on your locomotive's body & go!
 
-## Installation
-
-### When you use RailDriver
-
-Here's some helpful tips for when you're using RailDriver:
-
-- You _do not_ need to parent RailDriver's E2 to your locomotive's body. Because I have coded RailDriver to take care
-of this for you, as a part of RailDriver's Smart Entity Management.
-- You _do not_ need to do any wiring whatsoever.
-RailDriver has no physical I/Os.
-In later releases, I will start bringing in DLCT, which is a wireless protocol to communicate to other DLCT compatible E2s.
-- If you're in a multiplayer server, RailDriver's E2 _will_ seem like it has disappeared from your locomotive, once everything has initialized. Don't worry, your E2 hasn't gone anywhere. It's still there. This is normal behavior, because Smart Entity Management has now hidden your E2 & made it virtually inaccessible to other players.
-This is a convenience measure, as it provides peace-of-mind from would-be griefers that are smarter than your average troll.
-- If you need to reboot/restart/reset RailDriver, type ```.raildriver restart``` into your chat.
-- If you need to  update or restart RailDriver, stop your locomotive first.
-This will put RailDriver in a known state during the update & restart processes.
-
 ## RailDriver-LTS
 
 RailDriver-LTS can be found [here](https://github.com/ZZ-Cat/RailDriver/tree/RailDriver-LTS).
