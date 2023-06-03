@@ -669,6 +669,20 @@ elseif (RailDriverState == 2)
                 semControlTrucks(Trucks, Throttle, Brake, Reverser)
             ]#
 
+            # Set the brakes, if the train is not moving, the setpoint is 0, and the Emergency Brake is not active.
+            # This is to prevent the train from rolling away. Fixes #65.
+            if (SpeedAbs == 0 & pidGetSetPoint(PIDF) == 0 & EmBrakeState == 0)
+            {
+                # Set the train brakes to 100%.
+                semDirectControlBrakes(Trucks, 1)
+            }
+
+            else
+            {
+                # Set the train brakes to 0%.
+                semDirectControlBrakes(Trucks, 0)
+            }
+
             # Apply the PIDF Controller's output directly to the locomotive's traction motors.
             if (!semDirectControlTrucks(Trucks, PIDFOutput))
             {
