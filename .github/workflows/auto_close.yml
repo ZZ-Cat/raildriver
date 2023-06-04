@@ -14,7 +14,7 @@ jobs:
           stale-pr-message: 'This pull request has been closed due to inactivity in over 30 days after being marked for closure.'
           days-before-stale: 30
           days-before-close: 30
-          stale-issue-label: 'stale'
-          exempt-issue-labels: 'awaiting-response, question'
-          stale-pr-label: 'stale'
-          exempt-pr-labels: 'awaiting-response, question'
+          stale-issue-label: 'Stale 🚮'
+          exempt-issue-labels: '🚨 Help Wanted 🚨, ⚠️ Safety Hazard ⚠️'
+          stale-pr-label: 'Stale 🚮'
+          exempt-pr-labels: 'Bug Fix 👋🐞💥, 🚨 Help Wanted 🚨, ⚠️ Safety Hazard ⚠️, 🧪 Test/Experimental 🧪'
