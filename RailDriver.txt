@@ -98,7 +98,7 @@ if (RailDriverState == 1)
     local PIDOutputLimit = 75000
 
     local SpeedometerFilterCutoffFrequency = 1
-    local SpeedometerDeadband = 0.1
+    local SpeedometerDeadband = 2.0
 
     try
     {
