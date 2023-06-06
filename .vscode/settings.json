@@ -5,8 +5,18 @@
         "editor.defaultFormatter": "vscode.json-language-features"
     },
     "conventionalCommits.scopes": [
-        "project-settings",
+        "actions",
+        "automatic braking system",
+        "cli",
+        "control loop",
+        "emergency braking system",
+        "ndof sensor",
+        "ota-local",
+        "ota-remote",
+        "player controls",
+        "project settings",
         "readme",
-        "ota-local"
+        "speedometer",
+        "timers"
     ]
 }
