@@ -1,25 +1,28 @@
 @name RailDriver
 @model models/beer/wiremod/gate_e2_nano.mdl
 # Advanced Duplicator properties
-@persist [Dupe_state Dupe_loading_tick_interval E2_runtime_state]
+@persist [Dupe_state Dupe_loading_tick_interval Dupe_loading_tick_timeout Dupe_loading_tick_count E2_runtime_state]
 @strict
 
 if (duped())
 {
     Dupe_state = 1
     Dupe_loading_tick_interval = tickInterval() * 1000
+    Dupe_loading_tick_count = 0
+    Dupe_loading_tick_timeout = 10
     E2_runtime_state = 0
-    timer("dupe load watchdog", Dupe_loading_tick_interval)
+    # timer("dupe load watchdog", Dupe_loading_tick_interval)
 }
 elseif (dupefinished())
 {
     Dupe_state = 2
     E2_runtime_state = 0
 }
+#[#
 elseif (clk("dupe load watchdog"))
 {
     stoptimer("dupe load watchdog")
-    
+
     if (Dupe_state == 1)
     {
         # Dupe is still loading. Restart the watchdog timer.
@@ -40,16 +43,39 @@ elseif (clk("dupe load watchdog"))
         exit()
     }
 }
+#]#
 elseif (first())
 {
     # E2 script loaded successfully.
     # Execute main runtime state machine.
+    Dupe_state = 0
     E2_runtime_state = 1
 }
 
 event tick()
 {
-    if (E2_runtime_state == 1)
+    if (E2_runtime_state == 0)
+    {
+        # Run Duplicator timeout.
+        if (Dupe_state > 0)
+        {
+            if (Dupe_state == 1)
+            {
+                Dupe_loading_tick_count++
+                assert(Dupe_loading_tick_count < Dupe_loading_timeout, "Dupe loading timed out.")
+            }
+            elseif (Dupe_state == 2)
+            {
+                # Reset runtime.
+                reset()
+            }
+        }
+        else
+        {
+            error("E2 runtime not initialised")
+        }
+    }
+    elseif (E2_runtime_state == 1)
     {
         # Start main script.
         E2_runtime_state = 2
@@ -67,5 +93,6 @@ event tick()
         # E2_runtime_state = 0
         # printColor(vec(255, 0, 0), "[RailDriver | FATAL ERROR]", vec(255), ": E2 runtime terminated with unknown state.")
         # exit()
+        error("E2 runtime state is unknown.")
     }
 }
