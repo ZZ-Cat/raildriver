@@ -64,8 +64,8 @@ event tick()
     else
     {
         # E2 core state machine is in an unknown state.
-        E2_runtime_state = 0
-        printColor(vec(255, 0, 0), "[RailDriver | FATAL ERROR]", vec(255), ": E2 runtime terminated with unknown state.")
-        exit()
+        # E2_runtime_state = 0
+        # printColor(vec(255, 0, 0), "[RailDriver | FATAL ERROR]", vec(255), ": E2 runtime terminated with unknown state.")
+        # exit()
     }
 }
