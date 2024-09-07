@@ -4,7 +4,6 @@
 @persist [Dupe_state Dupe_loading_tick_interval E2_runtime_state]
 @strict
 
-#[#
 if (duped())
 {
     Dupe_state = 1
@@ -47,19 +46,10 @@ elseif (first())
     # Execute main runtime state machine.
     E2_runtime_state = 1
 }
-#]#
 
 event tick()
 {
-    if (E2_runtime_state == 0)
-    {
-        if (first())
-        {
-            # E2 runtime entry point.
-            Dupe_state = 0
-        }
-    }
-    elseif (E2_runtime_state == 1)
+    if (E2_runtime_state == 1)
     {
         # Start main script.
         E2_runtime_state = 2
