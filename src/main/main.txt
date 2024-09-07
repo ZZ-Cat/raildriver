@@ -1,0 +1,67 @@
+@name RailDriver
+@model models/beer/wiremod/gate_e2_nano.mdl
+# Advanced Duplicator properties
+@persist [Dupe_state Dupe_loading_tick_timeout Dupe_loading_tick_count E2_runtime_state]
+@strict
+
+if (duped())
+{
+    Dupe_state = 1
+    Dupe_loading_tick_count = 0
+    Dupe_loading_tick_timeout = 10
+    E2_runtime_state = 0
+}
+elseif (dupefinished())
+{
+    Dupe_state = 2
+    E2_runtime_state = 0
+}
+elseif (first())
+{
+    # E2 script loaded successfully.
+    # Execute main runtime state machine.
+    Dupe_state = 0
+    E2_runtime_state = 1
+}
+
+event tick()
+{
+    if (E2_runtime_state == 0)
+    {
+        # Run Duplicator timeout.
+        if (Dupe_state > 0)
+        {
+            if (Dupe_state == 1)
+            {
+                Dupe_loading_tick_count++
+                assert(Dupe_loading_tick_count < Dupe_loading_tick_timeout, "Dupe loading timed out.")
+            }
+            elseif (Dupe_state == 2)
+            {
+                # Reset runtime.
+                reset()
+            }
+        }
+        else
+        {
+            error("E2 runtime not initialised")
+        }
+    }
+    elseif (E2_runtime_state == 1)
+    {
+        # Start main script.
+        E2_runtime_state = 2
+
+        # Print Welcome Message.
+        printColor(vec(255), "Welcome to RailDriver.")
+    }
+    elseif (E2_runtime_state == 2)
+    {
+        # Run main script.
+    }
+    else
+    {
+        # E2 core state machine is in an unknown state.
+        error("E2 runtime state is unknown.")
+    }
+}
